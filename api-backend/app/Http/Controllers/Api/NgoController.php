@@ -143,6 +143,91 @@ class NgoController extends Controller
     }
 
     /**
+     * Update a task (only task owner NGO)
+     */
+    public function updateTask(Request $request, $id)
+    {
+        $user = $request->user();
+        $task = Task::findOrFail($id);
+
+        // Verify ownership
+        if ($task->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Unauthorized - only task owner can update',
+            ], 403);
+        }
+
+        // Validate input
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'category' => 'sometimes|string',
+            'district' => 'sometimes|string',
+            'quota' => 'sometimes|integer|min:1',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after:start_date',
+            'status' => 'sometimes|string|in:active,paused,completed,cancelled',
+            'skills' => 'nullable|array',
+        ]);
+
+        // Update task fields
+        $task->update($validated);
+
+        // Update skills if provided
+        if (array_key_exists('skills', $validated)) {
+            // Delete existing skills
+            $task->skills()->delete();
+
+            // Add new skills
+            if (!empty($validated['skills'])) {
+                foreach ($validated['skills'] as $skillName) {
+                    $task->skills()->create([
+                        'skill_name' => $skillName,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'data' => $task->load(['applications', 'skills']),
+        ]);
+    }
+
+    /**
+     * Delete a task (only task owner NGO)
+     */
+    public function deleteTask(Request $request, $id)
+    {
+        $user = $request->user();
+        $task = Task::findOrFail($id);
+
+        // Verify ownership
+        if ($task->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Unauthorized - only task owner can delete',
+            ], 403);
+        }
+
+        // Check if task has accepted applications
+        $acceptedApplications = $task->applications()
+            ->where('status', 'accepted')
+            ->count();
+
+        if ($acceptedApplications > 0) {
+            return response()->json([
+                'message' => 'Cannot delete task with accepted applications',
+            ], 422);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'message' => 'Task deleted successfully',
+        ]);
+    }
+
+    /**
      * Mark task as completed
      */
     public function completeTask(Request $request, $id)
@@ -162,6 +247,63 @@ class NgoController extends Controller
         return response()->json([
             'message' => 'Task marked as completed',
             'data' => $task,
+        ]);
+    }
+
+    /**
+     * Get current NGO's profile
+     */
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'ngo') {
+            return response()->json([
+                'message' => 'Only NGOs can access this',
+            ], 403);
+        }
+
+        $ngoProfile = $user->ngoProfile;
+
+        if (!$ngoProfile) {
+            return response()->json([
+                'message' => 'NGO profile not found',
+            ], 404);
+        }
+
+        // Generate full URLs for document files
+        $registrationUrl = null;
+        $panUrl = null;
+        $letterheadUrl = null;
+
+        if ($ngoProfile->registration_file_path) {
+            $registrationUrl = url('storage/' . $ngoProfile->registration_file_path);
+        }
+        if ($ngoProfile->pan_file_path) {
+            $panUrl = url('storage/' . $ngoProfile->pan_file_path);
+        }
+        if ($ngoProfile->letterhead_file_path) {
+            $letterheadUrl = url('storage/' . $ngoProfile->letterhead_file_path);
+        }
+
+        return response()->json([
+            'id' => $ngoProfile->id,
+            'organization_name' => $ngoProfile->organization_name,
+            'registration_number' => $ngoProfile->registration_number,
+            'pan_number' => $ngoProfile->pan_number,
+            'office_location' => $ngoProfile->office_location,
+            'is_verified' => $ngoProfile->is_verified,
+            'status' => $ngoProfile->status ?? 'pending',
+            'created_at' => $ngoProfile->created_at,
+            'registration_file_path' => $registrationUrl,
+            'pan_file_path' => $panUrl,
+            'letterhead_file_path' => $letterheadUrl,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+            ],
         ]);
     }
 }

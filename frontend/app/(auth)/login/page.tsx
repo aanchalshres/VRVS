@@ -65,11 +65,11 @@ const Login = () => {
       
       // Redirect based on role
       if (user?.role === "admin") {
-        router.push("/dashboard/admin");
+        router.replace("/dashboard/admin");
       } else if (user?.role === "ngo") {
-        router.push("/dashboard/ngo");
+        router.replace("/dashboard/ngo");
       } else {
-        router.push("/dashboard/volunteer");
+        router.replace("/dashboard/volunteer");
       }
     } catch (err) {
       // Handle errors from login

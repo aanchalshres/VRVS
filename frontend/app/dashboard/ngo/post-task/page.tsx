@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/hooks/use-toast";
 import { ArrowLeft, CheckCircle } from "lucide-react";
+import { createTask } from "@/app/lib/taskService";
 
 const skillOptions = [
   "First Aid", "Medical", "Logistics", "Construction", "Teaching",
@@ -49,6 +50,8 @@ const CreateOpportunity: React.FC = () => {
   const [category, setCategory] = useState("");
   const [district, setDistrict] = useState("");
   const [quota, setQuota] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const toggleSkill = (skill: string) => {
     setSelectedSkills((prev) =>
@@ -102,6 +105,26 @@ const CreateOpportunity: React.FC = () => {
       return;
     }
 
+    if (!startDate) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a start date.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!endDate) {
+      toast({
+        title: "Validation Error",
+        description: "Please select an end date.",
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
     if (selectedSkills.length === 0) {
       toast({
         title: "Validation Error",
@@ -113,46 +136,43 @@ const CreateOpportunity: React.FC = () => {
     }
 
     try {
-      // ✅ Create task object
-      const newTask = {
-        id: Date.now(),
+      // Call API to create task
+      const response = await createTask({
         title,
         description,
         category,
         district,
         quota: Number(quota),
+        start_date: startDate,
+        end_date: endDate,
         skills: selectedSkills,
-        isEmergency,
-        volunteers: 0,
-      };
-
-      // ✅ Save to localStorage
-      const existingTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-      localStorage.setItem("tasks", JSON.stringify([newTask, ...existingTasks]));
+      });
 
       toast({
         title: "Task Created!",
         description: `"${title}" posted successfully.`,
       });
 
-      // ✅ Reset form
+      // Reset form
       setTitle("");
       setDescription("");
       setCategory("");
       setDistrict("");
       setQuota("");
+      setStartDate("");
+      setEndDate("");
       setSelectedSkills([]);
       setIsEmergency(false);
 
-      // ✅ Navigate back after 1 second
+      // Navigate back after 1 second
       setTimeout(() => {
-        router.push("/dashboard/ngo");
+        router.push("/dashboard/ngo/tasks");
       }, 1000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating task:", error);
       toast({
         title: "Error",
-        description: "Failed to create task. Please try again.",
+        description: error.message || "Failed to create task. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -248,6 +268,28 @@ const CreateOpportunity: React.FC = () => {
                 onChange={(e) => setQuota(e.target.value)}
                 className="bg-white border-[#CACDD3]"
               />
+
+              {/* Start Date + End Date */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Start Date *</Label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="bg-white border-[#CACDD3]"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>End Date *</Label>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="bg-white border-[#CACDD3]"
+                  />
+                </div>
+              </div>
 
               {/* Skills */}
               <div className="flex flex-wrap gap-2">

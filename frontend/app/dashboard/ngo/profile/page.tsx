@@ -1,232 +1,231 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import DashboardLayout from "@/app/components/DashboardLayout";
-import { Card, CardContent } from "@/app/components/ui/card";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
-import { Label } from "@/app/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { FileText, Download, Building2 } from "lucide-react";
+import { apiGet } from "@/app/lib/api";
 
-const allSkills: string[] = [
-  "First Aid",
-  "Medical",
-  "Logistics",
-  "Construction",
-  "Teaching",
-  "IT",
-  "Translation",
-  "Driving",
-  "Swimming",
-  "Communication",
-];
+interface NGOProfile {
+  id: string;
+  organization_name: string;
+  registration_number: string;
+  pan_number: string;
+  office_location: string;
+  user?: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  registration_file_path?: string;
+  pan_file_path?: string;
+  letterhead_file_path?: string;
+  status?: string;
+  created_at?: string;
+}
 
-const Profile = () => {
-  // FORM STATE (REAL FUNCTIONAL)
-  const [form, setForm] = useState({
-    name: "Ram Sharma",
-    email: "ram@example.com",
-    location: "Kathmandu, Nepal",
-    availability: "Weekends",
-  });
+export default function NGOProfilePage() {
+  const { user } = useAuth();
+  const [profile, setProfile] = useState<NGOProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [skills, setSkills] = useState<string[]>([
-    "First Aid",
-    "Medical",
-    "Logistics",
-  ]);
-
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  // LOAD FROM LOCALSTORAGE
   useEffect(() => {
-    const saved = localStorage.getItem("volunteerProfile");
-    if (saved) {
-      const data = JSON.parse(saved);
-      setForm(data.form);
-      setSkills(data.skills);
-      setProfileImage(data.profileImage);
-    }
-  }, []);
-
-  // HANDLE INPUT CHANGE
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  // TOGGLE SKILLS
-  const toggleSkill = (skill: string) => {
-    setSkills((prev) =>
-      prev.includes(skill)
-        ? prev.filter((s) => s !== skill)
-        : [...prev, skill]
-    );
-  };
-
-  // IMAGE UPLOAD
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const imageUrl = URL.createObjectURL(file);
-    setProfileImage(imageUrl);
-  };
-
-  // SAVE PROFILE
-  const handleSave = () => {
-    const data = {
-      form,
-      skills,
-      profileImage,
+    const loadProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch NGO's own profile from /ngo/profile endpoint
+        const ngoProfile = await apiGet<NGOProfile>('/api/ngo/profile');
+        
+        setProfile(ngoProfile);
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+        setError("Failed to load NGO profile. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    localStorage.setItem("volunteerProfile", JSON.stringify(data));
-    alert("Profile saved successfully ✅");
-  };
+    if (user?.id) {
+      loadProfile();
+    }
+  }, [user?.id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46C8]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-[#6B7280]">Profile not found</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46C8]"></div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-[#6B7280]">Profile not found</p>
+      </div>
+    );
+  }
 
   return (
-    <DashboardLayout role="volunteer">
-      <div className="max-w-3xl mx-auto space-y-6">
-
-        {/* HEADER */}
-        <div>
-          <h1 className="text-2xl font-bold text-[#111827]">
-            Profile Settings
-          </h1>
-          <p className="text-[#6B7280] text-sm">
-            Manage your personal information and skills
-          </p>
-        </div>
-
-        {/* MAIN CARD */}
-        <Card className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm">
-          <CardContent className="p-6 space-y-6">
-
-            {/* AVATAR */}
-            <div className="flex items-center justify-between border-b pb-4">
-
-              <div className="flex items-center gap-4">
-
-                <Avatar className="h-20 w-20">
-                  {profileImage ? (
-                    <AvatarImage src={profileImage} />
-                  ) : (
-                    <AvatarFallback className="bg-[#4F46C8] text-white text-2xl">
-                      {form.name.charAt(0)}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-
-                <div>
-                  <h2 className="font-semibold text-[#111827]">
-                    {form.name}
-                  </h2>
-                  <p className="text-sm text-[#6B7280]">
-                    Volunteer
-                  </p>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Change Photo
-              </Button>
-
-              <input
-                type="file"
-                ref={fileInputRef}
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageChange}
-              />
-            </div>
-
-            {/* FORM */}
-            <div className="grid gap-5 sm:grid-cols-2">
-
-              <div className="space-y-2">
-                <Label>Full Name</Label>
-                <Input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Location</Label>
-                <Input
-                  name="location"
-                  value={form.location}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label>Availability</Label>
-                <Input
-                  name="availability"
-                  value={form.availability}
-                  onChange={handleChange}
-                />
-              </div>
-
-            </div>
-
-            {/* SKILLS */}
-            <div className="space-y-3">
-              <Label>Skills</Label>
-
-              <div className="flex flex-wrap gap-2">
-                {allSkills.map((skill) => {
-                  const selected = skills.includes(skill);
-
-                  return (
-                    <span
-                      key={skill}
-                      onClick={() => toggleSkill(skill)}
-                      className={`px-3 py-1.5 rounded-full text-sm cursor-pointer border transition ${
-                        selected
-                          ? "bg-[#4F46C8] text-white border-[#4F46C8]"
-                          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      {skill}
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* SAVE */}
-            <div className="pt-4 border-t flex justify-end">
-              <Button
-                onClick={handleSave}
-                className="bg-[#4F46C8] hover:bg-[#3f3db5] text-white px-6"
-              >
-                Save Changes
-              </Button>
-            </div>
-
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      {/* HEADER */}
+      <div>
+        <h1 className="text-3xl font-bold text-[#111827]">Organization Profile</h1>
+        <p className="text-[#6B7280]">View your organization information</p>
       </div>
-    </DashboardLayout>
-  );
-};
 
-export default Profile;
+      {/* ORGANIZATION INFO CARD */}
+      <Card className="bg-white border border-[#CACDD3]">
+        <CardHeader className="pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-[#4F46C8] to-[#3730A3] flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl text-[#111827]">
+                {profile.organization_name}
+              </CardTitle>
+              <p className="text-sm text-[#6B7280] mt-1">
+                Status: <span className="font-semibold text-green-600 capitalize">{profile.status || "pending"}</span>
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Organization Information */}
+          <div>
+            <h3 className="text-sm font-semibold text-[#111827] mb-4">Organization Information</h3>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <p className="text-xs text-[#6B7280] mb-2">Organization Name</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.organization_name}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] mb-2">Registration Number</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.registration_number}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] mb-2">PAN Number</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.pan_number}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] mb-2">Office Location</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.office_location}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div className="border-t border-[#CACDD3] pt-6">
+            <h3 className="text-sm font-semibold text-[#111827] mb-4">Contact Information</h3>
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <p className="text-xs text-[#6B7280] mb-2">Contact Person</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.user?.name}</p>
+              </div>
+              <div>
+                <p className="text-xs text-[#6B7280] mb-2">Email</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.user?.email}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-xs text-[#6B7280] mb-2">Phone</p>
+                <p className="text-sm font-medium text-[#111827]">{profile.user?.phone || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Documents Section */}
+          {(profile.registration_file_path || profile.pan_file_path || profile.letterhead_file_path) && (
+            <div className="border-t border-[#CACDD3] pt-6">
+              <h3 className="text-sm font-semibold text-[#111827] mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#4F46C8]" />
+                Submitted Documents
+              </h3>
+              <div className="grid grid-cols-1 gap-3">
+                {profile.registration_file_path && (
+                  <div className="flex items-center justify-between p-4 bg-[#F0F1F3] rounded-lg border border-[#CACDD3]">
+                    <div>
+                      <p className="text-xs font-medium text-[#6B7280] mb-1">Registration Certificate</p>
+                      <p className="text-xs text-[#6B7280]">Registration document</p>
+                    </div>
+                    <a
+                      href={profile.registration_file_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 bg-[#4F46C8] text-white rounded text-xs font-medium hover:bg-[#3730A3] transition"
+                    >
+                      <Download className="w-3 h-3" />
+                      View
+                    </a>
+                  </div>
+                )}
+                {profile.pan_file_path && (
+                  <div className="flex items-center justify-between p-4 bg-[#F0F1F3] rounded-lg border border-[#CACDD3]">
+                    <div>
+                      <p className="text-xs font-medium text-[#6B7280] mb-1">PAN Certificate</p>
+                      <p className="text-xs text-[#6B7280]">Tax identification document</p>
+                    </div>
+                    <a
+                      href={profile.pan_file_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 bg-[#4F46C8] text-white rounded text-xs font-medium hover:bg-[#3730A3] transition"
+                    >
+                      <Download className="w-3 h-3" />
+                      View
+                    </a>
+                  </div>
+                )}
+                {profile.letterhead_file_path && (
+                  <div className="flex items-center justify-between p-4 bg-[#F0F1F3] rounded-lg border border-[#CACDD3]">
+                    <div>
+                      <p className="text-xs font-medium text-[#6B7280] mb-1">Organization Letterhead</p>
+                      <p className="text-xs text-[#6B7280]">Official letterhead sample</p>
+                    </div>
+                    <a
+                      href={profile.letterhead_file_path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 bg-[#4F46C8] text-white rounded text-xs font-medium hover:bg-[#3730A3] transition"
+                    >
+                      <Download className="w-3 h-3" />
+                      View
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

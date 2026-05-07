@@ -1,13 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, User } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { useRouter } from "next/navigation";
 
 const OrgNavbar = ({ sidebarOpen }: { sidebarOpen?: boolean }) => {
-  const [profileOpen, setProfileOpen] = useState(false);
-  const { logout } = useAuth();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  // Get initials from user name
+  const getInitials = (name?: string) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const initials = getInitials(user?.name);
 
   return (
     <>
@@ -24,38 +38,24 @@ const OrgNavbar = ({ sidebarOpen }: { sidebarOpen?: boolean }) => {
             <span className="absolute top-0 right-0 inline-block w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
-          {/* Profile Icon */}
-          <div className="relative">
-            <button
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="p-2 rounded-full hover:bg-gray-200 transition"
-            >
-              <User className="h-6 w-6 text-gray-700" />
-            </button>
-
-            {/* DROPDOWN MENU */}
-            {profileOpen && (
-              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg py-1 z-50">
-                <Link
-                  href="/dashboard/ngo"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  onClick={() => setProfileOpen(false)}
-                >
-                  Dashboard
-                </Link>
-
-                <button
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  onClick={async () => {
-                    setProfileOpen(false);
-                    await logout();
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
+          {/* Profile Avatar Box - Click to go to profile */}
+          <button
+            onClick={() => router.push("/dashboard/ngo/profile")}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#CACDD3] hover:bg-gray-50 hover:border-[#4F46C8] transition-all cursor-pointer"
+            title={user?.name || "Profile"}
+          >
+            <div className="w-8 h-8 rounded-full bg-[#4F46C8] hover:bg-[#3f37a0] flex items-center justify-center text-white font-semibold text-xs">
+              {initials}
+            </div>
+            <div className="text-left">
+              <p className="text-xs font-semibold text-[#111827] truncate max-w-25">
+                {user?.name || "User"}
+              </p>
+              <p className="text-xs text-[#6B7280] leading-none">
+                {user?.role === "ngo" ? "NGO" : user?.role}
+              </p>
+            </div>
+          </button>
 
         </div>
       </div>

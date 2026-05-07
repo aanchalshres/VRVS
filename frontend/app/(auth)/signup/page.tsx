@@ -100,7 +100,7 @@ const Signup = () => {
             document.cookie = `authToken=${encodeURIComponent(token)}; path=/; expires=${expiryDate.toUTCString()}`;
             document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; expires=${expiryDate.toUTCString()}`;
             
-            router.push("/dashboard/volunteer");
+            router.replace("/dashboard/volunteer");
           } else {
             setError(data.message || "Registration failed");
           }
@@ -170,9 +170,8 @@ const Signup = () => {
             
             const redirectPath = role === "volunteer" ? "/dashboard/volunteer" : "/dashboard/ngo";
             
-            // Add small delay to ensure cookies and localStorage are synced before navigation
             setTimeout(() => {
-              router.push(redirectPath);
+              router.replace(redirectPath);
             }, 100);
           } else {
             setError(data.message || "Registration failed");

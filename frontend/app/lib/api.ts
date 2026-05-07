@@ -25,24 +25,38 @@ export async function apiCall(
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  try {
+    console.debug(`[API] ${options.method || 'GET'} ${API_URL}${endpoint}`);
+    
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
 
-  // Handle 401 Unauthorized - token might be expired
-  if (response.status === 401) {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
+    console.debug(`[API] Response status: ${response.status}`);
+
+    // Handle 401 Unauthorized - token might be expired
+    if (response.status === 401) {
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    }
+
+    // Handle 403 Forbidden - user doesn't have permission
+    if (response.status === 403) {
+      window.location.href = "/unauthorized";
+    }
+
+    return response;
+  } catch (error: any) {
+    const errorMsg = error?.message || String(error);
+    console.error(`[API] Failed to fetch ${endpoint}:`, error);
+    console.error(`[API] Error message:`, errorMsg);
+    console.error(`[API] API URL being used:`, API_URL);
+    
+    throw new Error(`Failed to connect to API at ${API_URL}${endpoint}. Backend error: ${errorMsg}`);
   }
-
-  // Handle 403 Forbidden - user doesn't have permission
-  if (response.status === 403) {
-    window.location.href = "/unauthorized";
-  }
-
-  return response;
 }
 
 /**
@@ -121,4 +135,31 @@ export async function apiDelete<T>(endpoint: string) {
     method: "DELETE",
   });
   return parseResponse<T>(response);
+}
+
+/**
+ * Health check - test if backend is running
+ */
+export async function checkBackendHealth() {
+  try {
+    console.log(`[API] Checking backend health at ${API_URL}/api/health`);
+    const response = await fetch(`${API_URL}/api/health`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log("[API] Backend is healthy:", data);
+      return true;
+    } else {
+      console.log("[API] Backend returned status:", response.status);
+      return false;
+    }
+  } catch (error) {
+    console.error("[API] Backend health check failed:", error);
+    return false;
+  }
 }
