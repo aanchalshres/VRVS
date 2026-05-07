@@ -6,6 +6,11 @@ use App\Http\Controllers\Api\VolunteerController;
 use App\Http\Controllers\Admin\AdminController;
 use Illuminate\Support\Facades\Route;
 
+// Health check (public - no auth required)
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok', 'message' => 'API is running']);
+});
+
 // Auth routes (public)
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -50,6 +55,7 @@ Route::middleware(['auth:sanctum', 'role:ngo'])->group(function () {
     Route::middleware('verified_ngo')->group(function () {
         Route::post('/ngo/tasks', [NgoController::class, 'createTask']);
         Route::put('/ngo/tasks/{id}', [NgoController::class, 'updateTask']);
+        Route::delete('/ngo/tasks/{id}', [NgoController::class, 'deleteTask']);
         Route::post('/ngo/tasks/{id}/complete', [NgoController::class, 'completeTask']);
         Route::post('/ngo/applications/{id}/accept', [NgoController::class, 'acceptApplication']);
         Route::post('/ngo/applications/{id}/reject', [NgoController::class, 'rejectApplication']);

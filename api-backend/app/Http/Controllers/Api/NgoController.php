@@ -143,6 +143,91 @@ class NgoController extends Controller
     }
 
     /**
+     * Update a task (only task owner NGO)
+     */
+    public function updateTask(Request $request, $id)
+    {
+        $user = $request->user();
+        $task = Task::findOrFail($id);
+
+        // Verify ownership
+        if ($task->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Unauthorized - only task owner can update',
+            ], 403);
+        }
+
+        // Validate input
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'category' => 'sometimes|string',
+            'district' => 'sometimes|string',
+            'quota' => 'sometimes|integer|min:1',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after:start_date',
+            'status' => 'sometimes|string|in:active,paused,completed,cancelled',
+            'skills' => 'nullable|array',
+        ]);
+
+        // Update task fields
+        $task->update($validated);
+
+        // Update skills if provided
+        if (array_key_exists('skills', $validated)) {
+            // Delete existing skills
+            $task->skills()->delete();
+
+            // Add new skills
+            if (!empty($validated['skills'])) {
+                foreach ($validated['skills'] as $skillName) {
+                    $task->skills()->create([
+                        'skill_name' => $skillName,
+                    ]);
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'data' => $task->load(['applications', 'skills']),
+        ]);
+    }
+
+    /**
+     * Delete a task (only task owner NGO)
+     */
+    public function deleteTask(Request $request, $id)
+    {
+        $user = $request->user();
+        $task = Task::findOrFail($id);
+
+        // Verify ownership
+        if ($task->user_id !== $user->id) {
+            return response()->json([
+                'message' => 'Unauthorized - only task owner can delete',
+            ], 403);
+        }
+
+        // Check if task has accepted applications
+        $acceptedApplications = $task->applications()
+            ->where('status', 'accepted')
+            ->count();
+
+        if ($acceptedApplications > 0) {
+            return response()->json([
+                'message' => 'Cannot delete task with accepted applications',
+            ], 422);
+        }
+
+        $task->delete();
+
+        return response()->json([
+            'message' => 'Task deleted successfully',
+        ]);
+    }
+
+    /**
      * Mark task as completed
      */
     public function completeTask(Request $request, $id)
