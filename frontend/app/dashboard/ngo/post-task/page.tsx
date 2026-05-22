@@ -289,45 +289,20 @@ const CreateOpportunity: React.FC = () => {
                 />
               </div>
 
-              {/* Priority */}
-<<<<<<< Updated upstream
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  onClick={() => setIsEmergency(false)}
-                  className={!isEmergency ? "bg-[#4F46C8] text-white hover:bg-[#3f37a0]" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}
-                >
-                  Regular
-                </Button>
-
-                <Button
-                  type="button"
-                  onClick={() => setIsEmergency(true)}
-                  className={isEmergency ? "bg-red-500 text-white hover:bg-red-600" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}
-                >
-                  🚨 Emergency
-                </Button>
-              </div>
-
-              {/* Submit */}
-              <Button 
-                type="submit" 
-                className="w-full bg-[#4F46C8] text-white hover:bg-[#3f37a0] active:bg-[#2d2670] disabled:opacity-60 disabled:cursor-not-allowed font-semibold"
-=======
               <div className="space-y-2">
                 <Label>Priority</Label>
                 <div className="flex gap-3">
                   <Button
                     type="button"
                     onClick={() => setIsEmergency(false)}
-                    className={!isEmergency ? "bg-[#4F46C8] text-white" : "bg-gray-200 text-gray-700"}
+                    className={!isEmergency ? "bg-[#4F46C8] text-white hover:bg-[#3f37a0]" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}
                   >
                     Regular
                   </Button>
                   <Button
                     type="button"
                     onClick={() => setIsEmergency(true)}
-                    className={isEmergency ? "bg-red-500 text-white" : "bg-gray-200 text-gray-700"}
+                    className={isEmergency ? "bg-red-500 text-white hover:bg-red-600" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}
                   >
                     🚨 Emergency
                   </Button>
@@ -337,8 +312,7 @@ const CreateOpportunity: React.FC = () => {
               {/* Submit */}
               <Button
                 type="submit"
-                className="w-full bg-[#4F46C8] hover:bg-[#4338CA] text-white"
->>>>>>> Stashed changes
+                className="w-full bg-[#4F46C8] text-white hover:bg-[#3f37a0] active:bg-[#2d2670] disabled:opacity-60 disabled:cursor-not-allowed font-semibold"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Posting..." : "Post Task"}
