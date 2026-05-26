@@ -30,7 +30,16 @@ export default function VolunteerPage() {
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("tasks") || "[]");
-    setTasks(stored);
+    setTasks(
+      stored.map((task: any) => ({
+        ...task,
+        volunteers: task.volunteers ?? task.filled_quota ?? 0,
+        isEmergency: task.isEmergency ?? task.is_emergency ?? false,
+        skills: Array.isArray(task.skills)
+          ? task.skills.map((skill: any) => (typeof skill === "string" ? skill : skill.skill_name))
+          : [],
+      }))
+    );
   }, []);
 
   // 👉 Redirect to apply page

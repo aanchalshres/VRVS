@@ -26,6 +26,7 @@ class NgoController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'skills' => 'nullable|array',
+            'is_emergency' => 'sometimes|boolean',
         ]);
 
         // Create task
@@ -40,6 +41,7 @@ class NgoController extends Controller
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'status' => 'active',
+            'is_emergency' => $validated['is_emergency'] ?? false,
         ]);
 
         if (!empty($validated['skills'])) {

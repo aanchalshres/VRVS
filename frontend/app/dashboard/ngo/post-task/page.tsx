@@ -285,7 +285,7 @@ const CreateOpportunity: React.FC = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe the task, responsibilities, and requirements..."
-                  className="bg-white border-[#CACDD3] min-h-[100px]"
+                  className="bg-white border-[#CACDD3] min-h-25"
                 />
               </div>
 

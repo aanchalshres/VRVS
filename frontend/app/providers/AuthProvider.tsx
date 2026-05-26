@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api$/, "");
 
 // Helper function to set cookies
 const setCookie = (name: string, value: string) => {
@@ -21,6 +21,21 @@ export interface User {
   email: string;
   name?: string;
   role: "volunteer" | "ngo" | "admin";
+  phone?: string;
+  ngoProfile?: {
+    id?: number;
+    organization_name?: string;
+    registration_number?: string;
+    pan_number?: string;
+    office_location?: string;
+    registration_file_path?: string;
+    pan_file_path?: string;
+    letterhead_file_path?: string;
+    status?: string;
+    is_verified?: boolean;
+    created_at?: string;
+  } | null;
+  volunteerProfile?: Record<string, unknown> | null;
 }
 
 interface AuthContextType {
@@ -135,6 +150,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: data.user?.email || email,
           name: data.user?.name || "",
           role: data.user?.role || "volunteer",
+          phone: data.user?.phone,
+          ngoProfile: data.user?.ngoProfile || null,
+          volunteerProfile: data.user?.volunteerProfile || null,
         };
 
         localStorage.setItem("authToken", authToken);

@@ -1,6 +1,19 @@
 // app/lib/api.ts
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = RAW_API_URL.replace(/\/+$/, "").replace(/\/api$/, "");
+
+function resolveApiEndpoint(endpoint: string) {
+  if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
+    return endpoint;
+  }
+
+  if (endpoint === "/api" || endpoint.startsWith("/api/")) {
+    return endpoint;
+  }
+
+  return `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+}
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -26,9 +39,10 @@ export async function apiCall(
   }
 
   try {
-    console.debug(`[API] ${options.method || 'GET'} ${API_URL}${endpoint}`);
+    const resolvedEndpoint = resolveApiEndpoint(endpoint);
+    console.debug(`[API] ${options.method || 'GET'} ${API_URL}${resolvedEndpoint}`);
     
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(`${API_URL}${resolvedEndpoint}`, {
       ...options,
       headers,
       credentials: 'include',
@@ -102,6 +116,18 @@ export async function parseResponse<T>(response: Response): Promise<T> {
  */
 export async function apiGet<T>(endpoint: string) {
   const response = await apiCall(endpoint);
+
+  if (!response.ok && response.status === 404) {
+    const alternateEndpoint = endpoint.startsWith("/api/")
+      ? endpoint.replace(/^\/api/, "")
+      : `/api${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+
+    if (alternateEndpoint !== endpoint) {
+      const fallbackResponse = await apiCall(alternateEndpoint);
+      return parseResponse<T>(fallbackResponse);
+    }
+  }
+
   return parseResponse<T>(response);
 }
 

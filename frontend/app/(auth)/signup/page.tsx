@@ -57,7 +57,7 @@ const Signup = () => {
     setError("");
     setLoading(true);
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api$/, "");
 
     if (role === "volunteer" && !registrationFile && !panFile && !letterhead) {
       // Send JSON for volunteer

@@ -4,14 +4,13 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { FileText, Download, Building2 } from "lucide-react";
-import { apiGet } from "@/app/lib/api";
 
 interface NGOProfile {
-  id: string;
-  organization_name: string;
-  registration_number: string;
-  pan_number: string;
-  office_location: string;
+  id?: string | number;
+  organization_name?: string;
+  registration_number?: string;
+  pan_number?: string;
+  office_location?: string;
   user?: {
     name: string;
     email: string;
@@ -28,24 +27,27 @@ export default function NGOProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<NGOProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Fetch NGO's own profile from /ngo/profile endpoint
-        const ngoProfile = await apiGet<NGOProfile>('/api/ngo/profile');
-        
-        setProfile(ngoProfile);
-      } catch (err) {
-        console.error("Failed to load profile:", err);
-        setError("Failed to load NGO profile. Please try again later.");
-      } finally {
-        setLoading(false);
+    const loadProfile = () => {
+      setLoading(true);
+
+      const cachedProfile = user?.ngoProfile;
+
+      if (cachedProfile) {
+        setProfile({
+          ...cachedProfile,
+          user: {
+            name: user?.name || "",
+            email: user?.email || "",
+            phone: user?.phone || "",
+          },
+        });
+      } else {
+        setProfile(null);
       }
+
+      setLoading(false);
     };
 
     if (user?.id) {
@@ -61,34 +63,10 @@ export default function NGOProfilePage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="p-6 text-center">
-        <p className="text-red-600">{error}</p>
-      </div>
-    );
-  }
-
   if (!profile) {
     return (
       <div className="p-6 text-center">
-        <p className="text-[#6B7280]">Profile not found</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46C8]"></div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="p-6 text-center">
-        <p className="text-[#6B7280]">Profile not found</p>
+        <p className="text-[#6B7280]">Profile data is not cached locally yet. Sign out and sign back in to refresh it.</p>
       </div>
     );
   }
