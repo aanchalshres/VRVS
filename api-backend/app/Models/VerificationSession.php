@@ -8,10 +8,12 @@ class VerificationSession extends Model
 {
     protected $table = 'verification_sessions';
     protected $fillable = [
-        'ngo_profile_id',
-        'started_by',
+        'user_id',
         'started_at',
-        'ended_at',
+        'completed_at',
+        'status',
+        'ip_address',
+        'device_info',
     ];
 
    // VerificationSession.php

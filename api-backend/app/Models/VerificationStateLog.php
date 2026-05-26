@@ -8,10 +8,11 @@ class VerificationStateLog extends Model
 {
     protected $table = 'verification_state_logs';
     protected $fillable = [
-        'workflow_id',
-        'from_state_id',
-        'to_state_id',
-        'changed_by',
+    'workflow_id',
+    'from_state_id',
+    'to_state_id',
+    'changed_by',
+    'remarks',
     ];
 
     // VerificationStateLog.php

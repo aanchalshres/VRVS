@@ -8,10 +8,11 @@ class Review extends Model
 {
     protected $table = 'reviews';
     protected $fillable = [
-        'document_id',
         'reviewer_id',
-        'status',
-        'comments',
+        'reviewee_id',
+        'task_id',
+        'rating',
+        'comment',
     ];
 
         // Review.php

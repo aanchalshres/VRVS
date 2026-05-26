@@ -4,17 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use ServiceLog;
 
 class VolunteerProfile extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'bio',
-        'skills',
-        'primary_location',
+   protected $fillable = [
+    'user_id',
+    'profile_photo',
+    'gender',
+    'date_of_birth',
+    'bio',
+    'primary_location',
+    'city',
+    'country',
+    'latitude',
+    'longitude',
+    'emergency_contact_name',
+    'emergency_contact_phone',
+    'availability_status',
+    'reliability_score',
+    'total_service_hours',
+    'average_rating',
     ];
 
     public function user()

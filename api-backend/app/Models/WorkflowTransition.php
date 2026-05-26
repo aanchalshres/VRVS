@@ -8,10 +8,10 @@ class WorkflowTransition extends Model
 {
     protected $table = 'workflow_transitions';
     protected $fillable = [
-        'workflow_id',
-        'from_state_id',
-        'to_state_id',
-    ];
+    'from_state_id',
+    'to_state_id',
+    'action',
+ ];
 
 
     // WorkflowTransition.php

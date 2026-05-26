@@ -9,10 +9,15 @@ class Application extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'task_id',
-        'volunteer_id',
-        'status',
+  protected $fillable = [
+    'task_id',
+    'volunteer_id',
+    'recommendation_score',
+    'status',
+    'applied_at',
+    'reviewed_by',
+    'reviewed_at',
+    'remarks',
     ];
 
    // Application.php

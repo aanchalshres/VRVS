@@ -11,19 +11,27 @@ class Task extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
+   protected $fillable = [
+        'ngo_id',
+        'category_id',
         'title',
+        'slug',
         'description',
-        'category',
-        'district',
-        'quota',
-        'filled_quota',
+        'task_type',
+        'selection_logic',
+        'location',
+        'city',
+        'country',
+        'latitude',
+        'longitude',
         'start_date',
         'end_date',
+        'application_deadline',
+        'required_volunteers',
         'status',
-        'is_emergency',
-        'skills',
+        'urgency_level',
+        'cover_image',
+        'created_by',
     ];
 
     protected $casts = [

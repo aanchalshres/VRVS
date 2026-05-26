@@ -8,11 +8,19 @@ class Document extends Model
 {
     protected $table = 'documents';
     protected $fillable = [
-        'user_id',
-        'file_path',
-        'reviewed_by',
-        'reviewed_at',
-    ];
+    'user_id',
+    'document_type',
+    'original_name',
+    'file_name',
+    'file_path',
+    'mime_type',
+    'file_size',
+    'status',
+    'reviewed_by',
+    'reviewed_at',
+    'remarks',
+    'expires_at',
+ ];
     // Document.php
 
     public function user()

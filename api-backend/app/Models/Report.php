@@ -8,10 +8,14 @@ class Report extends Model
 {
     protected $table = 'reports';
     protected $fillable = [
-        'reporter_id',
-        'reported_user_id',
+        'reported_by',
+        'against_user_id',
+        'task_id',
         'reason',
         'status',
+        'resolved_by',
+        'resolved_at',
+        'resolution_notes',
     ];
 
    // Report.php

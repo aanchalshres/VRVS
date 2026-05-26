@@ -8,12 +8,13 @@ class ServiceLog extends Model
 {
     protected $table = 'service_logs';
     protected $fillable = [
-        'service_name',
-        'endpoint',
-        'request_method',
-        'request_payload',
-        'response_status',
-        'response_payload',
+        'volunteer_id',
+        'task_id',
+        'check_in_time',
+        'check_out_time',
+        'hours',
+        'participation_status',
+        'feedback',
     ];
 
     // ServiceLog.php
