@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('file_size')->unsigned();
             $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');
             $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamp('reviewed_at')->useCurrent();
+            $table->timestamp('reviewed_at')->nullable();
             $table->text('remarks')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamp('created_at')->useCurrent();

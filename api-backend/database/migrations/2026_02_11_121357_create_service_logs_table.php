@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_logs', function (Blueprint $table) {
+    Schema::create('service_logs', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('volunteer_id')->constrained('users')->onDelete('cascade');
+    $table->foreignId('volunteer_profile_id')->constrained('volunteer_profiles')->onDelete('cascade');
     $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
-    $table->integer('hours')->default(0);
-    $table->timestamps();
+    $table->datetime('check_in_time')->nullable();
+    $table->datetime('check_out_time')->nullable();
+    $table->decimal('hours', 6, 2)->default(0.00);
+    $table->enum('participation_status',['assigned','active','completed','absent'])->default('assigned');
+    $table->text('feedback')->nullable();
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();
 });
 
     }

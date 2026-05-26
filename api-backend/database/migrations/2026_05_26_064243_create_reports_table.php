@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('reporter_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('reported_by')->constrained('users')->onDelete('cascade');
             $table->foreignId('against_user_id')->constrained('users')->onDelete('cascade');
             $table->string('report_type');
             $table->foreignId('task_id')->nullable()->constrained()->onDelete('set null');
             $table->text('reason');
-            $table->enum('status', ['pending', 'reviewed', 'rejected'])->default('pending');
+            $table->enum('status', ['open', 'reviewed', 'resolved', 'rejected'])->default('open');
             $table->foreignId('resolved_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('resolved_at')->nullable();
-            $table->text('remarks')->nullable();
+            $table->text('resolution_notes')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

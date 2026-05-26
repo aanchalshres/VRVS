@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->integer('sequence')->default(0);
-            $table->boolean('is_final')->default(true);
+            $table->boolean('is_final')->default(false);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();
         });

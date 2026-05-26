@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('workflow_transitions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('from_state_id');
-            $table->unsignedBigInteger('to_state_id');
+            $table->foreignId('from_state_id')->constrained('workflow_states')->onDelete('cascade');
+            $table->foreignId('to_state_id')->constrained('workflow_states')->onDelete('cascade');
             $table->string('action');
             $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent();
         });
     }
 
