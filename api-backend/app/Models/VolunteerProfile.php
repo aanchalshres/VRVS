@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use ServiceLog;
 
 class VolunteerProfile extends Model
 {
@@ -16,12 +17,27 @@ class VolunteerProfile extends Model
         'primary_location',
     ];
 
-    protected $casts = [
-        'skills' => 'array',
-    ];
-
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(
+            Skill::class,
+            'volunteer_skills'
+        )->withPivot('proficiency_level');
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'volunteer_id');
+    }
+
+    public function serviceLogs()
+    {
+        return $this->hasMany(ServiceLog::class, 'volunteer_id');
+    }
+
 }

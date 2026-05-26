@@ -33,27 +33,49 @@ class Task extends Model
         'end_date' => 'date',
     ];
 
-    /*
-    |--------------------------------------------------------------------------
-    | Relationships
-    |--------------------------------------------------------------------------
-    */
+  // Task.php
 
-    // NGO/User who created the task
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    // Alias for NGO
     public function ngo()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(
+            NgoProfile::class,
+            'ngo_id'
+        );
     }
 
-    // Volunteer applications
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(
+            User::class,
+            'created_by'
+        );
+    }
+
+    public function skills()
+    {
+        return $this->belongsToMany(
+            Skill::class,
+            'task_skills'
+        );
+    }
+
     public function applications()
     {
         return $this->hasMany(Application::class);
+    }
+
+    public function serviceLogs()
+    {
+        return $this->hasMany(ServiceLog::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

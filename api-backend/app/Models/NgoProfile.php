@@ -26,4 +26,13 @@ class NgoProfile extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'ngo_id');
+    }
+
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
 }

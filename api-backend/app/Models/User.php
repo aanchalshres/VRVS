@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -51,23 +52,83 @@ class User extends Authenticatable
         ];
     }
 
-    public function ngoProfile()
-    {
-        return $this->hasOne(\App\Models\NgoProfile::class);
-    }
+   // User.php
 
-    public function volunteerProfile()
-    {
-        return $this->hasOne(\App\Models\VolunteerProfile::class);
-    }
+        public function ngoProfile()
+        {
+            return $this->hasOne(NgoProfile::class);
+        }
 
-    public function tasks()
-    {
-        return $this->hasMany(\App\Models\Task::class);
-    }
+        public function volunteerProfile()
+        {
+            return $this->hasOne(VolunteerProfile::class);
+        }
 
-    public function applications()
-    {
-        return $this->hasMany(\App\Models\Application::class, 'volunteer_id');
-    }
+        public function verificationWorkflow()
+        {
+            return $this->hasOne(VerificationWorkflow::class);
+        }
+
+        public function documents()
+        {
+            return $this->hasMany(Document::class);
+        }
+
+        public function verificationSessions()
+        {
+            return $this->hasMany(VerificationSession::class);
+        }
+
+        public function notifications()
+        {
+            return $this->hasMany(Notification::class);
+        }
+
+        public function createdTasks()
+        {
+            return $this->hasMany(Task::class, 'created_by');
+        }
+
+        public function reviewedApplications()
+        {
+            return $this->hasMany(Application::class, 'reviewed_by');
+        }
+
+        public function reviewedDocuments()
+        {
+            return $this->hasMany(Document::class, 'reviewed_by');
+        }
+
+        public function reviewsGiven()
+        {
+            return $this->hasMany(Review::class, 'reviewer_id');
+        }
+
+        public function reviewsReceived()
+        {
+            return $this->hasMany(Review::class, 'reviewee_id');
+        }
+
+        public function reportsMade()
+        {
+            return $this->hasMany(Report::class, 'reported_by');
+        }
+
+        public function resolvedReports()
+        {
+            return $this->hasMany(Report::class, 'resolved_by');
+        }
+
+        public function activityLogs()
+        {
+            return $this->hasMany(ActivityLog::class);
+        }
+
+        public function badges()
+        {
+            return $this->belongsToMany(
+                Badge::class,
+                'user_badges'
+            )->withPivot('awarded_at');
+        }
 }

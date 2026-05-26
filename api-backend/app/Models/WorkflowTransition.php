@@ -6,5 +6,29 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkflowTransition extends Model
 {
-    //
+    protected $table = 'workflow_transitions';
+    protected $fillable = [
+        'workflow_id',
+        'from_state_id',
+        'to_state_id',
+    ];
+
+
+    // WorkflowTransition.php
+
+    public function fromState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'from_state_id'
+        );
+    }
+
+    public function toState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'to_state_id'
+        );
+    }
 }

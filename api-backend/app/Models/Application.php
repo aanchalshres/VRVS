@@ -15,7 +15,8 @@ class Application extends Model
         'status',
     ];
 
-    // Relationships
+   // Application.php
+
     public function task()
     {
         return $this->belongsTo(Task::class);
@@ -23,6 +24,17 @@ class Application extends Model
 
     public function volunteer()
     {
-        return $this->belongsTo(User::class, 'volunteer_id');
+        return $this->belongsTo(
+            VolunteerProfile::class,
+            'volunteer_id'
+        );
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(
+            User::class,
+            'reviewed_by'
+        );
     }
 }
