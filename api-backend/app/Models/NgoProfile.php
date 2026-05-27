@@ -10,17 +10,24 @@ class NgoProfile extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'organization_name',
-        'registration_number',
-        'pan_number',
-        'office_location',
-        'registration_file_path',
-        'pan_file_path',
-        'letterhead_file_path',
-        'is_verified',
-        'status',
+    'user_id',
+    'organization_name',
+    'registration_number',
+    'description',
+    'logo',
+    'website',
+    'office_location',
+    'city',
+    'country',
+    'latitude',
+    'longitude',
+    'pan_number',
+    'verification_status',
+    'verified_by',
+    'verified_at',
+    'rejection_reason',
     ];
+
 
     public function user()
     {

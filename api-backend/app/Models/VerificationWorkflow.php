@@ -8,8 +8,10 @@ class VerificationWorkflow extends Model
 {
     protected $table = 'verification_workflows';
     protected $fillable = [
-        'ngo_profile_id',
-        'current_state_id',
+    'user_id',
+    'current_state_id',
+    'started_at',
+    'completed_at',
     ];
 
     // VerificationWorkflow.php

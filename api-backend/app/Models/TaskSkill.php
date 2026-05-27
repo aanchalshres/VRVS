@@ -11,12 +11,17 @@ class TaskSkill extends Model
 
     protected $fillable = [
         'task_id',
-        'skill_name',
+        'skill_id',
     ];
 
     // Relationships
     public function task()
     {
         return $this->belongsTo(Task::class);
+    }
+    
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class);
     }
 }

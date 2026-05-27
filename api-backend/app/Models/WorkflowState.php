@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class WorkflowState extends Model
 {
     protected $table = 'workflow_states';
-    protected $fillable = [
-        'workflow_id',
-        'state_name',
-        'is_initial',
-        'is_final',
-    ];
+   protected $fillable = [
+    'code',
+    'name',
+    'description',
+    'sequence_order',
+    'is_final',
+  ];
 
     // WorkflowState.php
 

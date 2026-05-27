@@ -10,7 +10,8 @@ class Badge extends Model
     protected $fillable = [
         'name',
         'description',
-        'image_path',
+        'icon',
+        'minimum_hours',
     ];
 
     // Badge.php
