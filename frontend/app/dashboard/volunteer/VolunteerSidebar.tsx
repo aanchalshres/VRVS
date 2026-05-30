@@ -16,7 +16,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const menuItems = [
   { name: "Dashboard", href: "/dashboard/volunteer", icon: LayoutDashboard },
-  { name: "Browse Tasks", href: "/dashboard/volunteer/apply", icon: Briefcase },
+  { name: "Tasks", href: "/dashboard/volunteer/tasks", icon: Briefcase },
   { name: "My Applications", href: "/dashboard/volunteer/applications", icon: FileText },
   { name: "My Skills", href: "/dashboard/volunteer/skills", icon: CheckSquare },
   { name: "Profile", href: "/dashboard/volunteer/profile", icon: User },

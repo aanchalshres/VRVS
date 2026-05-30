@@ -379,3 +379,113 @@ const Signup = () => {
 };
 
 export default Signup;
+
+
+// this is actuall 
+
+// "use client";
+
+// import Navbar from "@/app/components/Navbar";
+// import {
+//   Card,
+//   CardContent,
+//   CardHeader,
+//   CardTitle,
+// } from "@/app/components/ui/card";
+// import Link from "next/link";
+// import { User, Building2 } from "lucide-react";
+
+// const Signup = () => {
+//   return (
+//     <div className="min-h-screen bg-[#F0F1F3]">
+//       <Navbar />
+
+//       <div className="container mx-auto flex items-center justify-center py-8 sm:py-16 lg:py-20 px-3 sm:px-4">
+//         <Card className="w-full max-w-md rounded-xl border border-[#CACDD3] bg-white shadow-xl">
+          
+//           {/* HEADER */}
+//           <CardHeader className="space-y-3 px-4 pt-6 text-center sm:px-6">
+//             <div className="flex justify-center">
+//               <img
+//                 src="/logo1.png"
+//                 alt="Logo"
+//                 className="h-20 w-20 object-contain"
+//               />
+//             </div>
+
+//             <CardTitle className="text-2xl font-bold text-[#111827]">
+//               Create Account
+//             </CardTitle>
+
+//             <p className="text-sm text-[#6B7280]">
+//               Join Sahayogi and start making an impact
+//             </p>
+//           </CardHeader>
+
+//           {/* BODY */}
+//           <CardContent className="space-y-4 px-4 pb-6 sm:px-6">
+
+//             {/* ROLE SELECT */}
+//             <div className="space-y-3">
+//               <p className="text-center text-sm font-medium text-[#111827]">
+//                 I want to join as:
+//               </p>
+
+//               {/* Volunteer */}
+//               <Link href="/signup/volunteer-register">
+//                 <div className="flex w-full cursor-pointer items-center gap-4 rounded-xl border-2 border-[#CACDD3] p-4 transition-all duration-200 hover:border-[#4F46C8] hover:bg-[#4F46C8]/10">
+                  
+//                   <User className="text-[#4F46C8]" />
+
+//                   <div className="text-left">
+//                     <p className="font-semibold text-[#111827]">
+//                       Volunteer
+//                     </p>
+
+//                     <p className="text-sm text-gray-500">
+//                       Find opportunities and make a difference
+//                     </p>
+//                   </div>
+//                 </div>
+//               </Link>
+
+//               {/* NGO */}
+//               <Link href="/signup/ngo-register">
+//                 <div className="flex w-full cursor-pointer items-center gap-4 rounded-xl border-2 border-[#CACDD3] p-4 transition-all duration-200 hover:border-[#7683D6] hover:bg-[#7683D6]/10">
+                  
+//                   <Building2 className="text-[#7683D6]" />
+
+//                   <div className="text-left">
+//                     <p className="font-semibold text-[#111827]">
+//                       Organization (NGO)
+//                     </p>
+
+//                     <p className="text-sm text-gray-500">
+//                       Post opportunities and find volunteers
+//                     </p>
+//                   </div>
+//                 </div>
+//               </Link>
+//             </div>
+
+//             {/* FOOTER */}
+//             <div className="border-t pt-4">
+//               <p className="text-center text-sm">
+//                 Already have an account?{" "}
+//                 <Link
+//                   href="/login"
+//                   className="text-blue-600 hover:underline"
+//                 >
+//                   Login
+//                 </Link>
+//               </p>
+//             </div>
+
+//           </CardContent>
+//         </Card>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Signup;
