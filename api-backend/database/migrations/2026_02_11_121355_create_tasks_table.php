@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
     $table->id();
+    $table->json('tfidf_vector')->nullable();
     $table->foreignId('ngo_id')->constrained('ngo_profiles')->onDelete('cascade');
     $table->foreignId('category_id')->constrained('categories');
     $table->string('title');
@@ -37,8 +38,7 @@ return new class extends Migration
     $table->timestamp('created_at')->useCurrent();
     $table->timestamp('updated_at')->useCurrent();
     $table->timestamp('deleted_at')->nullable();
-    $table->timestamps();
-});
+    });
 
     }
 

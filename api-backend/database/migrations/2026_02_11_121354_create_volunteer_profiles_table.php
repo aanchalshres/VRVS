@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('volunteer_profiles', function (Blueprint $table) {
             $table->id();
+            $table->json('tfidf_vector')->nullable();
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
             $table->string('profile_photo')->nullable();
             $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
