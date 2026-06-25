@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\NgoController;
 use App\Http\Controllers\Api\NgoProfileController;
 use App\Http\Controllers\Api\VolunteerController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\TfIdfController;
 use Illuminate\Support\Facades\Route;
 
 // Health check (public - no auth required)
@@ -75,3 +76,12 @@ Route::middleware(['auth:sanctum', 'role:volunteer'])->group(function () {
     // Profile
     Route::get('/volunteer/profile', [VolunteerController::class, 'getProfile']);
 });
+
+Route::post('/admin/tfidf/recompute', [TfIdfController::class, 'recompute'])
+     ->middleware('auth:sanctum');
+
+Route::get('/volunteers/{id}/tfidf',  [TfIdfController::class, 'showVolunteer']);
+Route::get('/tasks/{id}/tfidf',       [TfIdfController::class, 'showTask']);
+
+Route::post('/admin/batch-assign', [AdminController::class, 'batchAssign'])
+     ->middleware('auth:sanctum');
