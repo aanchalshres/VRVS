@@ -1,122 +1,98 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/app/components/ui/button";
-import { Badge } from "@/app/components/ui/badge";
-
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  category: string;
-  district: string;
-  quota: number;
-  skills: string[];
-  isEmergency: boolean;
-  volunteers: number;
-  organization?: string;
-}
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { Button } from '@/app/components/ui/button'
+import { Badge } from '@/app/components/ui/badge'
 
 export default function ApplyPage() {
-  const { id } = useParams();
-  const router = useRouter();
+  const { id } = useParams()
+  const router = useRouter()
 
-  const [task, setTask] = useState<Task | null>(null);
+  const [task, setTask] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-    availability: "",
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    availability: '',
     skills: [] as string[],
-    location: "",
-    shareLocation: true,
-  });
+    location: '',
+  })
 
-  const [userLocation, setUserLocation] = useState("");
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
 
+  // ✅ LOAD TASK BY ID (FIXED)
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("selectedTask") || "null");
+    const tasks = JSON.parse(localStorage.getItem('ngo_tasks') || '[]')
 
-      if (stored && !stored.organization) {
-        stored.organization = "Nepal Red Cross";
-      }
+    const found = tasks.find((t: any) => t.id == id)
 
-      setTask(stored);
-    } catch {
-      setTask(null);
-    }
+    setTask(found || null)
+    setLoading(false)
+  }, [id])
 
-    // 🌍 Detect location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
+  // Location detection
+  useEffect(() => {
+    if (!navigator.geolocation) return
 
-          setCoords({ lat: latitude, lng: longitude });
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords
 
-          try {
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            );
-            const data = await res.json();
+      setCoords({ lat: latitude, lng: longitude })
 
-            const locationName =
-              data.address?.city ||
-              data.address?.town ||
-              data.address?.village ||
-              data.display_name ||
-              "Detected location";
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+        )
 
-            setUserLocation(locationName);
+        const data = await res.json()
 
-            // auto fill in form
-            setForm((prev) => ({ ...prev, location: locationName }));
-          } catch {
-            setUserLocation("Location detected");
-          }
-        },
-        () => {
-          console.log("Location permission denied");
-        }
-      );
-    }
-  }, []);
+        const locationName =
+          data.address?.city ||
+          data.address?.town ||
+          data.address?.village ||
+          data.display_name ||
+          'Detected location'
 
-  // 🔹 Toggle skills
+        setForm((prev) => ({
+          ...prev,
+          location: locationName,
+        }))
+      } catch {}
+    })
+  }, [])
+
   const toggleSkill = (skill: string) => {
     setForm((prev) => ({
       ...prev,
       skills: prev.skills.includes(skill)
         ? prev.skills.filter((s) => s !== skill)
         : [...prev.skills, skill],
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (!form.name || !form.email || !form.phone || !form.availability) {
-      alert("Please fill all required fields!");
-      return;
+      alert('Please fill all required fields!')
+      return
     }
 
     const applications = JSON.parse(
-      localStorage.getItem("applications") || "[]"
-    );
+      localStorage.getItem('applications') || '[]'
+    )
 
-    // 🚫 Prevent duplicate
     const alreadyApplied = applications.find(
-      (app: any) => app.taskId == id && app.email === form.email
-    );
+      (a: any) => a.taskId == id && a.email === form.email
+    )
 
     if (alreadyApplied) {
-      alert("You already applied!");
-      return;
+      alert('You already applied!')
+      return
     }
 
     applications.push({
@@ -128,63 +104,72 @@ export default function ApplyPage() {
       message: form.message,
       skills: form.skills,
       availability: form.availability,
-      location: form.shareLocation ? form.location : "Not shared",
-      coordinates: form.shareLocation ? coords : null,
+      location: form.location,
+      coordinates: coords,
       appliedAt: new Date().toISOString(),
-    });
+    })
 
-    localStorage.setItem("applications", JSON.stringify(applications));
+    localStorage.setItem('applications', JSON.stringify(applications))
 
-    alert("✅ Application submitted successfully!");
-    router.push("/volunteer");
-  };
+    alert('Application submitted successfully!')
+
+    router.push('/dashboard/volunteer/tasks')
+  }
+
+  // LOADING
+  if (loading) return <div className="p-6">Loading...</div>
+
+  // NO TASK
+  if (!task) {
+    return (
+      <div className="p-6 text-red-500">
+        Task not found. Please go back.
+      </div>
+    )
+  }
 
   const progress =
-    task && task.quota > 0
-      ? (task.volunteers / task.quota) * 100
-      : 0;
+    task.quota > 0 ? (task.volunteers / task.quota) * 100 : 0
 
   return (
     <div className="bg-[#F0F1F3] min-h-screen p-6">
+
       <div className="max-w-5xl mx-auto space-y-6">
 
-        {/* BACK */}
         <button
-          onClick={() => router.push("/volunteer")}
+          onClick={() => router.push('/dashboard/volunteer/tasks')}
           className="text-sm text-[#4F46C8]"
         >
           ← Back
         </button>
 
-        {/* TASK DETAILS */}
-        {task && (
-          <div className="bg-white p-6 rounded-xl space-y-4">
-            <h1 className="text-xl font-bold">{task.title}</h1>
-            <p>{task.description}</p>
+        {/* TASK CARD */}
+        <div className="bg-white p-6 rounded-xl space-y-4">
 
-            <div className="flex flex-wrap gap-2">
-              {task.skills.map((skill) => (
-                <Badge key={skill}>{skill}</Badge>
-              ))}
-            </div>
+          <h1 className="text-xl font-bold">{task.title}</h1>
+          <p>{task.description}</p>
 
-            <p>📍 {task.district}</p>
-
-            <div className="h-2 bg-gray-200 rounded">
-              <div
-                className="h-2 bg-indigo-500"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+          <div className="flex flex-wrap gap-2">
+            {task.selectedSkills?.map((skill: string) => (
+              <Badge key={skill}>{skill}</Badge>
+            ))}
           </div>
-        )}
+
+          <p>📍 {task.location}</p>
+
+          <div className="h-2 bg-gray-200 rounded">
+            <div
+              className="h-2 bg-indigo-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
 
         {/* FORM */}
         <form
           onSubmit={handleSubmit}
           className="bg-white p-6 rounded-xl space-y-4"
         >
-          <h3 className="font-semibold">Apply Now</h3>
 
           <input
             placeholder="Name *"
@@ -213,7 +198,6 @@ export default function ApplyPage() {
             }
           />
 
-          {/* Availability */}
           <select
             className="w-full p-2 border rounded"
             value={form.availability}
@@ -227,28 +211,6 @@ export default function ApplyPage() {
             <option value="Weekend">Weekend</option>
           </select>
 
-          {/* Skills */}
-          <div>
-            <p className="text-sm mb-2">Select Your Skills</p>
-            <div className="flex flex-wrap gap-2">
-              {(task?.skills || []).map((skill) => (
-                <button
-                  type="button"
-                  key={skill}
-                  onClick={() => toggleSkill(skill)}
-                  className={`px-3 py-1 rounded-full border ${
-                    form.skills.includes(skill)
-                      ? "bg-indigo-500 text-white"
-                      : "bg-gray-100"
-                  }`}
-                >
-                  {skill}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Message */}
           <textarea
             placeholder="Message"
             className="w-full p-2 border rounded"
@@ -258,49 +220,46 @@ export default function ApplyPage() {
             }
           />
 
-          {/* LOCATION */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium">Your Location</p>
+          {/* SKILLS */}
+          <div>
+            <p className="text-sm mb-2">Select Skills</p>
 
-            <input
-              placeholder="Enter your location"
-              className="w-full p-2 border rounded"
-              value={form.location}
-              onChange={(e) =>
-                setForm({ ...form, location: e.target.value })
-              }
-            />
-
-            <button
-              type="button"
-              onClick={() =>
-                setForm({ ...form, location: userLocation })
-              }
-              className="text-sm text-blue-500 underline"
-            >
-              📍 Use detected location
-            </button>
-
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.shareLocation}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    shareLocation: e.target.checked,
-                  })
-                }
-              />
-              Share my location with NGO
-            </label>
+            <div className="flex flex-wrap gap-2">
+              {task.selectedSkills?.map((skill: string) => (
+                <button
+                  type="button"
+                  key={skill}
+                  onClick={() => toggleSkill(skill)}
+                  className={`px-3 py-1 rounded-full border ${
+                    form.skills.includes(skill)
+                      ? 'bg-indigo-500 text-white'
+                      : 'bg-gray-100'
+                  }`}
+                >
+                  {skill}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <Button type="submit" className="w-full bg-indigo-600 text-white">
+          {/* LOCATION */}
+          <input
+            className="w-full p-2 border rounded"
+            value={form.location}
+            onChange={(e) =>
+              setForm({ ...form, location: e.target.value })
+            }
+          />
+
+          <Button
+            type="submit"
+            className="w-full bg-indigo-600 text-white"
+          >
             Apply
           </Button>
         </form>
+
       </div>
     </div>
-  );
+  )
 }
