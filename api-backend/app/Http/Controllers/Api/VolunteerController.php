@@ -5,145 +5,153 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\Application;
+use App\Services\TfIdfService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class VolunteerController extends Controller
 {
-    /**
-     * Get all available tasks (only active tasks from verified NGOs)
-     */
+    public function __construct(private TfIdfService $tfidf) {}
+
     public function getTasks(Request $request)
     {
         $user = $request->user();
 
         if ($user->role !== 'volunteer') {
-            return response()->json([
-                'message' => 'Only volunteers can access this',
-            ], 403);
+            return response()->json(['message' => 'Only volunteers can access this'], 403);
         }
 
-        // Get active tasks from verified NGOs only
+        $volunteerProfile = $user->volunteerProfile;
+        $volunteerVector  = $volunteerProfile?->tfidf_vector ?? [];
+        $volunteerLat     = $volunteerProfile?->latitude;
+        $volunteerLng     = $volunteerProfile?->longitude;
+        $tfidf            = $this->tfidf;
+
+        $alpha = 0.5; // skill match
+        $beta  = 0.3; // distance
+        $gamma = 0.2; // trust
+
+        // FIX 1a: was ->whereHas('ngoProfile') — tasks belong to a user who has an ngoProfile
+        // FIX 1b: was checking 'verification_status' = 'verified' — correct column is 'is_verified' = true
         $tasks = Task::where('status', 'active')
-            ->where('filled_quota', '<', DB::raw('quota'))
             ->whereHas('user.ngoProfile', function ($query) {
                 $query->where('is_verified', true);
             })
-            ->with(['user', 'skills'])
+            ->whereNotNull('tfidf_vector')
+            ->with(['user.ngoProfile', 'skills'])
             ->get();
+
+        $tasks = $tasks->map(function ($task) use (
+            $volunteerProfile, $volunteerVector, $volunteerLat, $volunteerLng, $tfidf, $alpha, $beta, $gamma
+        ) {
+            $skillScore = count($volunteerVector) > 0
+                ? $tfidf->cosineSimilarity($volunteerVector, $task->tfidf_vector ?? [])
+                : 0;
+
+            $distScore = 0;
+            if ($volunteerLat && $volunteerLng && $task->latitude && $task->longitude) {
+                $km        = $tfidf->haversine($volunteerLat, $volunteerLng, $task->latitude, $task->longitude);
+                $distScore = max(0, 1 - ($km / 500));
+            }
+
+            $trustScore = $volunteerProfile?->trust_score ?? 0.5;
+
+            $finalScore = ($alpha * $skillScore) + ($beta * $distScore) + ($gamma * $trustScore);
+
+            $task->match_score = round($finalScore * 100, 1);
+            return $task;
+        })
+        ->sortByDesc('match_score')
+        ->values();
 
         return response()->json(['data' => $tasks]);
     }
 
-    /**
-     * Get task details
-     */
     public function getTaskDetail(Request $request, $id)
     {
         $user = $request->user();
 
         if ($user->role !== 'volunteer') {
-            return response()->json([
-                'message' => 'Only volunteers can access this',
-            ], 403);
+            return response()->json(['message' => 'Only volunteers can access this'], 403);
         }
 
-        $task = Task::findOrFail($id);
+        $task = Task::with(['user.ngoProfile', 'applications', 'skills'])->findOrFail($id);
 
-        // Check if task is from a verified NGO
-        if (!$task->user->ngoProfile || !$task->user->ngoProfile->is_verified) {
-            return response()->json([
-                'message' => 'Task not available',
-            ], 404);
+    
+        if (!$task->user?->ngoProfile || !$task->user->ngoProfile->is_verified) {
+            return response()->json(['message' => 'Task not available'], 404);
         }
 
-        return response()->json(['data' => $task->load(['user', 'applications', 'skills'])]);
+        return response()->json(['data' => $task]);
     }
 
-    /**
-     * Apply for a task
-     */
     public function applyForTask(Request $request, $id)
     {
         $user = $request->user();
 
         if ($user->role !== 'volunteer') {
-            return response()->json([
-                'message' => 'Only volunteers can apply for tasks',
-            ], 403);
+            return response()->json(['message' => 'Only volunteers can apply for tasks'], 403);
         }
 
-        $task = Task::findOrFail($id);
+        $task = Task::with('user.ngoProfile')->findOrFail($id);
 
-        // Verify task is from verified NGO
-        if (!$task->user->ngoProfile || !$task->user->ngoProfile->is_verified) {
-            return response()->json([
-                'message' => 'Cannot apply to this task',
-            ], 403);
+        // FIX 3: same relation fix as above
+        if (!$task->user?->ngoProfile || !$task->user->ngoProfile->is_verified) {
+            return response()->json(['message' => 'Cannot apply to this task'], 403);
         }
 
-        // Check if volunteer has already applied
+        $volunteerProfileId = $user->volunteerProfile->id;
+
         $existingApplication = Application::where('task_id', $id)
-            ->where('volunteer_id', $user->id)
+            ->where('volunteer_id', $volunteerProfileId)
             ->first();
 
         if ($existingApplication) {
-            return response()->json([
-                'message' => 'You have already applied for this task',
-            ], 409);
+            return response()->json(['message' => 'You have already applied for this task'], 409);
         }
 
-        // Check quota
-        if ($task->filled_quota >= $task->quota) {
-            return response()->json([
-                'message' => 'Task quota is full',
-            ], 400);
+        $acceptedCount = Application::where('task_id', $id)
+            ->where('status', 'Accepted')
+            ->count();
+
+        // FIX 4: was $task->required_volunteers — correct column name is 'quota'
+        if ($acceptedCount >= $task->quota) {
+            return response()->json(['message' => 'Task quota is full'], 400);
         }
 
-        // Create application
         $application = Application::create([
-            'task_id' => $id,
-            'volunteer_id' => $user->id,
-            'status' => 'pending',
+            'task_id'      => $id,
+            'volunteer_id' => $volunteerProfileId,
+            'status'       => 'Pending',
+            'remarks'      => $request->message,
         ]);
 
         return response()->json([
             'message' => 'Application submitted successfully',
-            'data' => $application,
+            'data'    => $application,
         ], 201);
     }
 
-    /**
-     * Get volunteer's applications
-     */
     public function getApplications(Request $request)
     {
         $user = $request->user();
 
         if ($user->role !== 'volunteer') {
-            return response()->json([
-                'message' => 'Only volunteers can access this',
-            ], 403);
+            return response()->json(['message' => 'Only volunteers can access this'], 403);
         }
 
-        $applications = Application::where('volunteer_id', $user->id)
-            ->with(['task', 'task.user'])
+        $applications = Application::where('volunteer_id', $user->volunteerProfile->id)
+            ->with(['task', 'task.user.ngoProfile'])
             ->get();
 
         return response()->json(['data' => $applications]);
     }
 
-    /**
-     * Get volunteer's profile
-     */
     public function getProfile(Request $request)
     {
         $user = $request->user();
 
         if ($user->role !== 'volunteer') {
-            return response()->json([
-                'message' => 'Only volunteers can access this',
-            ], 403);
+            return response()->json(['message' => 'Only volunteers can access this'], 403);
         }
 
         return response()->json([

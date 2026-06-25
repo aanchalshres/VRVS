@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\Application;
+use App\Services\TrustScoreService;
 use Illuminate\Http\Request;
 
 class NgoController extends Controller
@@ -114,7 +115,12 @@ class NgoController extends Controller
         }
 
         $application->update(['status' => 'accepted']);
+        $trustService = app(TrustScoreService::class);
+        $volunteerProfile = $application->volunteer->volunteerProfile;
 
+        if ($volunteerProfile) {
+            $trustService->update($volunteerProfile, 'task_completed');
+        }
         return response()->json([
             'message' => 'Application accepted',
             'data' => $application,
