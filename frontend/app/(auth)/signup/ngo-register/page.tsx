@@ -2,7 +2,12 @@
 
 import Navbar from '@/app/components/Navbar'
 import { Button } from '@/app/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/app/components/ui/card'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { useState } from 'react'
@@ -12,97 +17,114 @@ export default function NGORegister() {
   const router = useRouter()
 
   const [form, setForm] = useState({
-    organizationName: '',
-    email: '',
-    phone: '',
-    password: '',
-    officeLocation: '',
-    registrationNumber: '',
-    panNumber: '',
+    organization_name: '',
+    registration_number: '',
+    description: '',
+    website: '',
+    address: '',
+    city: '',
+    country: '',
   })
 
-  const [registrationFile, setRegistrationFile] = useState<File | null>(null)
-  const [panFile, setPanFile] = useState<File | null>(null)
-  const [letterhead, setLetterhead] = useState<File | null>(null)
+  const [logo, setLogo] = useState<File | null>(null)
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (
-      !form.organizationName ||
-      !form.email ||
-      !form.phone ||
-      !form.password ||
-      !form.officeLocation ||
-      !form.registrationNumber ||
-      !form.panNumber ||
-      !registrationFile ||
-      !panFile
-    ) {
-      setError('Please fill all required fields')
+    if (!form.organization_name) {
+      setError('Organization Name is required')
       return
     }
 
     setError('')
     setLoading(true)
 
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const ngoData = {
+      // BIGINT PK
+      id: Date.now(),
 
-    const formData = new FormData()
-    formData.append('role', 'ngo')
-    formData.append('organizationName', form.organizationName)
-    formData.append('email', form.email)
-    formData.append('phone', form.phone)
-    formData.append('password', form.password)
-    formData.append('officeLocation', form.officeLocation)
-    formData.append('registrationNumber', form.registrationNumber)
-    formData.append('panNumber', form.panNumber)
+      // BIGINT FK -> users.id
+      // Placeholder until authentication/API is connected
+      user_id: null,
 
-    formData.append('registrationFile', registrationFile)
-    formData.append('panFile', panFile)
+      // VARCHAR
+      organization_name: form.organization_name,
 
-    if (letterhead) {
-      formData.append('letterhead', letterhead)
+      // VARCHAR NULL
+      registration_number:
+        form.registration_number || null,
+
+      // TEXT NULL
+      description: form.description || null,
+
+      // VARCHAR NULL
+      // Placeholder until file upload API is connected
+      logo: logo ? logo.name : null,
+
+      // VARCHAR NULL
+      website: form.website || null,
+
+      // TEXT NULL
+      address: form.address || null,
+
+      // VARCHAR NULL
+      city: form.city || null,
+
+      // VARCHAR NULL
+      country: form.country || null,
+
+      // ENUM(pending, approved, rejected)
+      verification_status: 'pending',
+
+      // BIGINT NULL FK -> users.id
+      verified_by: null,
+
+      // TIMESTAMP NULL
+      verified_at: null,
+
+      // TEXT NULL
+      rejection_reason: null,
+
+      // TIMESTAMPS
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     }
 
-    fetch(`${apiUrl}/api/register`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-      },
-      body: formData,
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error('Registration failed')
-        return res.json()
-      })
-      .then((data) => {
-        setLoading(false)
+    try {
+      /*
+       * TODO: API Integration
+       *
+       * const response = await fetch('/api/ngos', {
+       *   method: 'POST',
+       *   headers: {
+       *     'Content-Type': 'application/json',
+       *   },
+       *   body: JSON.stringify(ngoData),
+       * })
+       */
 
-        if (data.access_token || data.token) {
-          const token = data.access_token || data.token
-          const user = data.user
+      // Temporary localStorage fallback
+      const existing = JSON.parse(
+        localStorage.getItem('ngos') || '[]'
+      )
 
-          localStorage.setItem('authToken', token)
-          localStorage.setItem('user', JSON.stringify(user))
+      localStorage.setItem(
+        'ngos',
+        JSON.stringify([ngoData, ...existing])
+      )
 
-          document.cookie = `token=${token}; path=/`
-          document.cookie = `role=ngo; path=/`
+      alert('NGO Registered Successfully')
 
-          alert('NGO Registered Successfully 🚀')
-
-          router.push('/dashboard/ngo')
-        } else {
-          setError(data.message || 'Registration failed')
-        }
-      })
-      .catch((err) => {
-        setLoading(false)
-        setError(err.message)
-      })
+      router.push('/dashboard/ngo')
+    } catch (err) {
+      setError('Registration failed')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -111,64 +133,33 @@ export default function NGORegister() {
 
       <div className="flex items-center justify-center py-10">
         <Card className="w-full max-w-md bg-white shadow-xl">
-
-          <CardHeader>
-            <CardTitle className="text-center text-2xl text-[#4F46C8]">
+               <CardHeader className="space-y-3 px-4 pt-6 text-center sm:px-6">
+            <div className="flex justify-center">
+              <img
+                src="/logo1.png"
+                alt="Logo"
+                className="h-20 w-20 object-contain"
+              />
+            </div>
+          </CardHeader>
+           <CardTitle className="text-2xl text-[#4F46C8] text-center">
               NGO Registration
             </CardTitle>
-          </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-4"
+            >
               <div>
-                <Label>Organization Name</Label>
+                <Label>Organization Name *</Label>
                 <Input
-                  value={form.organizationName}
+                  value={form.organization_name}
                   onChange={(e) =>
-                    setForm({ ...form, organizationName: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) =>
-                    setForm({ ...form, email: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label>Phone</Label>
-                <Input
-                  value={form.phone}
-                  onChange={(e) =>
-                    setForm({ ...form, phone: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label>Password</Label>
-                <Input
-                  type="password"
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <Label>Office Location</Label>
-                <Input
-                  value={form.officeLocation}
-                  onChange={(e) =>
-                    setForm({ ...form, officeLocation: e.target.value })
+                    setForm({
+                      ...form,
+                      organization_name: e.target.value,
+                    })
                   }
                 />
               </div>
@@ -176,53 +167,88 @@ export default function NGORegister() {
               <div>
                 <Label>Registration Number</Label>
                 <Input
-                  value={form.registrationNumber}
+                  value={form.registration_number}
                   onChange={(e) =>
-                    setForm({ ...form, registrationNumber: e.target.value })
+                    setForm({
+                      ...form,
+                      registration_number:
+                        e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div>
-                <Label>PAN Number</Label>
+                <Label>Description</Label>
                 <Input
-                  value={form.panNumber}
+                  value={form.description}
                   onChange={(e) =>
-                    setForm({ ...form, panNumber: e.target.value })
+                    setForm({
+                      ...form,
+                      description: e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div>
-                <Label>Registration Certificate</Label>
+                <Label>Website</Label>
                 <Input
-                  type="file"
+                  value={form.website}
                   onChange={(e) =>
-                    setRegistrationFile(e.target.files?.[0] || null)
+                    setForm({
+                      ...form,
+                      website: e.target.value,
+                    })
                   }
                 />
               </div>
 
               <div>
-                <Label>PAN Certificate</Label>
+                <Label>Address</Label>
                 <Input
-                  type="file"
-                  onChange={(e) => setPanFile(e.target.files?.[0] || null)}
+                  value={form.address}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      address: e.target.value,
+                    })
+                  }
                 />
               </div>
 
               <div>
-                <Label>Letterhead (Optional)</Label>
+                <Label>City</Label>
                 <Input
-                  type="file"
+                  value={form.city}
                   onChange={(e) =>
-                    setLetterhead(e.target.files?.[0] || null)
+                    setForm({
+                      ...form,
+                      city: e.target.value,
+                    })
                   }
                 />
               </div>
+
+              <div>
+                <Label>Country</Label>
+                <Input
+                  value={form.country}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      country: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              
 
               {error && (
-                <p className="text-red-500 text-sm">{error}</p>
+                <p className="text-red-500 text-sm">
+                  {error}
+                </p>
               )}
 
               <Button
@@ -230,9 +256,10 @@ export default function NGORegister() {
                 className="w-full bg-[#4F46C8] text-white"
                 disabled={loading}
               >
-                {loading ? 'Registering...' : 'Register NGO'}
+                {loading
+                  ? 'Registering...'
+                  : 'Register NGO'}
               </Button>
-
             </form>
           </CardContent>
         </Card>

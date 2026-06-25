@@ -12,13 +12,11 @@ import {
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 
-export default function VolunteerRegister() {
+export default function VolunteerLogin() {
   const router = useRouter()
 
   const [form, setForm] = useState({
-    name: '',
     email: '',
-    phone: '',
     password: '',
   })
 
@@ -31,50 +29,47 @@ export default function VolunteerRegister() {
     setLoading(true)
     setError('')
 
-    const userData = {
-      id: Date.now(),
-      role: 'volunteer',
-
-      name: form.name,
+    const loginData = {
       email: form.email,
-      phone: form.phone || null,
       password: form.password,
-
-      email_verified_at: null,
-      is_active: true,
-      last_login_at: null,
-      remember_token: null,
-
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      deleted_at: null,
+      role: 'volunteer',
     }
 
     try {
       /*
-      TODO: API integration
-      const res = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
-      })
+        TODO: API Integration
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(loginData),
+        })
       */
 
-      const existing = JSON.parse(
-        localStorage.getItem('users') || '[]'
+      // 🔹 Local fallback (same storage used in register)
+      const users = JSON.parse(localStorage.getItem('users') || '[]')
+
+      const user = users.find(
+        (u: any) =>
+          u.email === form.email &&
+          u.password === form.password &&
+          u.role === 'volunteer'
       )
 
-      localStorage.setItem(
-        'users',
-        JSON.stringify([userData, ...existing])
-      )
+      if (!user) {
+        setError('Invalid email or password')
+        setLoading(false)
+        return
+      }
 
-      alert('Volunteer registered successfully 🚀')
+      localStorage.setItem('authUser', JSON.stringify(user))
+      localStorage.setItem('role', 'volunteer')
+
+      alert('Login successful 🚀')
 
       router.push('/volunteer/tasks')
     } catch (err) {
       console.error(err)
-      setError('Registration failed')
+      setError('Login failed')
     } finally {
       setLoading(false)
     }
@@ -96,7 +91,7 @@ export default function VolunteerRegister() {
           </div>
 
           <CardTitle className="text-2xl text-[#4F46C8]">
-            Volunteer Registration
+            Volunteer Login
           </CardTitle>
         </CardHeader>
 
@@ -105,19 +100,10 @@ export default function VolunteerRegister() {
           <form onSubmit={handleSubmit} className="space-y-4">
 
             <div>
-              <Label>Full Name</Label>
-              <Input
-                value={form.name}
-                onChange={(e) =>
-                  setForm({ ...form, name: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
               <Label>Email</Label>
               <Input
                 type="email"
+                placeholder="Enter email"
                 value={form.email}
                 onChange={(e) =>
                   setForm({ ...form, email: e.target.value })
@@ -126,19 +112,10 @@ export default function VolunteerRegister() {
             </div>
 
             <div>
-              <Label>Phone</Label>
-              <Input
-                value={form.phone}
-                onChange={(e) =>
-                  setForm({ ...form, phone: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
               <Label>Password</Label>
               <Input
                 type="password"
+                placeholder="Enter password"
                 value={form.password}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
@@ -147,9 +124,7 @@ export default function VolunteerRegister() {
             </div>
 
             {error && (
-              <p className="text-red-500 text-sm">
-                {error}
-              </p>
+              <p className="text-red-500 text-sm">{error}</p>
             )}
 
             <Button
@@ -157,9 +132,7 @@ export default function VolunteerRegister() {
               className="w-full bg-[#4F46C8] text-white"
               disabled={loading}
             >
-              {loading
-                ? 'Registering...'
-                : 'Register Volunteer'}
+              {loading ? 'Logging in...' : 'Login Volunteer'}
             </Button>
 
           </form>

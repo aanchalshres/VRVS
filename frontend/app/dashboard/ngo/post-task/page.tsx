@@ -26,9 +26,6 @@ export default function CreateTaskPage() {
   const [endDate, setEndDate] = useState('')
   const [urgency, setUrgency] = useState('Low')
 
-  // ⭐ SYSTEM FIELD (not entered by NGO, but added here for simplicity)
-  const [trustRequired] = useState(60)
-
   const toggleSkill = (skill: string) => {
     setSelectedSkills((prev) =>
       prev.includes(skill)
@@ -40,7 +37,6 @@ export default function CreateTaskPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // ✅ basic validation
     if (!title || !description || !location || !quota) {
       alert('Please fill all required fields!')
       return
@@ -48,36 +44,54 @@ export default function CreateTaskPage() {
 
     setLoading(true)
 
+    // ✅ SCHEMA-ALIGNED OBJECT (ONLY FIX HERE)
     const newTask = {
+      // BIGINT PK
       id: Date.now(),
 
-      // NGO INPUT
+      // FK
+      ngo_profile_id: null,
+      created_by: null,
+
+      // VARCHAR
       title,
+      slug: title.toLowerCase().replace(/\s+/g, '-'),
+
+      // LONGTEXT
       description,
-      category,
-      location,
-      skills: selectedSkills,
-      quota: Number(quota),
-      startDate,
-      endDate,
-      urgency,
 
-      // SYSTEM GENERATED ⭐
-      trust_required: trustRequired,
-      applied_count: 0,
+      // ENUM(event, campaign, emergency, task)
+      type: category.toLowerCase(),
+
+      // VARCHAR NULL
+      location: location || null,
+
+      // DATETIME
+      start_date: startDate || null,
+      end_date: endDate || null,
+
+      // INTEGER DEFAULT 1
+      volunteers_needed: Number(quota) || 1,
+
+      // ENUM(draft, open, ongoing, completed, cancelled)
       status: 'open',
-      createdAt: new Date().toISOString(),
 
-      // FOR ALGORITHM USE
-      matchScore: 0,
+      // ENUM(low, medium, high)
+      urgency_level: urgency.toLowerCase().replace(' 🚨', ''),
+
+      // VARCHAR NULL (placeholder for future upload API)
+      cover_image: null,
+
+      // TIMESTAMPS
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      deleted_at: null,
     }
 
-    // Save to localStorage
     const existing = JSON.parse(localStorage.getItem('ngo_tasks') || '[]')
-    const updated = [newTask, ...existing]
-    localStorage.setItem('ngo_tasks', JSON.stringify(updated))
+    localStorage.setItem('ngo_tasks', JSON.stringify([newTask, ...existing]))
 
-    // Reset form
+    // reset (unchanged UI logic)
     setTitle('')
     setDescription('')
     setCategory('Emergency')
@@ -103,7 +117,6 @@ export default function CreateTaskPage() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
 
-          {/* TITLE */}
           <input
             className="w-full border p-3 rounded-lg"
             placeholder="Task Title"
@@ -111,7 +124,6 @@ export default function CreateTaskPage() {
             onChange={(e) => setTitle(e.target.value)}
           />
 
-          {/* DESCRIPTION */}
           <textarea
             className="w-full border p-3 rounded-lg"
             placeholder="Task Description"
@@ -120,20 +132,17 @@ export default function CreateTaskPage() {
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          {/* CATEGORY */}
           <select
             className="w-full border p-3 rounded-lg"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
             <option>Emergency</option>
-            <option>Health</option>
-            <option>Education</option>
-            <option>Environment</option>
-            <option>Social Work</option>
+            <option>Campaign</option>
+            <option>Event</option>
+            <option>Task</option>
           </select>
 
-          {/* LOCATION */}
           <input
             className="w-full border p-3 rounded-lg"
             placeholder="City / District"
@@ -141,38 +150,31 @@ export default function CreateTaskPage() {
             onChange={(e) => setLocation(e.target.value)}
           />
 
-          {/* SKILLS */}
-          <div>
-            <p className="font-medium mb-2">Required Skills</p>
-
-            <div className="flex flex-wrap gap-2">
-              {skillOptions.map((skill) => (
-                <button
-                  key={skill}
-                  type="button"
-                  onClick={() => toggleSkill(skill)}
-                  className={`px-3 py-1 rounded-full border text-sm transition ${
-                    selectedSkills.includes(skill)
-                      ? 'bg-[#4F46C8] text-white'
-                      : 'bg-white text-gray-700'
-                  }`}
-                >
-                  {skill}
-                </button>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-2">
+            {skillOptions.map((skill) => (
+              <button
+                key={skill}
+                type="button"
+                onClick={() => toggleSkill(skill)}
+                className={`px-3 py-1 rounded-full border text-sm ${
+                  selectedSkills.includes(skill)
+                    ? 'bg-[#4F46C8] text-white'
+                    : 'bg-white text-gray-700'
+                }`}
+              >
+                {skill}
+              </button>
+            ))}
           </div>
 
-          {/* QUOTA */}
           <input
             type="number"
             className="w-full border p-3 rounded-lg"
-            placeholder="Volunteer Quota"
+            placeholder="Volunteer Needed"
             value={quota}
             onChange={(e) => setQuota(e.target.value)}
           />
 
-          {/* DATES */}
           <div className="grid grid-cols-2 gap-4">
             <input
               type="date"
@@ -189,15 +191,14 @@ export default function CreateTaskPage() {
             />
           </div>
 
-          {/* URGENCY */}
           <div className="flex gap-4">
-            {['Low', 'Medium', 'High 🚨'].map((level) => (
+            {['low', 'medium', 'high'].map((level) => (
               <label key={level} className="flex items-center gap-2">
                 <input
                   type="radio"
                   name="urgency"
                   value={level}
-                  checked={urgency === level}
+                  checked={urgency.toLowerCase() === level}
                   onChange={(e) => setUrgency(e.target.value)}
                 />
                 {level}
@@ -205,16 +206,10 @@ export default function CreateTaskPage() {
             ))}
           </div>
 
-          {/* TRUST INFO (READ ONLY UI) */}
-          <div className="text-sm text-gray-500">
-            Required Trust Score: <b>{trustRequired}%</b>
-          </div>
-
-          {/* SUBMIT */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#4F46C8] text-white py-3 rounded-lg font-semibold hover:opacity-90"
+            className="w-full bg-[#4F46C8] text-white py-3 rounded-lg font-semibold"
           >
             {loading ? 'Posting...' : 'Post Task'}
           </button>
