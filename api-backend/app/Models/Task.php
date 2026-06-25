@@ -2,87 +2,62 @@
 
 namespace App\Models;
 
-use App\Models\TaskSkill;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Task extends Model
+class VolunteerProfile extends Model
 {
     use HasFactory;
 
-   protected $fillable = [
-        'ngo_id',
-        'category_id',
-        'title',
-        'slug',
-        'description',
-        'task_type',
-        'selection_logic',
-        'location',
+    protected $fillable = [
+        'user_id',
+        'profile_photo',
+        'gender',
+        'date_of_birth',
+        'bio',
+        'skills',              // text field used in TF-IDF corpus
+        'primary_location',
         'city',
         'country',
         'latitude',
         'longitude',
-        'start_date',
-        'end_date',
-        'application_deadline',
-        'required_volunteers',
-        'status',
-        'urgency_level',
-        'cover_image',
-        'created_by',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'availability_status',
+        'reliability_score',
+        'total_service_hours',
+        'average_rating',
+        'tfidf_vector',        // json — computed by TfIdfService
+        'trust_score',         // float — computed by TrustScoreService
+        'trust_updated_at',    // timestamp — used for decay calculation
     ];
 
     protected $casts = [
-        'skills' => 'array',
-        'is_emergency' => 'boolean',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'tfidf_vector'     => 'array',
+        'trust_updated_at' => 'datetime',
+        'trust_score'      => 'float',
     ];
 
-  // Task.php
-
-    public function ngo()
+    public function user()
     {
-        return $this->belongsTo(
-            NgoProfile::class,
-            'ngo_id'
-        );
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function creator()
-    {
-        return $this->belongsTo(
-            User::class,
-            'created_by'
-        );
+        return $this->belongsTo(User::class);
     }
 
     public function skills()
     {
         return $this->belongsToMany(
             Skill::class,
-            'task_skills'
-        );
+            'volunteer_skills'
+        )->withPivot('proficiency_level');
     }
 
     public function applications()
     {
-        return $this->hasMany(Application::class);
+        return $this->hasMany(Application::class, 'volunteer_id');
     }
 
     public function serviceLogs()
     {
-        return $this->hasMany(ServiceLog::class);
-    }
-
-    public function reviews()
-    {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(ServiceLog::class, 'volunteer_id');
     }
 }
