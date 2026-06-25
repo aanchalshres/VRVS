@@ -11,70 +11,82 @@ import {
 } from '@/app/components/ui/card'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
+import { useToast } from '@/app/hooks/use-toast'
 
 export default function VolunteerRegister() {
   const router = useRouter()
+  const { toast } = useToast()
 
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
     password: '',
+    location: '',
   })
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     setLoading(true)
-    setError('')
-
-    const userData = {
-      id: Date.now(),
-      role: 'volunteer',
-
-      name: form.name,
-      email: form.email,
-      phone: form.phone || null,
-      password: form.password,
-
-      email_verified_at: null,
-      is_active: true,
-      last_login_at: null,
-      remember_token: null,
-
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      deleted_at: null,
-    }
 
     try {
-      /*
-      TODO: API integration
-      const res = await fetch('/api/register', {
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api$/, '')
+
+      const res = await fetch(`${apiUrl}/api/register`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          password: form.password,
+          role: 'volunteer',
+          location: form.location,
+        }),
       })
-      */
 
-      const existing = JSON.parse(
-        localStorage.getItem('users') || '[]'
-      )
+      const data = await res.json()
 
-      localStorage.setItem(
-        'users',
-        JSON.stringify([userData, ...existing])
-      )
+      if (!res.ok) {
+        const description = data.errors
+          ? Object.values(data.errors as Record<string, string[]>)[0][0]
+          : data.message || 'Registration failed'
 
-      alert('Volunteer registered successfully 🚀')
+        toast({
+          title: 'Registration Failed',
+          description,
+          variant: 'destructive',
+        })
+        return
+      }
 
-      router.push('/volunteer/tasks')
+      const token = data.token || data.access_token
+      const user = data.user
+
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 7)
+      document.cookie = `token=${token}; path=/; expires=${expiry.toUTCString()}`
+      document.cookie = `role=${user.role}; path=/; expires=${expiry.toUTCString()}`
+
+      window.dispatchEvent(new CustomEvent('auth-updated'))
+
+      router.push('/dashboard/volunteer')
     } catch (err) {
       console.error(err)
-      setError('Registration failed')
+      toast({
+        title: 'Network Error',
+        description: 'Could not connect to the server. Please try again.',
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
@@ -136,6 +148,16 @@ export default function VolunteerRegister() {
             </div>
 
             <div>
+              <Label>Location</Label>
+              <Input
+                value={form.location}
+                onChange={(e) =>
+                  setForm({ ...form, location: e.target.value })
+                }
+              />
+            </div>
+
+            <div>
               <Label>Password</Label>
               <Input
                 type="password"
@@ -145,12 +167,6 @@ export default function VolunteerRegister() {
                 }
               />
             </div>
-
-            {error && (
-              <p className="text-red-500 text-sm">
-                {error}
-              </p>
-            )}
 
             <Button
               type="submit"

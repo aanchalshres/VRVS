@@ -113,7 +113,7 @@ export default function NGOProfilePage() {
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-[#4F46C8] to-[#3730A3]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-[#4F46C8] to-[#3730A3]">
               <Building2 className="h-6 w-6 text-white" />
             </div>
 

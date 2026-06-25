@@ -12,9 +12,11 @@ import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/app/hooks/use-toast'
 
 export default function NGOLogin() {
   const router = useRouter()
+  const { toast } = useToast()
 
   const [form, setForm] = useState({
     email: '',
@@ -22,57 +24,68 @@ export default function NGOLogin() {
   })
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     setLoading(true)
-    setError('')
-
-    const loginData = {
-      email: form.email,
-      password: form.password,
-      role: 'ngo',
-    }
 
     try {
-      /*
-        TODO: API Integration
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api$/, '')
 
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(loginData),
+      const res = await fetch(`${apiUrl}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        toast({
+          title: 'Login Failed',
+          description: data.message || 'Invalid email or password',
+          variant: 'destructive',
         })
-      */
-
-      // 🔹 Temporary fallback (replace later with API response)
-      const users = JSON.parse(localStorage.getItem('ngos') || '[]')
-
-      const user = users.find(
-        (u: any) =>
-          u.email === form.email &&
-          u.password === form.password
-      )
-
-      if (!user) {
-        setError('Invalid email or password')
-        setLoading(false)
         return
       }
 
-      localStorage.setItem('authUser', JSON.stringify(user))
-      localStorage.setItem('role', 'ngo')
+      if (data.user?.role !== 'ngo') {
+        toast({
+          title: 'Access Denied',
+          description: 'This account is not registered as an NGO.',
+          variant: 'destructive',
+        })
+        return
+      }
 
-      alert('Login Successful')
+      const token = data.token || data.access_token
+      const user = data.user
 
-      router.push('/app/dashboard/ngo')
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 7)
+      document.cookie = `token=${token}; path=/; expires=${expiry.toUTCString()}`
+      document.cookie = `role=${user.role}; path=/; expires=${expiry.toUTCString()}`
+
+      window.dispatchEvent(new CustomEvent('auth-updated'))
+
+      router.push('/dashboard/ngo')
     } catch (err) {
       console.error(err)
-      setError('Login failed')
+      toast({
+        title: 'Network Error',
+        description: 'Could not connect to the server. Please try again.',
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
@@ -127,11 +140,6 @@ export default function NGOLogin() {
                   }
                 />
               </div>
-
-              {/* ERROR */}
-              {error && (
-                <p className="text-red-500 text-sm">{error}</p>
-              )}
 
               {/* BUTTON */}
               <Button

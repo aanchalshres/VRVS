@@ -11,9 +11,11 @@ import {
 } from '@/app/components/ui/card'
 import { Input } from '@/app/components/ui/input'
 import { Label } from '@/app/components/ui/label'
+import { useToast } from '@/app/hooks/use-toast'
 
 export default function VolunteerLogin() {
   const router = useRouter()
+  const { toast } = useToast()
 
   const [form, setForm] = useState({
     email: '',
@@ -21,55 +23,68 @@ export default function VolunteerLogin() {
   })
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     setLoading(true)
-    setError('')
-
-    const loginData = {
-      email: form.email,
-      password: form.password,
-      role: 'volunteer',
-    }
 
     try {
-      /*
-        TODO: API Integration
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(loginData),
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api$/, '')
+
+      const res = await fetch(`${apiUrl}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        toast({
+          title: 'Login Failed',
+          description: data.message || 'Invalid email or password',
+          variant: 'destructive',
         })
-      */
-
-      // 🔹 Local fallback (same storage used in register)
-      const users = JSON.parse(localStorage.getItem('users') || '[]')
-
-      const user = users.find(
-        (u: any) =>
-          u.email === form.email &&
-          u.password === form.password &&
-          u.role === 'volunteer'
-      )
-
-      if (!user) {
-        setError('Invalid email or password')
-        setLoading(false)
         return
       }
 
-      localStorage.setItem('authUser', JSON.stringify(user))
-      localStorage.setItem('role', 'volunteer')
+      if (data.user?.role !== 'volunteer') {
+        toast({
+          title: 'Access Denied',
+          description: 'This account is not registered as a volunteer.',
+          variant: 'destructive',
+        })
+        return
+      }
 
-      alert('Login successful 🚀')
+      const token = data.token || data.access_token
+      const user = data.user
 
-      router.push('/volunteer/tasks')
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      const expiry = new Date()
+      expiry.setDate(expiry.getDate() + 7)
+      document.cookie = `token=${token}; path=/; expires=${expiry.toUTCString()}`
+      document.cookie = `role=${user.role}; path=/; expires=${expiry.toUTCString()}`
+
+      window.dispatchEvent(new CustomEvent('auth-updated'))
+
+      router.push('/dashboard/volunteer')
     } catch (err) {
       console.error(err)
-      setError('Login failed')
+      toast({
+        title: 'Network Error',
+        description: 'Could not connect to the server. Please try again.',
+        variant: 'destructive',
+      })
     } finally {
       setLoading(false)
     }
@@ -122,10 +137,6 @@ export default function VolunteerLogin() {
                 }
               />
             </div>
-
-            {error && (
-              <p className="text-red-500 text-sm">{error}</p>
-            )}
 
             <Button
               type="submit"
