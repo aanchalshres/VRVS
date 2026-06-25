@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\TaskSkill;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Application;
 
 class Task extends Model
 {

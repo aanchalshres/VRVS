@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 
+
 const VolunteerNavbar = ({ sidebarOpen }: { sidebarOpen?: boolean }) => {
   const { user } = useAuth();
   const router = useRouter();
