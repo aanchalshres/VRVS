@@ -43,16 +43,18 @@ export default function OrgSidebar({ isOpen, toggleSidebar }: { isOpen: boolean;
       {/* TOP LOGO + TOGGLE */}
       <div className="flex items-center justify-between h-16 border-b border-[#CACDD3] px-2">
         <div className="flex items-center justify-center flex-1">
-          <Image
-            src="/logo3.png"
-            alt="Org Logo"
-            width={90}
-            height={50}
-            style={{ width: isOpen ? '90px' : '32px', height: 'auto' }}
-            className="rounded-lg transition-all duration-300"
-            priority
-          />
-        </div>
+  <Link href="/">
+    <Image
+      src="/logo3.png"
+      alt="Org Logo"
+      width={90}
+      height={50}
+      style={{ width: isOpen ? '90px' : '32px', height: 'auto' }}
+      className="rounded-lg transition-all duration-300 cursor-pointer"
+      priority
+    />
+  </Link>
+</div>
 
         {/* TOGGLE BUTTON */}
         <button
