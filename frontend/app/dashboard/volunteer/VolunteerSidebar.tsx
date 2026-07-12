@@ -11,6 +11,7 @@ import {
   CheckSquare,
   User,
   LogOut,
+  Users,
 } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -20,6 +21,7 @@ const menuItems = [
   { name: "My Applications", href: "/dashboard/volunteer/applications", icon: FileText },
   { name: "My Skills", href: "/dashboard/volunteer/skills", icon: CheckSquare },
   { name: "Profile", href: "/dashboard/volunteer/profile", icon: User },
+  { name: "Participations", href: "/dashboard/volunteer/participations", icon: Users }
 ];
 
 export default function VolunteerSidebar({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) {

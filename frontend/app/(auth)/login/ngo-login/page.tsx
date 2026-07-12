@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from '@/app/components/Navbar'
+import Link from 'next/link'
 import { Button } from '@/app/components/ui/button'
 import {
   Card,
@@ -151,6 +152,18 @@ export default function NGOLogin() {
               </Button>
 
             </form>
+
+            {/* REGISTER LINK */}
+            <p className="mt-4 text-center text-sm text-gray-600">
+              Don&apos;t have an account?{' '}
+              <Link
+                href="/signup/ngo-register"
+                className="text-[#4F46C8] font-medium hover:underline"
+              >
+                Register as NGO
+              </Link>
+            </p>
+
           </CardContent>
 
         </Card>

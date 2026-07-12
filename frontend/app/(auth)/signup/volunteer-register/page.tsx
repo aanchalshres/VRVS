@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/app/components/ui/button'
 import {
   Card,
@@ -26,6 +27,14 @@ export default function VolunteerRegister() {
   })
 
   const [loading, setLoading] = useState(false)
+
+  // Helper: detect "already registered" style errors and bounce to login
+  const isDuplicateAccountError = (status: number, message: string) => {
+    return (
+      status === 409 ||
+      /already (exists|registered|taken)/i.test(message || '')
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,6 +66,18 @@ export default function VolunteerRegister() {
         const description = data.errors
           ? Object.values(data.errors as Record<string, string[]>)[0][0]
           : data.message || 'Registration failed'
+
+        if (isDuplicateAccountError(res.status, description)) {
+          toast({
+            title: 'Account Already Exists',
+            description: 'An account with this email is already registered. Redirecting to login...',
+            variant: 'destructive',
+          })
+          setTimeout(() => {
+            router.push('/login/volunteer-login')
+          }, 1200)
+          return
+        }
 
         toast({
           title: 'Registration Failed',
@@ -179,6 +200,18 @@ export default function VolunteerRegister() {
             </Button>
 
           </form>
+
+          {/* LOGIN LINK */}
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Already have an account?{' '}
+            <Link
+              href="/login/volunteer-login"
+              className="text-[#4F46C8] font-medium hover:underline"
+            >
+              Login here
+            </Link>
+          </p>
+
         </CardContent>
 
       </Card>

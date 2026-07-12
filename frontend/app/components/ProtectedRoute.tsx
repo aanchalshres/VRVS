@@ -26,29 +26,43 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
 
     // Check if user is authenticated
     if (!isAuthenticated) {
-      console.log('ProtectedRoute: Not authenticated, redirecting to login');
       router.push("/login");
       return;
     }
 
     // Check if user has required role
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-      console.log('ProtectedRoute: Role not allowed, redirecting to unauthorized');
       router.push("/unauthorized");
       return;
     }
-
-    console.log('ProtectedRoute: Auth check passed');
   }, [mounted, isLoading, isAuthenticated, user, allowedRoles, router]);
-
-  console.log('ProtectedRoute render:', { mounted, isLoading, isAuthenticated, userRole: user?.role });
 
   // Wait for context to finish loading
   if (!mounted || isLoading) {
-    console.log('ProtectedRoute: Showing spinner');
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4F46C8]"></div>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "#F0F1F3" }}
+      >
+        <div className="flex flex-col items-center gap-4">
+          {/* Dual-tone spinner using primary + secondary CTA colors */}
+          <div className="relative w-14 h-14">
+            <div
+              className="absolute inset-0 rounded-full border-4 animate-spin"
+              style={{
+                borderColor: "#CACDD3",
+                borderTopColor: "#4F46C8",
+                borderRightColor: "#7683D6",
+              }}
+            />
+          </div>
+          <p
+            className="text-sm font-medium tracking-wide"
+            style={{ color: "#6B7280" }}
+          >
+            Checking your session…
+          </p>
+        </div>
       </div>
     );
   }
@@ -58,11 +72,27 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return null;
   }
 
-  // If role check fails, don't render yet (redirect will happen via effect)
+  // If role check fails, show a branded "redirecting" state instead of a blank screen
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return null;
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: "#F0F1F3" }}
+      >
+        <div
+          className="flex flex-col items-center gap-3 text-center px-6 py-8 rounded-2xl bg-white"
+          style={{ border: "1px solid #CACDD3" }}
+        >
+          <p className="font-display font-bold" style={{ color: "#111827" }}>
+            You don't have access to this page
+          </p>
+          <p className="text-sm" style={{ color: "#6B7280" }}>
+            Redirecting you to the right place…
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  console.log('ProtectedRoute: Rendering children');
   return <>{children}</>;
 }

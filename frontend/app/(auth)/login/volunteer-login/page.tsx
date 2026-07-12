@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Button } from '@/app/components/ui/button'
 import {
   Card,
@@ -147,6 +148,18 @@ export default function VolunteerLogin() {
             </Button>
 
           </form>
+
+          {/* REGISTER LINK */}
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Don&apos;t have an account?{' '}
+            <Link
+              href="/signup/volunteer-register"
+              className="text-[#4F46C8] font-medium hover:underline"
+            >
+              Register as Volunteer
+            </Link>
+          </p>
+
         </CardContent>
 
       </Card>

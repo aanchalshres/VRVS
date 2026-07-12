@@ -9,25 +9,25 @@ import {
 
 const stats = [
   {
-    target: 24810,
+    target: 299,
     suffix: '+',
     label: 'Volunteers Verified',
     icon: BadgeCheck,
   },
   {
-    target: 1340,
+    target: 300,
     suffix: '+',
     label: 'NGOs Registered',
     icon: Building2,
   },
   {
-    target: 18220,
+    target: 500,
     suffix: '+',
     label: 'Emergency Responses',
     icon: Siren,
   },
   {
-    target: 4600,
+    target: 460,
     suffix: '+',
     label: 'Campaigns Completed',
     icon: Trophy,

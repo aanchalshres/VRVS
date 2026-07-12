@@ -1,265 +1,785 @@
-'use client'
+'use client';
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { Button } from '@/app/components/ui/button'
-import { Badge } from '@/app/components/ui/badge'
+import { useEffect, useState } from 'react';
+import { useRouter, useParams, usePathname } from 'next/navigation';
+import { isVolunteerVerified } from 'app/lib/verification';
+import {
+  MapPin,
+  Users,
+  AlertTriangle,
+  FolderOpen,
+  ArrowLeft,
+  Send,
+  Loader2,
+  FileText,
+  Sparkles,
+  User,
+  Mail,
+  Phone,
+  Home,
+  Calendar,
+  Briefcase,
+  Award,
+  Clock,
+  ShieldCheck,
+  ShieldAlert,
+  HeartPulse,
+  Car,
+  CheckSquare,
+  Square,
+  UserCircle2,
+} from 'lucide-react';
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  location?: string;
+  volunteers_needed?: number;
+  urgency_level?: string;
+  type?: string;
+  selectedSkills?: string[];
+  created_by?: number | string;
+  ngo_user_id?: number | string;
+  user_id?: number | string;
+}
+
+const URGENCY_STYLES: Record<string, string> = {
+  high: 'text-red-600',
+  medium: 'text-amber-600',
+  low: 'text-[#6B7280]',
+};
+
+const EXPERIENCE_LEVELS = ['Beginner', 'Intermediate', 'Experienced'];
+
+const AVAILABILITY_OPTIONS = ['Weekdays', 'Weekends', 'Morning', 'Afternoon', 'Evening'];
+
+const SKILL_OPTIONS = [
+  'First Aid',
+  'Teaching',
+  'Driving',
+  'Communication',
+  'Cooking',
+  'Crowd Management',
+];
+
+interface FormState {
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  age: string;
+  gender: string;
+  emergencyContact: string;
+  emergencyPhone: string;
+  occupation: string;
+  experienceLevel: string;
+  availability: string[];
+  skills: string[];
+  motivation: string;
+  previousExperience: string;
+  medicalConditions: string;
+  hasTransport: string;
+  agreedToTerms: boolean;
+}
+
+const INITIAL_FORM: FormState = {
+  fullName: '',
+  email: '',
+  phone: '',
+  address: '',
+  age: '',
+  gender: '',
+  emergencyContact: '',
+  emergencyPhone: '',
+  occupation: '',
+  experienceLevel: '',
+  availability: [],
+  skills: [],
+  motivation: '',
+  previousExperience: '',
+  medicalConditions: '',
+  hasTransport: '',
+  agreedToTerms: false,
+};
+
+// Pulls the NGO user_id off a task, trying every field name the
+// task-creation flow might have used. Coerces to a number so it still
+// works whether the id was stored as a number or a numeric string.
+// Returns null only if no usable value is present at all, so the
+// notification write can be safely skipped rather than mis-targeted.
+function resolveNgoUserId(task: Task): number | null {
+  const candidate = task.created_by ?? task.ngo_user_id ?? task.user_id;
+  if (candidate === undefined || candidate === null || candidate === '') return null;
+  const num = Number(candidate);
+  return Number.isNaN(num) ? null : num;
+}
 
 export default function ApplyPage() {
-  const { id } = useParams()
-  const router = useRouter()
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useParams();
+  const taskId = params.id;
 
-  const [task, setTask] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [task, setTask] = useState<Task | null>(null);
+  const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
 
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-    availability: '',
-    skills: [] as string[],
-    location: '',
-  })
+  // --- Identity verification (email + phone) ---
+  // This app identifies the volunteer via `volunteer_profile_id` in
+  // localStorage rather than an auth context, so verification is checked
+  // against that id.
+  const [volunteerProfileId, setVolunteerProfileId] = useState<number | null>(null);
+  const [verified, setVerified] = useState(false);
 
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
-
-  // ✅ LOAD TASK BY ID (FIXED)
   useEffect(() => {
-    const tasks = JSON.parse(localStorage.getItem('ngo_tasks') || '[]')
+    const idStr = localStorage.getItem('volunteer_profile_id');
+    const id = idStr ? Number(idStr) : null;
+    setVolunteerProfileId(id);
+    setVerified(isVolunteerVerified(id));
 
-    const found = tasks.find((t: any) => t.id == id)
+    const refresh = () => setVerified(isVolunteerVerified(id));
+    window.addEventListener('verification:updated', refresh);
+    return () => window.removeEventListener('verification:updated', refresh);
+  }, []);
 
-    setTask(found || null)
-    setLoading(false)
-  }, [id])
+  const goVerify = () => {
+    router.push(`/dashboard/volunteer/verify?next=${encodeURIComponent(pathname)}`);
+  };
 
-  // Location detection
+  // Load the selected task from localStorage
   useEffect(() => {
-    if (!navigator.geolocation) return
+    const stored = localStorage.getItem('selectedTask');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (String(parsed.id) === String(taskId)) {
+        setTask(parsed);
+      } else {
+        const allTasks = JSON.parse(localStorage.getItem('ngo_tasks') || '[]');
+        const found = allTasks.find((t: any) => String(t.id) === String(taskId));
+        if (found) setTask(found);
+        else setError('Task not found');
+      }
+    } else {
+      const allTasks = JSON.parse(localStorage.getItem('ngo_tasks') || '[]');
+      const found = allTasks.find((t: any) => String(t.id) === String(taskId));
+      if (found) setTask(found);
+      else setError('No task selected');
+    }
+  }, [taskId]);
 
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const { latitude, longitude } = position.coords
+  const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
 
-      setCoords({ lat: latitude, lng: longitude })
+  const toggleFromArray = (field: 'availability' | 'skills', value: string) => {
+    setForm((prev) => {
+      const current = prev[field];
+      const next = current.includes(value)
+        ? current.filter((v) => v !== value)
+        : [...current, value];
+      return { ...prev, [field]: next };
+    });
+  };
 
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-        )
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!task) return;
 
-        const data = await res.json()
+    setFormError('');
 
-        const locationName =
-          data.address?.city ||
-          data.address?.town ||
-          data.address?.village ||
-          data.display_name ||
-          'Detected location'
-
-        setForm((prev) => ({
-          ...prev,
-          location: locationName,
-        }))
-      } catch {}
-    })
-  }, [])
-
-  const toggleSkill = (skill: string) => {
-    setForm((prev) => ({
-      ...prev,
-      skills: prev.skills.includes(skill)
-        ? prev.skills.filter((s) => s !== skill)
-        : [...prev.skills, skill],
-    }))
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!form.name || !form.email || !form.phone || !form.availability) {
-      alert('Please fill all required fields!')
-      return
+    // --- Verification guard: this is the actual enforcement point ---
+    if (!isVolunteerVerified(volunteerProfileId)) {
+      goVerify();
+      return;
     }
 
-    const applications = JSON.parse(
-      localStorage.getItem('applications') || '[]'
-    )
-
-    const alreadyApplied = applications.find(
-      (a: any) => a.taskId == id && a.email === form.email
-    )
-
-    if (alreadyApplied) {
-      alert('You already applied!')
-      return
+    if (!form.fullName.trim() || !form.email.trim() || !form.phone.trim()) {
+      setFormError('Please fill in your full name, email, and phone number.');
+      return;
+    }
+    if (!form.agreedToTerms) {
+      setFormError('Please confirm that the information provided is correct.');
+      return;
     }
 
-    applications.push({
-      taskId: id,
-      taskTitle: task?.title,
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      message: form.message,
-      skills: form.skills,
+    setLoading(true);
+    setError('');
+
+    const appliedAt = new Date().toISOString();
+
+    const applicant = {
+      fullName: form.fullName.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      address: form.address.trim() || null,
+      age: form.age ? Number(form.age) : null,
+      gender: form.gender || null,
+      emergencyContact: form.emergencyContact.trim() || null,
+      emergencyPhone: form.emergencyPhone.trim() || null,
+      occupation: form.occupation.trim() || null,
+      experienceLevel: form.experienceLevel || null,
       availability: form.availability,
-      location: form.location,
-      coordinates: coords,
-      appliedAt: new Date().toISOString(),
-    })
+      skills: form.skills,
+      motivation: form.motivation.trim() || null,
+      previousExperience: form.previousExperience.trim() || null,
+      medicalConditions: form.medicalConditions.trim() || null,
+      hasTransport: form.hasTransport || null,
+    };
 
-    localStorage.setItem('applications', JSON.stringify(applications))
+    const newApplication = {
+      id: Date.now(),
+      opportunity_id: task.id,
+      volunteer_profile_id: volunteerProfileId,
+      status: 'pending' as const,
+      applied_at: appliedAt,
+      reviewed_by: null,
+      reviewed_at: null,
+      applicant,
+      created_at: appliedAt,
+      updated_at: appliedAt,
+    };
 
-    alert('Application submitted successfully!')
+    try {
+      // 1. Volunteer-facing record (used on /dashboard/volunteer/applications)
+      const existing = JSON.parse(localStorage.getItem('opportunity_applications') || '[]');
+      localStorage.setItem('opportunity_applications', JSON.stringify([newApplication, ...existing]));
 
-    router.push('/dashboard/volunteer/tasks')
+      // 2. NGO-facing record (used on /dashboard/ngo/applications).
+      // Carries the same id so the two records can be kept in sync later,
+      // plus the full applicant details so the NGO can review the submission.
+      const volunteerName = form.fullName.trim() || `Volunteer #${volunteerProfileId ?? 'unknown'}`;
+      const ngoExisting = JSON.parse(localStorage.getItem('ngo_applications') || '[]');
+      const ngoRecord = {
+        id: newApplication.id,
+        task_id: task.id,
+        volunteer_name: volunteerName,
+        status: 'pending' as const,
+        applied_at: appliedAt,
+        applicant,
+      };
+      localStorage.setItem('ngo_applications', JSON.stringify([ngoRecord, ...ngoExisting]));
+      window.dispatchEvent(new Event('applications:updated'));
+
+      // 3. Notification for the NGO, only if we can resolve a recipient.
+      const ngoUserId = resolveNgoUserId(task);
+      if (ngoUserId !== null) {
+        const newNotification = {
+          id: newApplication.id + 1,
+          user_id: ngoUserId,
+          title: 'New volunteer application',
+          message: `${volunteerName} applied to "${task.title}".`,
+          type: 'volunteer_applied',
+          is_read: false,
+          read_at: null,
+          created_at: appliedAt,
+          updated_at: appliedAt,
+          meta: {
+            volunteer_name: volunteerName,
+            task_id: task.id,
+            task_title: task.title,
+            application_status: 'pending',
+            application_id: newApplication.id,
+          },
+        };
+        const notifExisting = JSON.parse(localStorage.getItem('ngo_notifications') || '[]');
+        localStorage.setItem('ngo_notifications', JSON.stringify([newNotification, ...notifExisting]));
+        window.dispatchEvent(new Event('notifications:updated'));
+      } else {
+        console.warn(
+          `ApplyPage: could not resolve NGO user_id for task ${task.id}; notification not created.`
+        );
+      }
+
+      router.push('/dashboard/volunteer/applications');
+    } catch (err) {
+      setError('Failed to submit application. Please try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F0F1F3] p-6 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-[#CACDD3] text-center max-w-sm">
+          <AlertTriangle size={36} className="mx-auto text-red-500 mb-3" />
+          <p className="text-[#111827] font-medium text-lg mb-1">{error}</p>
+          <p className="text-[#6B7280] text-sm mb-6">
+            The task may have been removed or the link is invalid.
+          </p>
+          <button
+            onClick={() => router.push('/dashboard/volunteer/tasks')}
+            className="flex items-center gap-2 justify-center w-full bg-[#4F46C8] hover:bg-[#3f39a8] transition-colors text-white px-6 py-2.5 rounded-lg font-medium"
+          >
+            <ArrowLeft size={16} />
+            Back to Tasks
+          </button>
+        </div>
+      </div>
+    );
   }
 
-  // LOADING
-  if (loading) return <div className="p-6">Loading...</div>
-
-  // NO TASK
   if (!task) {
     return (
-      <div className="p-6 text-red-500">
-        Task not found. Please go back.
+      <div className="min-h-screen bg-[#F0F1F3] flex items-center justify-center p-6">
+        <div className="flex items-center gap-2 text-[#6B7280]">
+          <Loader2 size={18} className="animate-spin" />
+          Loading task...
+        </div>
       </div>
-    )
+    );
   }
 
-  const progress =
-    task.quota > 0 ? (task.volunteers / task.quota) * 100 : 0
-
   return (
-    <div className="bg-[#F0F1F3] min-h-screen p-6">
-
-      <div className="max-w-5xl mx-auto space-y-6">
-
+    <div className="min-h-screen bg-[#F0F1F3] p-6">
+      <div className="max-w-3xl mx-auto">
         <button
           onClick={() => router.push('/dashboard/volunteer/tasks')}
-          className="text-sm text-[#4F46C8]"
+          className="flex items-center gap-2 text-[#6B7280] hover:text-[#111827] mb-6 text-sm font-medium transition-colors"
         >
-          ← Back
+          <ArrowLeft size={16} />
+          Back to Tasks
         </button>
 
-        {/* TASK CARD */}
-        <div className="bg-white p-6 rounded-xl space-y-4">
-
-          <h1 className="text-xl font-bold">{task.title}</h1>
-          <p>{task.description}</p>
-
-          <div className="flex flex-wrap gap-2">
-            {task.selectedSkills?.map((skill: string) => (
-              <Badge key={skill}>{skill}</Badge>
-            ))}
+        {/* Verification banner */}
+        {!verified && (
+          <div className="flex items-start gap-2.5 text-sm text-[#B91C1C] bg-[#B91C1C]/5 border border-[#B91C1C]/20 rounded-xl px-4 py-3.5 mb-6">
+            <ShieldAlert size={18} className="shrink-0 mt-0.5" />
+            <span>
+              You need to verify your email and phone number before applying.{' '}
+              <button type="button" onClick={goVerify} className="underline font-semibold">
+                Verify now
+              </button>
+            </span>
           </div>
+        )}
 
-          <p>📍 {task.location}</p>
+        {/* Task summary card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6 mb-6">
+          <h1 className="text-2xl font-bold text-[#111827]">{task.title}</h1>
+          <p className="text-[#6B7280] mt-2">{task.description}</p>
 
-          <div className="h-2 bg-gray-200 rounded">
-            <div
-              className="h-2 bg-indigo-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
+          <div className="mt-5 grid grid-cols-2 gap-4 text-sm">
+            <div className="flex items-center gap-2.5 bg-[#B9C0D4]/25 rounded-lg px-3 py-2.5">
+              <MapPin size={17} className="text-[#4F46C8] shrink-0" />
+              <div>
+                <p className="text-[#6B7280] text-xs">Location</p>
+                <p className="font-medium text-[#111827]">{task.location || 'Remote'}</p>
+              </div>
+            </div>
 
-        {/* FORM */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-xl space-y-4"
-        >
+            <div className="flex items-center gap-2.5 bg-[#B9C0D4]/25 rounded-lg px-3 py-2.5">
+              <Users size={17} className="text-[#4F46C8] shrink-0" />
+              <div>
+                <p className="text-[#6B7280] text-xs">Volunteers Needed</p>
+                <p className="font-medium text-[#111827]">{task.volunteers_needed || 1}</p>
+              </div>
+            </div>
 
-          <input
-            placeholder="Name *"
-            className="w-full p-2 border rounded"
-            value={form.name}
-            onChange={(e) =>
-              setForm({ ...form, name: e.target.value })
-            }
-          />
+            <div className="flex items-center gap-2.5 bg-[#B9C0D4]/25 rounded-lg px-3 py-2.5">
+              <AlertTriangle
+                size={17}
+                className={`shrink-0 ${URGENCY_STYLES[(task.urgency_level || 'low').toLowerCase()] || 'text-[#6B7280]'}`}
+              />
+              <div>
+                <p className="text-[#6B7280] text-xs">Urgency</p>
+                <p className="font-medium text-[#111827] capitalize">{task.urgency_level || 'Low'}</p>
+              </div>
+            </div>
 
-          <input
-            placeholder="Email *"
-            className="w-full p-2 border rounded"
-            value={form.email}
-            onChange={(e) =>
-              setForm({ ...form, email: e.target.value })
-            }
-          />
-
-          <input
-            placeholder="Phone *"
-            className="w-full p-2 border rounded"
-            value={form.phone}
-            onChange={(e) =>
-              setForm({ ...form, phone: e.target.value })
-            }
-          />
-
-          <select
-            className="w-full p-2 border rounded"
-            value={form.availability}
-            onChange={(e) =>
-              setForm({ ...form, availability: e.target.value })
-            }
-          >
-            <option value="">Select Availability *</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Part-time">Part-time</option>
-            <option value="Weekend">Weekend</option>
-          </select>
-
-          <textarea
-            placeholder="Message"
-            className="w-full p-2 border rounded"
-            value={form.message}
-            onChange={(e) =>
-              setForm({ ...form, message: e.target.value })
-            }
-          />
-
-          {/* SKILLS */}
-          <div>
-            <p className="text-sm mb-2">Select Skills</p>
-
-            <div className="flex flex-wrap gap-2">
-              {task.selectedSkills?.map((skill: string) => (
-                <button
-                  type="button"
-                  key={skill}
-                  onClick={() => toggleSkill(skill)}
-                  className={`px-3 py-1 rounded-full border ${
-                    form.skills.includes(skill)
-                      ? 'bg-indigo-500 text-white'
-                      : 'bg-gray-100'
-                  }`}
-                >
-                  {skill}
-                </button>
-              ))}
+            <div className="flex items-center gap-2.5 bg-[#B9C0D4]/25 rounded-lg px-3 py-2.5">
+              <FolderOpen size={17} className="text-[#4F46C8] shrink-0" />
+              <div>
+                <p className="text-[#6B7280] text-xs">Type</p>
+                <p className="font-medium text-[#111827] capitalize">{task.type || 'General'}</p>
+              </div>
             </div>
           </div>
 
-          {/* LOCATION */}
-          <input
-            className="w-full p-2 border rounded"
-            value={form.location}
-            onChange={(e) =>
-              setForm({ ...form, location: e.target.value })
-            }
-          />
+          {task.selectedSkills && task.selectedSkills.length > 0 && (
+            <div className="mt-5">
+              <div className="flex items-center gap-1.5 text-[#6B7280] text-sm mb-2">
+                <Sparkles size={14} />
+                Required skills
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {task.selectedSkills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-3 py-1 bg-[#4F46C8] text-white text-xs font-medium rounded-full"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-indigo-600 text-white"
-          >
-            Apply
-          </Button>
+        {/* Application form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Your Information */}
+          <div className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <User size={20} className="text-[#4F46C8]" />
+              <h2 className="text-xl font-semibold text-[#111827]">Your Information</h2>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Full Name" required icon={User}>
+                <input
+                  type="text"
+                  required
+                  value={form.fullName}
+                  onChange={(e) => updateField('fullName', e.target.value)}
+                  placeholder="Jane Doe"
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label="Email" required icon={Mail}>
+                <input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => updateField('email', e.target.value)}
+                  placeholder="jane@example.com"
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label="Phone Number" required icon={Phone}>
+                <input
+                  type="tel"
+                  required
+                  value={form.phone}
+                  onChange={(e) => updateField('phone', e.target.value)}
+                  placeholder="+977 98XXXXXXXX"
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label="Address" icon={Home}>
+                <input
+                  type="text"
+                  value={form.address}
+                  onChange={(e) => updateField('address', e.target.value)}
+                  placeholder="Street, City"
+                  className={inputClass}
+                />
+              </Field>
+            </div>
+          </div>
+
+          {/* Volunteer Details */}
+          <div className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <UserCircle2 size={20} className="text-[#4F46C8]" />
+              <h2 className="text-xl font-semibold text-[#111827]">Volunteer Details</h2>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Field label="Age" icon={Calendar}>
+                <input
+                  type="number"
+                  min={0}
+                  value={form.age}
+                  onChange={(e) => updateField('age', e.target.value)}
+                  placeholder="25"
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label="Gender" icon={User}>
+                <select
+                  value={form.gender}
+                  onChange={(e) => updateField('gender', e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">Select</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </Field>
+
+              <Field label="Emergency Contact" icon={User}>
+                <input
+                  type="text"
+                  value={form.emergencyContact}
+                  onChange={(e) => updateField('emergencyContact', e.target.value)}
+                  placeholder="Contact person's name"
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label="Emergency Phone" icon={Phone}>
+                <input
+                  type="tel"
+                  value={form.emergencyPhone}
+                  onChange={(e) => updateField('emergencyPhone', e.target.value)}
+                  placeholder="+977 98XXXXXXXX"
+                  className={inputClass}
+                />
+              </Field>
+
+              <Field label="Occupation" icon={Briefcase}>
+                <input
+                  type="text"
+                  value={form.occupation}
+                  onChange={(e) => updateField('occupation', e.target.value)}
+                  placeholder="Student, Engineer, etc."
+                  className={inputClass}
+                />
+              </Field>
+            </div>
+
+            {/* Experience Level */}
+            <div className="mt-5">
+              <div className="flex items-center gap-1.5 text-sm font-medium text-[#111827] mb-2.5">
+                <Award size={15} className="text-[#4F46C8]" />
+                Experience Level
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {EXPERIENCE_LEVELS.map((level) => (
+                  <label
+                    key={level}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
+                      form.experienceLevel === level
+                        ? 'border-[#4F46C8] bg-[#4F46C8]/5 text-[#4F46C8] font-medium'
+                        : 'border-[#CACDD3] text-[#111827] hover:bg-[#B9C0D4]/20'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="experienceLevel"
+                      value={level}
+                      checked={form.experienceLevel === level}
+                      onChange={(e) => updateField('experienceLevel', e.target.value)}
+                      className="accent-[#4F46C8]"
+                    />
+                    {level}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Availability */}
+            <div className="mt-5">
+              <div className="flex items-center gap-1.5 text-sm font-medium text-[#111827] mb-2.5">
+                <Clock size={15} className="text-[#4F46C8]" />
+                Availability
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {AVAILABILITY_OPTIONS.map((option) => {
+                  const active = form.availability.includes(option);
+                  return (
+                    <button
+                      type="button"
+                      key={option}
+                      onClick={() => toggleFromArray('availability', option)}
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-sm transition-colors ${
+                        active
+                          ? 'border-[#4F46C8] bg-[#4F46C8]/5 text-[#4F46C8] font-medium'
+                          : 'border-[#CACDD3] text-[#111827] hover:bg-[#B9C0D4]/20'
+                      }`}
+                    >
+                      {active ? <CheckSquare size={15} /> : <Square size={15} />}
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Skills */}
+          <div className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <Sparkles size={20} className="text-[#4F46C8]" />
+              <h2 className="text-xl font-semibold text-[#111827]">Skills</h2>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {SKILL_OPTIONS.map((skill) => {
+                const active = form.skills.includes(skill);
+                return (
+                  <button
+                    type="button"
+                    key={skill}
+                    onClick={() => toggleFromArray('skills', skill)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-sm transition-colors ${
+                      active
+                        ? 'border-[#4F46C8] bg-[#4F46C8] text-white font-medium'
+                        : 'border-[#CACDD3] text-[#111827] hover:bg-[#B9C0D4]/20'
+                    }`}
+                  >
+                    {active ? <CheckSquare size={15} /> : <Square size={15} />}
+                    {skill}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Motivation & Experience */}
+          <div className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6 space-y-5">
+            <div className="flex items-center gap-2">
+              <FileText size={20} className="text-[#4F46C8]" />
+              <h2 className="text-xl font-semibold text-[#111827]">Tell Us More</h2>
+            </div>
+
+            <Field label="Why do you want to volunteer?">
+              <textarea
+                rows={4}
+                value={form.motivation}
+                onChange={(e) => updateField('motivation', e.target.value)}
+                placeholder="Share your motivation for joining this task..."
+                className={inputClass}
+              />
+            </Field>
+
+            <Field label="Previous Volunteer Experience">
+              <textarea
+                rows={4}
+                value={form.previousExperience}
+                onChange={(e) => updateField('previousExperience', e.target.value)}
+                placeholder="Describe any relevant past volunteer work..."
+                className={inputClass}
+              />
+            </Field>
+
+            <Field label="Medical Conditions" icon={HeartPulse}>
+              <textarea
+                rows={3}
+                value={form.medicalConditions}
+                onChange={(e) => updateField('medicalConditions', e.target.value)}
+                placeholder="List any conditions we should be aware of (optional)..."
+                className={inputClass}
+              />
+            </Field>
+
+            {/* Own transportation */}
+            <div>
+              <div className="flex items-center gap-1.5 text-sm font-medium text-[#111827] mb-2.5">
+                <Car size={15} className="text-[#4F46C8]" />
+                Can you bring your own transportation?
+              </div>
+              <div className="flex gap-3">
+                {['Yes', 'No'].map((option) => (
+                  <label
+                    key={option}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
+                      form.hasTransport === option
+                        ? 'border-[#4F46C8] bg-[#4F46C8]/5 text-[#4F46C8] font-medium'
+                        : 'border-[#CACDD3] text-[#111827] hover:bg-[#B9C0D4]/20'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="hasTransport"
+                      value={option}
+                      checked={form.hasTransport === option}
+                      onChange={(e) => updateField('hasTransport', e.target.value)}
+                      className="accent-[#4F46C8]"
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Terms */}
+          <div className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.agreedToTerms}
+                onChange={(e) => updateField('agreedToTerms', e.target.checked)}
+                className="mt-0.5 accent-[#4F46C8] w-4 h-4"
+              />
+              <span className="flex items-center gap-1.5 text-sm text-[#111827]">
+                <ShieldCheck size={15} className="text-[#4F46C8] shrink-0" />
+                I confirm that the information provided is correct.
+              </span>
+            </label>
+          </div>
+
+          {(formError || error) && (
+            <div className="flex items-center gap-2 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
+              <AlertTriangle size={16} />
+              {formError || error}
+            </div>
+          )}
+
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="flex-1 px-6 py-3 bg-white border border-[#CACDD3] text-[#111827] rounded-xl hover:bg-[#B9C0D4]/25 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`flex-1 py-3 rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                verified
+                  ? 'bg-[#4F46C8] hover:bg-[#3f39a8] text-white'
+                  : 'bg-[#CACDD3] text-white'
+              }`}
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Submitting...
+                </>
+              ) : verified ? (
+                <>
+                  <Send size={18} />
+                  Submit Application
+                </>
+              ) : (
+                <>
+                  <ShieldAlert size={18} />
+                  Verify Identity to Apply
+                </>
+              )}
+            </button>
+          </div>
         </form>
-
       </div>
     </div>
-  )
+  );
+}
+
+const inputClass =
+  'w-full px-4 py-2.5 border border-[#CACDD3] rounded-xl text-[#111827] placeholder:text-[#6B7280] focus:ring-2 focus:ring-[#7683D6] focus:border-transparent transition bg-white';
+
+function Field({
+  label,
+  required,
+  icon: Icon,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  icon?: React.ComponentType<{ size?: number; className?: string }>;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="flex items-center gap-1.5 text-sm font-medium text-[#111827] mb-1.5">
+        {Icon && <Icon size={14} className="text-[#4F46C8]" />}
+        {label}
+        {required && <span className="text-[#6B7280] font-normal">*</span>}
+      </label>
+      {children}
+    </div>
+  );
 }

@@ -1,13 +1,12 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import { Siren, Target, Bell, LineChart, QrCode, Award, FileWarning, FileCheck } from 'lucide-react'
+import { Siren, Target, Bell, LineChart, Award, FileWarning, FileCheck } from 'lucide-react'
 
 const features = [
   { icon: Siren, title: 'Emergency Response Management', desc: 'Rapidly deploy verified volunteers to active emergencies with automated alerts and smart task assignments.', color: 'text-red-500', bg: 'bg-red-50' },
   { icon: Target, title: 'Volunteer Matching', desc: 'AI-powered matching connects the right skills and availability to the right opportunities instantly.', color: 'text-brand', bg: 'bg-brand/10' },
   { icon: Bell, title: 'Real-time Notifications', desc: 'Instant push, SMS, and email alerts for emergencies, status updates, and new campaign opportunities.', color: 'text-amber-500', bg: 'bg-amber-50' },
   { icon: LineChart, title: 'Participation Tracking', desc: 'Comprehensive dashboards tracking volunteer hours, tasks completed, and impact metrics for every NGO.', color: 'text-green-600', bg: 'bg-green-50' },
-  { icon: QrCode, title: 'QR Attendance', desc: 'Contactless check-in and attendance tracking with secure QR codes at every volunteering event.', color: 'text-purple-600', bg: 'bg-purple-50' },
   { icon: Award, title: 'Badge & Reputation System', desc: 'Digital credentials, achievement badges, and reputation scores for dedicated and impactful volunteers.', color: 'text-accent', bg: 'bg-accent/10' },
   { icon: FileWarning, title: 'Incident Reporting', desc: 'Real-time incident logging and escalation tools for field coordinators and on-ground teams worldwide.', color: 'text-orange-500', bg: 'bg-orange-50' },
   { icon: FileCheck, title: 'Document Verification', desc: 'Secure encrypted document storage and verification pipeline with full audit trails for compliance needs.', color: 'text-teal-600', bg: 'bg-teal-50' },

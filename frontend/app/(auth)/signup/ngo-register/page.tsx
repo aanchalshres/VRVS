@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from '@/app/components/Navbar'
+import Link from 'next/link'
 import { Button } from '@/app/components/ui/button'
 import {
   Card,
@@ -78,6 +79,17 @@ export default function NGORegister() {
         const description = data.errors
           ? Object.values(data.errors as Record<string, string[]>)[0][0]
           : data.message || 'Registration failed'
+
+        // If the backend indicates the account already exists, nudge to login
+        if (res.status === 409 || /already (exists|registered)/i.test(description || '')) {
+          toast({
+            title: 'Account Already Exists',
+            description: 'An account with this email is already registered. Please login instead.',
+            variant: 'destructive',
+          })
+          router.push('/login/ngo')
+          return
+        }
 
         toast({
           title: 'Registration Failed',
@@ -253,6 +265,18 @@ export default function NGORegister() {
                   : 'Register NGO'}
               </Button>
             </form>
+
+            {/* LOGIN LINK */}
+            <p className="mt-4 text-center text-sm text-gray-600">
+              Already have an account?{' '}
+              <Link
+                href="/login/ngo-login"
+                className="text-[#4F46C8] font-medium hover:underline"
+              >
+                Login here
+              </Link>
+            </p>
+
           </CardContent>
         </Card>
       </div>
