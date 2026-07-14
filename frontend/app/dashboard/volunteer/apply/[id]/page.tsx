@@ -256,6 +256,7 @@ export default function ApplyPage() {
         id: newApplication.id,
         task_id: task.id,
         volunteer_name: volunteerName,
+        volunteer_profile_id: volunteerProfileId,
         status: 'pending' as const,
         applied_at: appliedAt,
         applicant,

@@ -13,6 +13,7 @@ import {
   Loader2,
   Check,
 } from 'lucide-react'
+import { addNotification } from 'app/lib/notifications'
 
 const skillOptions = [
   'First Aid',
@@ -81,45 +82,21 @@ export default function CreateTaskPage() {
 
     setLoading(true)
 
-    // ✅ SCHEMA-ALIGNED OBJECT MATCHING BACKEND DEFINITION
     const newTask = {
-      // BIGINT PK
       id: Date.now(),
-
-      // FK
       ngo_profile_id: null,
       created_by: null,
-
-      // VARCHAR
       title,
       slug: title.toLowerCase().trim().replace(/\s+/g, '-'),
-
-      // LONGTEXT
       description,
-
-      // ENUM(event, campaign, emergency, task)
       type: category.toLowerCase() as 'event' | 'campaign' | 'emergency' | 'task',
-
-      // VARCHAR NULL
       location: location || null,
-
-      // DATETIME
       start_date: startDate ? new Date(startDate).toISOString() : new Date().toISOString(),
       end_date: endDate ? new Date(endDate).toISOString() : null,
-
-      // INTEGER DEFAULT 1
       volunteers_needed: Number(quota) || 1,
-
-      // ENUM(draft, open, ongoing, completed, cancelled) DEFAULT draft
       status: 'open' as 'draft' | 'open' | 'ongoing' | 'completed' | 'cancelled',
-
-      // ENUM(low, medium, high) DEFAULT low
       urgency_level: urgency.toLowerCase().replace(' 🚨', '') as 'low' | 'medium' | 'high',
-
-      // VARCHAR NULL (placeholder for future upload API)
       cover_image: null,
-
-      // TIMESTAMPS
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       deleted_at: null,
@@ -128,7 +105,15 @@ export default function CreateTaskPage() {
     const existing = JSON.parse(localStorage.getItem('ngo_tasks') || '[]')
     localStorage.setItem('ngo_tasks', JSON.stringify([newTask, ...existing]))
 
-    // reset (unchanged UI logic)
+    // 🔔 Notify volunteers that a new task was posted
+    addNotification({
+      task_id: newTask.id,
+      title: newTask.title,
+      location: newTask.location,
+      urgency_level: newTask.urgency_level,
+      type: 'new_task',
+    })
+
     setTitle('')
     setDescription('')
     setCategory('Emergency')
@@ -149,7 +134,6 @@ export default function CreateTaskPage() {
     <div className="min-h-screen bg-[#F0F1F3] flex justify-center p-6">
       <div className="w-full max-w-3xl">
 
-        {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#111827]">
             Create Volunteer Task
@@ -159,7 +143,6 @@ export default function CreateTaskPage() {
           </p>
         </div>
 
-        {/* Success banner */}
         {posted && (
           <div className="mb-5 flex items-center gap-3 rounded-xl border border-[#CACDD3] bg-white px-4 py-3 shadow-sm">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#4F46C8]/10">
@@ -175,7 +158,6 @@ export default function CreateTaskPage() {
         <div className="w-full bg-white border border-[#CACDD3] shadow-sm rounded-2xl p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
 
-            {/* Title */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-[#111827] mb-2">
                 <FileText className="h-4 w-4 text-[#6B7280]" />
@@ -189,7 +171,6 @@ export default function CreateTaskPage() {
               />
             </div>
 
-            {/* Description */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-[#111827] mb-2">
                 <AlignLeft className="h-4 w-4 text-[#6B7280]" />
@@ -204,7 +185,6 @@ export default function CreateTaskPage() {
               />
             </div>
 
-            {/* Category + Location */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-[#111827] mb-2">
@@ -237,7 +217,6 @@ export default function CreateTaskPage() {
               </div>
             </div>
 
-            {/* Skills */}
             <div>
               <label className="text-sm font-medium text-[#111827] mb-2 block">
                 Skills Needed
@@ -263,7 +242,6 @@ export default function CreateTaskPage() {
               </div>
             </div>
 
-            {/* Volunteers Needed */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-[#111827] mb-2">
                 <Users className="h-4 w-4 text-[#6B7280]" />
@@ -279,7 +257,6 @@ export default function CreateTaskPage() {
               />
             </div>
 
-            {/* Dates */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-[#111827] mb-2">
                 <CalendarDays className="h-4 w-4 text-[#6B7280]" />
@@ -307,7 +284,6 @@ export default function CreateTaskPage() {
               </div>
             </div>
 
-            {/* Urgency */}
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-[#111827] mb-2">
                 <AlertTriangle className="h-4 w-4 text-[#6B7280]" />
@@ -342,7 +318,6 @@ export default function CreateTaskPage() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
