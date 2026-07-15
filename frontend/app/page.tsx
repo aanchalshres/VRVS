@@ -18,7 +18,7 @@ export default function HomePage() {
       <FeaturesSection />
       <Testimonials />
       <ImpactStats />
-      <Footer />
+      
       
     </>
     

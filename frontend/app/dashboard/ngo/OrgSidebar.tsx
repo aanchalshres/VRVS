@@ -20,8 +20,10 @@ const menuItems = [
   { name: "Post Task", href: "/dashboard/ngo/post-task", icon: Plus },
   { name: "My Tasks", href: "/dashboard/ngo/tasks", icon: FileText },
   { name: "Applications", href: "/dashboard/ngo/applications", icon: Users },
-  { name: "Verify Volunteers", href: "/dashboard/ngo/verify", icon: CheckSquare },
+  { name: "Participations", href: "/dashboard/ngo/participations", icon: Users },
+  { name: "Verify Volunteers", href: "/dashboard/ngo/verification", icon: CheckSquare },
   { name: "Profile", href: "/dashboard/ngo/profile", icon: User },
+
 ];
 
 export default function OrgSidebar({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) {
