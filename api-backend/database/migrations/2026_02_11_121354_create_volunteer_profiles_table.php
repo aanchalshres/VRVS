@@ -26,8 +26,7 @@ return new class extends Migration
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('emergency_contact_name')->nullable();
             $table->string('emergency_contact_phone')->nullable();
-            $table->enum('availability', ['Available', 'Unavailable', 'Busy'])->nullable(); // available, unavailable, busy
-              $table->json('tfidf_vector')->nullable();
+            $table->enum('availability', ['Available', 'Unavailable', 'Busy'])->default('Available'); // available, unavailable, busy
             $table->float('trust_score')->default(0.5);
             $table->timestamp('trust_updated_at')->nullable();
             $table->decimal('reliability_score', 5, 2)->default(0.00);
