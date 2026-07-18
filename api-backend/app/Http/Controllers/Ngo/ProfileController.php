@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\NgoProfile;
 use Illuminate\Http\Request;
 
-class NgoProfileController extends Controller
+class ProfileController extends Controller
 {
     /**
      * Get all NGO profiles with optional status filter

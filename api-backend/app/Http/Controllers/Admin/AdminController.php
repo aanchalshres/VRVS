@@ -9,11 +9,17 @@ use App\Models\Task;
 use App\Models\VolunteerProfile;
 use App\Services\HungarianMatcher;
 use App\Services\TfIdfService;
+use App\Services\VerificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
+    private VerificationService $verificationService;
+    public function __construct(VerificationService $verificationService)
+    {
+        $this->verificationService = $verificationService;
+    }
     public function getNgoVerification()
     {
         $ngos = NgoProfile::where('verification_status', 'pending')
@@ -29,7 +35,7 @@ class AdminController extends Controller
     public function verifyNgo($id)
     {
         $ngoProfile = NgoProfile::findOrFail($id);
-        $ngoProfile->update(['verification_status' => 'verified']);
+        $this->verificationService->verifyNgo($ngoProfile);
 
         return response()->json([
             'message' => 'NGO verified successfully',
@@ -40,7 +46,7 @@ class AdminController extends Controller
     public function rejectNgo($id)
     {
         $ngoProfile = NgoProfile::findOrFail($id);
-        $ngoProfile->update(['verification_status' => 'rejected']);
+        $this->verificationService->rejectNgo($ngoProfile);
 
         return response()->json([
             'message' => 'NGO rejected',

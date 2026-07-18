@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\VolunteerProfile;
 
-class TrustScoreService
+class TrustScoreCalculator
 {
     const WEIGHTS = [
         'gov_id_uploaded'     =>  0.15,
