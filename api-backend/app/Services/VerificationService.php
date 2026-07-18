@@ -37,6 +37,86 @@ class VerificationService
     }
 
     /**
+     * Get all pending NGOs.
+     */
+    public function getPendingNgos()
+    {
+        return NgoProfile::where('verification_status', 'pending')
+            ->with('user')
+            ->get();
+    }
+
+    public function verifyNgoById(int $id): NgoProfile
+    {
+        $ngo = NgoProfile::findOrFail($id);
+
+        $this->verifyNgo($ngo);
+
+        return $ngo;
+    }
+
+    public function rejectNgoById(int $id): NgoProfile
+    {
+        $ngo = NgoProfile::findOrFail($id);
+
+        $this->rejectNgo($ngo);
+
+        return $ngo;
+    }
+
+    public function getAllNgos()
+    {
+        return NgoProfile::with('user')
+            ->latest()
+            ->get()
+            ->map(fn ($ngo) => [
+                'id' => $ngo->id,
+                'organization_name' => $ngo->organization_name,
+                'registration_number' => $ngo->registration_number,
+                'pan_number' => $ngo->pan_number,
+                'office_location' => $ngo->office_location,
+                'verification_status' => $ngo->verification_status,
+                'created_at' => $ngo->created_at,
+                'user' => [
+                    'id' => $ngo->user?->id,
+                    'name' => $ngo->user?->name,
+                    'email' => $ngo->user?->email,
+                    'phone' => $ngo->user?->phone,
+                ],
+            ]);
+    }
+
+    public function getNgoDetails(int $id): array
+    {
+        $ngo = NgoProfile::with('user')->findOrFail($id);
+
+        return [
+            'id' => $ngo->id,
+            'organization_name' => $ngo->organization_name,
+            'registration_number' => $ngo->registration_number,
+            'pan_number' => $ngo->pan_number,
+            'office_location' => $ngo->office_location,
+            'verification_status' => $ngo->verification_status,
+            'created_at' => $ngo->created_at,
+            'registration_file_path' => $ngo->registration_file_path
+                ? url('storage/' . $ngo->registration_file_path)
+                : null,
+            'pan_file_path' => $ngo->pan_file_path
+                ? url('storage/' . $ngo->pan_file_path)
+                : null,
+            'letterhead_file_path' => $ngo->letterhead_file_path
+                ? url('storage/' . $ngo->letterhead_file_path)
+                : null,
+            'user' => [
+                'id' => $ngo->user?->id,
+                'name' => $ngo->user?->name,
+                'email' => $ngo->user?->email,
+                'phone' => $ngo->user?->phone,
+            ],
+        ];
+    }
+
+    /**
      * Start a volunteer verification session.
      * Called when the volunteer begins the KYC process.
      */
