@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useAuth } from "@/app/providers/AuthProvider";
+import { apiGet } from "@/app/lib/api";
 import { useRouter } from 'next/navigation'
 import {
   MapPin,

@@ -2,7 +2,6 @@
 
 "use client";
 
-import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,34 +10,49 @@ interface ProtectedRouteProps {
   allowedRoles?: ("volunteer" | "ngo" | "admin")[];
 }
 
+// Reads a cookie by name on the client. Returns null if not found or SSR.
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(
+    new RegExp(`(?:^|; )${name}=([^;]*)`)
+  );
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { isAuthenticated, user, isLoading } = useAuth();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
+    // Read the same cookies proxy.ts checks, so client and server agree.
+    setToken(getCookie("token"));
+    setRole(getCookie("role"));
     setMounted(true);
   }, []);
 
+  const isAuthenticated = !!token;
+  const roleAllowed =
+    !allowedRoles || (role !== null && allowedRoles.includes(role as any));
+
   // Handle redirects in a separate effect (not during render)
   useEffect(() => {
-    if (!mounted || isLoading) return;
+    if (!mounted) return;
 
-    // Check if user is authenticated
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
 
-    // Check if user has required role
-    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    if (!roleAllowed) {
       router.push("/unauthorized");
       return;
     }
-  }, [mounted, isLoading, isAuthenticated, user, allowedRoles, router]);
+  }, [mounted, isAuthenticated, roleAllowed, router]);
 
-  // Wait for context to finish loading
-  if (!mounted || isLoading) {
+  // Wait for cookies to be read on the client
+  if (!mounted) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
@@ -73,7 +87,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   // If role check fails, show a branded "redirecting" state instead of a blank screen
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  if (!roleAllowed) {
     return (
       <div
         className="min-h-screen flex items-center justify-center"
