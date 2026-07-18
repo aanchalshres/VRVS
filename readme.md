@@ -1,4 +1,4 @@
-# Sahayogi Hub
+# VRVS
 
 Single setup guide for collaborators working on both the frontend and backend.
 
