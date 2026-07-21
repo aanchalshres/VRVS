@@ -1,87 +1,297 @@
 <?php
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\NgoController;
-use App\Http\Controllers\Api\NgoProfileController;
-use App\Http\Controllers\Api\VolunteerController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\TfIdfController;
+
 use Illuminate\Support\Facades\Route;
 
-// Health check (public - no auth required)
+use App\Http\Controllers\Api\AuthController;
+
+use App\Http\Controllers\Admin\VerificationController;
+use App\Http\Controllers\Admin\TaskController as AdminTaskController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AssignmentController;
+use App\Http\Controllers\Admin\TfIdfController;
+
+use App\Http\Controllers\Ngo\TaskController as NgoTaskController;
+use App\Http\Controllers\Ngo\ApplicationController as NgoApplicationController;
+
+use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
+use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
+use App\Http\Controllers\Volunteer\ProfileController as VolunteerProfileController;
+
+
+/*
+|--------------------------------------------------------------------------
+| Health Check
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/health', function () {
-    return response()->json(['status' => 'ok', 'message' => 'API is running']);
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'API is running'
+    ]);
 });
 
-// Auth routes (public)
+
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Protected routes (authenticated users)
-Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'me']);
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
-// Admin routes (admin role only)
-Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
-    // NGO profile routes
-    Route::get('/ngo-profiles', [NgoProfileController::class, 'index']);
-    Route::get('/ngo-profiles/{id}', [NgoProfileController::class, 'show']);
-    Route::post('/ngo-profiles/{id}/approve', [NgoProfileController::class, 'approve']);
-    Route::post('/ngo-profiles/{id}/reject', [NgoProfileController::class, 'reject']);
+Route::middleware('auth:sanctum')->group(function () {
 
-    // Legacy NGO verification routes (kept for backward compatibility)
-    Route::get('/admin/ngo-verification', [AdminController::class, 'getNgoVerification']);
-    Route::post('/admin/ngo-verify/{id}', [AdminController::class, 'verifyNgo']);
-    Route::post('/admin/ngo-reject/{id}', [AdminController::class, 'rejectNgo']);
+    Route::get('/user', [AuthController::class, 'me']);
 
-    // Task moderation routes
-    Route::get('/admin/task-moderation', [AdminController::class, 'getTaskModeration']);
-    Route::delete('/admin/tasks/{id}', [AdminController::class, 'deleteTask']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    // System stats
-    Route::get('/admin/stats', [AdminController::class, 'getSystemStats']);
-
-    // New NGO routes with formatted data
-    Route::get('/ngos', [AdminController::class, 'ngos']);
-    Route::get('/ngos/{id}', [AdminController::class, 'ngoDetails']);
 });
 
-// NGO routes (ngo role only)
-Route::middleware(['auth:sanctum', 'role:ngo'])->group(function () {
-    // View own tasks (verified or unverified NGOs)
-    Route::get('/ngo/tasks', [NgoController::class, 'getTasks']);
-    Route::get('/ngo/applications', [NgoController::class, 'getApplications']);
-    Route::get('/ngo/profile', [NgoController::class, 'getProfile']);
 
-    // Task creation/management routes (verified NGOs only)
-    Route::middleware('verified_ngo')->group(function () {
-        Route::post('/ngo/tasks', [NgoController::class, 'createTask']);
-        Route::put('/ngo/tasks/{id}', [NgoController::class, 'updateTask']);
-        Route::delete('/ngo/tasks/{id}', [NgoController::class, 'deleteTask']);
-        Route::post('/ngo/tasks/{id}/complete', [NgoController::class, 'completeTask']);
-        Route::post('/ngo/applications/{id}/accept', [NgoController::class, 'acceptApplication']);
-        Route::post('/ngo/applications/{id}/reject', [NgoController::class, 'rejectApplication']);
-    });
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware([
+    'auth:sanctum',
+    'role:admin'
+])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGO Verification
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/ngo-verification',
+        [VerificationController::class, 'getNgoVerification']
+    );
+
+    Route::post(
+        '/admin/ngo-verify/{id}',
+        [VerificationController::class, 'verifyNgo']
+    );
+
+    Route::post(
+        '/admin/ngo-reject/{id}',
+        [VerificationController::class, 'rejectNgo']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGO Listing
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ngos',
+        [VerificationController::class, 'ngos']
+    );
+
+    Route::get(
+        '/ngos/{id}',
+        [VerificationController::class, 'ngoDetails']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task Moderation
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/task-moderation',
+        [AdminTaskController::class, 'index']
+    );
+
+    Route::delete(
+        '/admin/tasks/{id}',
+        [AdminTaskController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/stats',
+        [DashboardController::class, 'stats']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assignment
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/admin/batch-assign',
+        [AssignmentController::class, 'batchAssign']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TF-IDF
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/admin/tfidf/recompute',
+        [TfIdfController::class, 'recompute']
+    );
+
 });
 
-// Volunteer routes (volunteer role only)
-Route::middleware(['auth:sanctum', 'role:volunteer'])->group(function () {
-    // Browse tasks
-    Route::get('/volunteer/tasks', [VolunteerController::class, 'getTasks']);
-    Route::get('/volunteer/tasks/{id}', [VolunteerController::class, 'getTaskDetail']);
 
-    // Apply for task
-    Route::post('/volunteer/tasks/{id}/apply', [VolunteerController::class, 'applyForTask']);
-    Route::get('/volunteer/applications', [VolunteerController::class, 'getApplications']);
+/*
+|--------------------------------------------------------------------------
+| NGO Routes
+|--------------------------------------------------------------------------
+*/
 
-    // Profile
-    Route::get('/volunteer/profile', [VolunteerController::class, 'getProfile']);
+Route::middleware([
+    'auth:sanctum',
+    'role:ngo'
+])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ngo/tasks',
+        [NgoTaskController::class, 'index']
+    );
+
+    Route::post(
+        '/ngo/tasks',
+        [NgoTaskController::class, 'store']
+    );
+
+    Route::put(
+        '/ngo/tasks/{id}',
+        [NgoTaskController::class, 'update']
+    );
+
+    Route::delete(
+        '/ngo/tasks/{id}',
+        [NgoTaskController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Applications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ngo/applications',
+        [NgoApplicationController::class, 'index']
+    );
+
+    Route::post(
+        '/ngo/applications/{id}/accept',
+        [NgoApplicationController::class, 'accept']
+    );
+
+    Route::post(
+        '/ngo/applications/{id}/reject',
+        [NgoApplicationController::class, 'reject']
+    );
+
 });
 
-Route::post('/admin/tfidf/recompute', [TfIdfController::class, 'recompute'])
-     ->middleware('auth:sanctum');
 
-Route::get('/volunteers/{id}/tfidf',  [TfIdfController::class, 'showVolunteer']);
-Route::get('/tasks/{id}/tfidf',       [TfIdfController::class, 'showTask']);
+/*
+|--------------------------------------------------------------------------
+| Volunteer Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::post('/admin/batch-assign', [AdminController::class, 'batchAssign'])
-     ->middleware('auth:sanctum');
+Route::middleware([
+    'auth:sanctum',
+    'role:volunteer'
+])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task Discovery
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/tasks',
+        [VolunteerTaskController::class, 'index']
+    );
+
+    Route::get(
+        '/volunteer/tasks/{id}',
+        [VolunteerTaskController::class, 'show']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Applications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/volunteer/tasks/{id}/apply',
+        [VolunteerApplicationController::class, 'store']
+    );
+
+    Route::get(
+        '/volunteer/applications',
+        [VolunteerApplicationController::class, 'index']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/profile',
+        [VolunteerProfileController::class, 'show']
+    );
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| TF-IDF Public Debug Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/volunteers/{id}/tfidf',
+    [TfIdfController::class, 'showVolunteer']
+);
+
+Route::get(
+    '/tasks/{id}/tfidf',
+    [TfIdfController::class, 'showTask']
+);

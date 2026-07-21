@@ -1,79 +1,36 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Ngo;
 
 use App\Http\Controllers\Controller;
-use App\Models\NgoProfile;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
-    /**
-     * Get all NGO profiles with optional status filter
-     * GET /api/ngo-profiles?status=pending
-     */
-    public function index(Request $request)
+    public function show(Request $request)
     {
-        $query = NgoProfile::with('user');
-
-        // Filter by status if provided
-        if ($request->has('status')) {
-            $status = $request->query('status');
-            if ($status === 'pending') {
-                $query->where('is_verified', false);
-            } elseif ($status === 'verified') {
-                $query->where('is_verified', true);
-            }
-        }
-
-        $ngos = $query->get();
-
         return response()->json([
-            'data' => $ngos,
-            'total' => $ngos->count(),
+            'data' => $request->user()
+                ->load('ngoProfile')
         ]);
     }
 
-    /**
-     * Get a single NGO profile by ID
-     * GET /api/ngo-profiles/{id}
-     */
-    public function show($id)
+
+    public function update(Request $request)
     {
-        $ngo = NgoProfile::with('user')->findOrFail($id);
+        $profile = $request->user()->ngoProfile;
+
+        $profile->update(
+            $request->validate([
+                'organization_name'=>'sometimes|string',
+                'office_location'=>'sometimes|string',
+            ])
+        );
+
 
         return response()->json([
-            'data' => $ngo,
-        ]);
-    }
-
-    /**
-     * Approve an NGO profile
-     * POST /api/ngo-profiles/{id}/approve
-     */
-    public function approve($id)
-    {
-        $ngo = NgoProfile::findOrFail($id);
-        $ngo->update(['is_verified' => true, 'status' => 'verified']);
-
-        return response()->json([
-            'message' => 'NGO approved successfully',
-            'data' => $ngo,
-        ]);
-    }
-
-    /**
-     * Reject an NGO profile
-     * POST /api/ngo-profiles/{id}/reject
-     */
-    public function reject($id)
-    {
-        $ngo = NgoProfile::findOrFail($id);
-        $ngo->update(['is_verified' => false, 'status' => 'rejected']);
-
-        return response()->json([
-            'message' => 'NGO rejected',
-            'data' => $ngo,
+            'message'=>'Profile updated',
+            'data'=>$profile
         ]);
     }
 }

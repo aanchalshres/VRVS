@@ -5,59 +5,62 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class VolunteerProfile extends Model
+class Task extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'profile_photo',
-        'gender',
-        'date_of_birth',
-        'bio',
-        'skills',              // text field used in TF-IDF corpus
-        'primary_location',
-        'city',
-        'country',
+        'ngo_id',
+        'title',
+        'slug',
+        'description',
+        'category_id',
+        'task_type',
+        'location',
         'latitude',
         'longitude',
-        'emergency_contact_name',
-        'emergency_contact_phone',
-        'availability_status',
-        'reliability_score',
-        'total_service_hours',
-        'average_rating',
-        'tfidf_vector',        // json — computed by TfIdfService
-        'trust_score',         // float — computed by TrustScoreService
-        'trust_updated_at',    // timestamp — used for decay calculation
+        'required_volunteers',
+        'status',
+        'tfidf_vector',
     ];
+
 
     protected $casts = [
-        'tfidf_vector'     => 'array',
-        'trust_updated_at' => 'datetime',
-        'trust_score'      => 'float',
+        'tfidf_vector' => 'array',
+        'latitude' => 'float',
+        'longitude' => 'float',
     ];
 
-    public function user()
+
+    public function ngo()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(
+            NgoProfile::class,
+            'ngo_id'
+        );
     }
+
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
 
     public function skills()
     {
         return $this->belongsToMany(
             Skill::class,
-            'volunteer_skills'
-        )->withPivot('proficiency_level');
+            'task_skills'
+        );
     }
 
-    public function applications()
-    {
-        return $this->hasMany(Application::class, 'volunteer_id');
-    }
 
-    public function serviceLogs()
+    public function category()
     {
-        return $this->hasMany(ServiceLog::class, 'volunteer_id');
+        return $this->belongsTo(
+            Category::class,
+            'category_id'
+        );
     }
 }

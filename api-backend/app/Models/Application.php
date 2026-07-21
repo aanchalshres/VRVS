@@ -9,31 +9,39 @@ class Application extends Model
 {
     use HasFactory;
 
-  protected $fillable = [
-    'task_id',
-    'volunteer_id',
-    'recommendation_score',
-    'status',
-    'applied_at',
-    'reviewed_by',
-    'reviewed_at',
-    'remarks',
+    protected $fillable = [
+        'task_id',
+        'volunteer_profile_id',
+        'recommendation_score',
+        'status',
+        'applied_at',
+        'reviewed_by',
+        'reviewed_at',
+        'remarks',
     ];
 
-   // Application.php
+
+    protected $casts = [
+        'applied_at'  => 'datetime',
+        'reviewed_at' => 'datetime',
+        'recommendation_score' => 'float',
+    ];
+
 
     public function task()
     {
         return $this->belongsTo(Task::class);
     }
 
+
     public function volunteer()
     {
         return $this->belongsTo(
             VolunteerProfile::class,
-            'volunteer_id'
+            'volunteer_profile_id'
         );
     }
+
 
     public function reviewer()
     {

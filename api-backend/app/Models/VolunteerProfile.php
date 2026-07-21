@@ -56,11 +56,11 @@ class VolunteerProfile extends Model
 
     public function applications()
     {
-        return $this->hasMany(Application::class, 'volunteer_id');
+        return $this->hasMany(Application::class, 'volunteer_profile_id');
     }
 
     public function serviceLogs()
     {
-        return $this->hasMany(ServiceLog::class, 'volunteer_id');
+        return $this->hasMany(ServiceLog::class, 'volunteer_profile_id');
     }
 }
