@@ -16,7 +16,8 @@ class RecommendationService
 
     public function __construct(
         private SimilarityCalculatorInterface $similarity,
-        private HaversineDistance $distance
+        private HaversineDistance $distance,
+        private TrustScoreService $trustService
     ) {}
 
     public function computeVolunteerTaskScore(
@@ -44,12 +45,24 @@ class RecommendationService
             $distanceScore = max(0, 1 - ($km / 500));
         }
 
-        $trustScore = $volunteer->trust_score ?? 0.5;
+        $trustScore = $this->getTrustScore($volunteer);
 
         return
             (self::SKILL_WEIGHT * $skillScore) +
             (self::DISTANCE_WEIGHT * $distanceScore) +
             (self::TRUST_WEIGHT * $trustScore);
+    }
+
+    public function getTrustScore(VolunteerProfile $volunteer): float
+    {
+        if (
+            !$volunteer->trust_updated_at ||
+            $volunteer->trust_updated_at->diffInHours(now()) > 1
+        ) {
+            $this->trustService->recalculate($volunteer);
+        }
+
+        return $volunteer->fresh()->trust_score ?? 0.5;
     }
 
     public function computeVolunteerTaskMatchScore(
@@ -74,7 +87,9 @@ class RecommendationService
             ->get();
 
         $volunteers->each(function ($volunteer) use ($task) {
-            $volunteer->recommendation_score = $this->computeVolunteerTaskMatchScore($volunteer, $task);
+            $score = $this->computeVolunteerTaskMatchScore($volunteer, $task);
+            $volunteer->recommendation_score = $score;
+            $volunteer->trust_score = $this->getTrustScore($volunteer);
         });
 
         return $volunteers->sortByDesc('recommendation_score')->values();
@@ -137,10 +152,13 @@ class RecommendationService
 
         $tasks = $query->get();
 
-        $tasks->each(function ($task) use ($volunteer) {
+        $trustScore = $this->getTrustScore($volunteer);
+
+        $tasks->each(function ($task) use ($volunteer, $trustScore) {
             $score = $this->computeVolunteerTaskMatchScore($volunteer, $task);
             $task->recommendation_score = $score;
             $task->match_score = $score;
+            $task->trust_score = $trustScore;
         });
 
         return $tasks->sortByDesc('recommendation_score')->values();
