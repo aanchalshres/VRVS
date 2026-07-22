@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Navbar from '../components/Navbar'; // adjust path to match your project
+import Navbar from '../../components/Navbar'; // adjust path to match your project
 import {
   FaCheck,
   FaUsers,

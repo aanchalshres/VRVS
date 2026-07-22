@@ -1,9 +1,6 @@
-// app/layout.tsx
-
 import "./globals.css";
 import React from "react";
 import { AuthProvider } from "./providers/AuthProvider";
-import Footer from "./components/Footer"; // Update the path if needed
 
 export default function RootLayout({
   children,
@@ -18,7 +15,6 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
-          <Footer />
         </AuthProvider>
       </body>
     </html>
