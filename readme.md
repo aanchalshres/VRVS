@@ -55,5 +55,3 @@ npm run dev
 | **NGO** | Post and manage tasks, review applications, track attendance, issue certificates, rate volunteers |
 | **Admin** | Verify NGOs and volunteers, moderate tasks and reviews, manage categories/skills, view analytics and reports |
 
-## Key Subsystems
-
