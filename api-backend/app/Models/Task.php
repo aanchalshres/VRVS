@@ -16,11 +16,21 @@ class Task extends Model
         'description',
         'category_id',
         'task_type',
+        'selection_logic',
         'location',
+        'city',
+        'country',
         'latitude',
         'longitude',
         'required_volunteers',
+        'start_date',
+        'end_date',
+        'application_deadline',
+        'urgency_level',
         'status',
+        'cover_image',
+        'created_by',
+        'updated_by',
         'tfidf_vector',
     ];
 
@@ -29,6 +39,9 @@ class Task extends Model
         'tfidf_vector' => 'array',
         'latitude' => 'float',
         'longitude' => 'float',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'application_deadline' => 'datetime',
     ];
 
 

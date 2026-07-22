@@ -23,12 +23,12 @@ class MatchingService
      */
     public function rankTasksForVolunteer(VolunteerProfile $volunteer)
     {
-        $tasks = Task::where('status', 'active')
-            ->whereHas('user.ngoProfile', function ($query) {
-                $query->where('is_verified', true);
+        $tasks = Task::whereIn('status', ['Open', 'Ongoing'])
+            ->whereHas('ngo', function ($query) {
+                $query->where('verification_status', 'verified');
             })
             ->whereNotNull('tfidf_vector')
-            ->with(['user.ngoProfile', 'skills'])
+            ->with(['ngo.user', 'skills'])
             ->get();
 
         return $tasks
@@ -94,12 +94,12 @@ class MatchingService
     public function getTaskDetail(int $taskId): Task
     {
         return Task::with([
-                'user.ngoProfile',
+                'ngo.user',
                 'applications',
                 'skills'
             ])
-            ->whereHas('user.ngoProfile', function ($query) {
-                $query->where('is_verified', true);
+            ->whereHas('ngo', function ($query) {
+                $query->where('verification_status', 'verified');
             })
             ->findOrFail($taskId);
     }

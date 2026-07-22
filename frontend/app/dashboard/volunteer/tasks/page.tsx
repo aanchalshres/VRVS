@@ -2,16 +2,34 @@
 
 import { useEffect, useState } from 'react'
 import { useAuth } from "@/app/providers/AuthProvider";
-import { apiGet } from "@/app/lib/api";
+import { apiGet, apiPost } from "@/app/lib/api";
 import { useRouter } from 'next/navigation'
 import {
   MapPin,
   Users,
-  AlertTriangle,
   Layers,
   Inbox,
   Send,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react'
+
+interface VolunteerTask {
+  id: number;
+  title: string;
+  description: string;
+  location: string | null;
+  required_volunteers?: number;
+  volunteers_needed?: number;
+  quota?: number;
+  urgency_level?: string;
+  urgency?: string;
+  type?: string;
+  task_type?: string;
+  category?: string;
+  selectedSkills?: string[];
+  [key: string]: unknown;
+}
 
 const urgencyStyles: Record<string, { text: string; bg: string; dot: string }> = {
   low: { text: 'text-[#4F46C8]', bg: 'bg-[#4F46C8]/10', dot: 'bg-[#4F46C8]' },
@@ -26,20 +44,13 @@ export default function VolunteerTasksPage() {
   const [tasks, setTasks]         = useState<VolunteerTask[]>([])
   const [loading, setLoading]     = useState(true)
   const [applying, setApplying]   = useState<number | null>(null)
-  const [search, setSearch]       = useState('')
-  const [district, setDistrict]   = useState('all')
   const [toast, setToast]         = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  // Unique districts for filter dropdown
-  const districts = ['all', ...Array.from(new Set(tasks.map(t => t.district).filter(Boolean)))]
-
-  // ── Fetch tasks from backend ─────────────────────────────────────────────
   useEffect(() => {
     async function load() {
       try {
         setLoading(true)
         const res = await apiGet<{ data: VolunteerTask[] }>('/volunteer/tasks')
-        // API returns tasks already sorted by match_score DESC
         setTasks(res.data ?? [])
       } catch (err: any) {
         console.error('Failed to load tasks:', err)
@@ -51,54 +62,38 @@ export default function VolunteerTasksPage() {
     load()
   }, [])
 
-  const handleApply = (task: any) => {
-    // 1. Create the schema-aligned opportunity application object
-    const newApplication = {
-      // BIGINT PK
-      id: Date.now(),
-
-      // BIGINT FK -> opportunities.id (maps to the selected task id)
-      opportunity_id: task.id,
-
-      // BIGINT FK -> volunteer_profiles.id (Placeholder for authorized user profile)
-      volunteer_profile_id: null, 
-
-      // ENUM(pending, approved, rejected, withdrawn) DEFAULT pending
-      status: 'pending' as 'pending' | 'approved' | 'rejected' | 'withdrawn',
-
-      // TIMESTAMP
-      applied_at: new Date().toISOString(),
-
-      // BIGINT NULL FK -> users.id (NGO reviewer - initially null)
-      reviewed_by: null,
-
-      // TIMESTAMP NULL
-      reviewed_at: null,
-
-      // TEXT NULL
-      remarks: null,
-
-      // TIMESTAMPS
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+  const handleApply = async (task: VolunteerTask) => {
+    setApplying(task.id)
+    setToast(null)
+    try {
+      await apiPost(`/volunteer/tasks/${task.id}/apply`, {})
+      setToast({ message: 'Application submitted successfully!', type: 'success' })
+      setTimeout(() => router.push('/dashboard/volunteer/applications'), 1200)
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err.message || 'Failed to apply. Please try again.'
+      setToast({ message: msg, type: 'error' })
+    } finally {
+      setApplying(null)
     }
-
-    // 2. Save application record to database (localStorage simulated)
-    const existingApplications = JSON.parse(localStorage.getItem('opportunity_applications') || '[]')
-    localStorage.setItem(
-      'opportunity_applications', 
-      JSON.stringify([newApplication, ...existingApplications])
-    )
-
-    // 3. Store selected task details for display UI on the next page
-    localStorage.setItem('selectedTask', JSON.stringify(task))
-    
-    // 4. Route user to the application screen
-    router.push(`/dashboard/volunteer/apply/${task.id}`)
   }
 
   return (
     <div className="min-h-screen bg-[#F0F1F3] p-6">
+
+      {toast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
+          <div
+            className={`flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border text-sm font-medium ${
+              toast.type === 'success'
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-red-50 border-red-200 text-red-800'
+            }`}
+          >
+            {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+            {toast.message}
+          </div>
+        </div>
+      )}
 
       <div className="max-w-5xl mx-auto">
         <div className="mb-6">
@@ -110,7 +105,11 @@ export default function VolunteerTasksPage() {
           </p>
         </div>
 
-        {tasks.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="w-8 h-8 border-4 border-[#4F46C8]/30 border-t-[#4F46C8] rounded-full animate-spin" />
+          </div>
+        ) : tasks.length === 0 ? (
           <div className="bg-white border border-dashed border-[#CACDD3] rounded-2xl p-12 text-center shadow-sm">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-[#F0F1F3] flex items-center justify-center">
               <Inbox className="h-6 w-6 text-[#6B7280]" />
@@ -149,17 +148,13 @@ export default function VolunteerTasksPage() {
                       <MapPin className="h-4 w-4 text-[#6B7280] shrink-0" />
                       {task.location || 'Remote / Online'}
                     </p>
-                    {/* 
-                      Fallback fields used here since the form creates 'volunteers_needed', 
-                      'urgency_level', and 'type' to comply with your backend schema specifications 
-                    */}
                     <p className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-[#6B7280] shrink-0" />
-                      {task.volunteers_needed || task.quota || 1} Volunteers Needed
+                      {task.volunteers_needed || task.required_volunteers || task.quota || 1} Volunteers Needed
                     </p>
                     <p className="flex items-center gap-2 capitalize">
                       <Layers className="h-4 w-4 text-[#6B7280] shrink-0" />
-                      {task.type || task.category || 'task'}
+                      {task.type || task.task_type || task.category || 'task'}
                     </p>
                   </div>
 
@@ -178,10 +173,20 @@ export default function VolunteerTasksPage() {
 
                   <button
                     onClick={() => handleApply(task)}
-                    className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-[#4F46C8] hover:bg-[#4F46C8]/90 text-white py-2.5 rounded-lg transition font-medium"
+                    disabled={applying === task.id}
+                    className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-[#4F46C8] hover:bg-[#4F46C8]/90 disabled:bg-[#4F46C8]/50 text-white py-2.5 rounded-lg transition font-medium"
                   >
-                    <Send className="h-4 w-4" />
-                    Apply Now
+                    {applying === task.id ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Applying...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4" />
+                        Apply Now
+                      </>
+                    )}
                   </button>
 
                 </div>

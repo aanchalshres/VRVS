@@ -27,11 +27,13 @@ class VerificationService
         NgoProfile $ngoProfile,
         ?string $reason = null
     ): NgoProfile {
-        $ngoProfile->update([
-            'verification_status' => 'rejected',
-        ]);
+        $data = ['verification_status' => 'rejected'];
 
-        // Save $reason later if you add a rejection_reason column.
+        if ($reason !== null) {
+            $data['rejection_reason'] = $reason;
+        }
+
+        $ngoProfile->update($data);
 
         return $ngoProfile->fresh();
     }
@@ -55,11 +57,11 @@ class VerificationService
         return $ngo;
     }
 
-    public function rejectNgoById(int $id): NgoProfile
+    public function rejectNgoById(int $id, ?string $reason = null): NgoProfile
     {
         $ngo = NgoProfile::findOrFail($id);
 
-        $this->rejectNgo($ngo);
+        $this->rejectNgo($ngo, $reason);
 
         return $ngo;
     }

@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\TfIdfController;
 
 use App\Http\Controllers\Ngo\TaskController as NgoTaskController;
 use App\Http\Controllers\Ngo\ApplicationController as NgoApplicationController;
+use App\Http\Controllers\Ngo\ProfileController as NgoProfileController;
+use App\Http\Controllers\Ngo\DashboardController as NgoDashboardController;
+use App\Http\Controllers\Ngo\NotificationController as NgoNotificationController;
 
 use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
 use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
@@ -187,9 +190,19 @@ Route::middleware([
         [NgoTaskController::class, 'index']
     );
 
+    Route::get(
+        '/ngo/tasks/{id}',
+        [NgoTaskController::class, 'show']
+    );
+
     Route::post(
         '/ngo/tasks',
         [NgoTaskController::class, 'store']
+    );
+
+    Route::post(
+        '/ngo/tasks/{id}/complete',
+        [NgoTaskController::class, 'complete']
     );
 
     Route::put(
@@ -203,26 +216,87 @@ Route::middleware([
     );
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Applications
-    |--------------------------------------------------------------------------
-    */
+/*
+|--------------------------------------------------------------------------
+| Applications
+|--------------------------------------------------------------------------
+*/
 
-    Route::get(
-        '/ngo/applications',
-        [NgoApplicationController::class, 'index']
-    );
+Route::get(
+    '/ngo/applications',
+    [NgoApplicationController::class, 'index']
+);
 
-    Route::post(
-        '/ngo/applications/{id}/accept',
-        [NgoApplicationController::class, 'accept']
-    );
+Route::post(
+    '/ngo/applications/{id}/accept',
+    [NgoApplicationController::class, 'accept']
+);
 
-    Route::post(
-        '/ngo/applications/{id}/reject',
-        [NgoApplicationController::class, 'reject']
-    );
+Route::post(
+    '/ngo/applications/{id}/reject',
+    [NgoApplicationController::class, 'reject']
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Profile
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/profile',
+    [NgoProfileController::class, 'show']
+);
+
+Route::put(
+    '/ngo/profile',
+    [NgoProfileController::class, 'update']
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/dashboard',
+    [NgoDashboardController::class, 'index']
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Notifications
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/notifications',
+    [NgoNotificationController::class, 'index']
+);
+
+Route::post(
+    '/ngo/notifications/{id}/read',
+    [NgoNotificationController::class, 'markAsRead']
+);
+
+Route::post(
+    '/ngo/notifications/read-all',
+    [NgoNotificationController::class, 'markAllAsRead']
+);
+
+Route::get(
+    '/ngo/notifications/unread-count',
+    [NgoNotificationController::class, 'unreadCount']
+);
+
+Route::delete(
+    '/ngo/notifications/{id}',
+    [NgoNotificationController::class, 'destroy']
+);
 
 });
 
@@ -247,12 +321,12 @@ Route::middleware([
 
     Route::get(
         '/volunteer/tasks',
-        [VolunteerTaskController::class, 'index']
+        [VolunteerTaskController::class, 'getTasks']
     );
 
     Route::get(
         '/volunteer/tasks/{id}',
-        [VolunteerTaskController::class, 'show']
+        [VolunteerTaskController::class, 'getTaskDetail']
     );
 
 
@@ -264,12 +338,17 @@ Route::middleware([
 
     Route::post(
         '/volunteer/tasks/{id}/apply',
-        [VolunteerApplicationController::class, 'store']
+        [VolunteerApplicationController::class, 'applyForTask']
     );
 
     Route::get(
         '/volunteer/applications',
-        [VolunteerApplicationController::class, 'index']
+        [VolunteerApplicationController::class, 'getApplications']
+    );
+
+    Route::post(
+        '/volunteer/applications/{id}/withdraw',
+        [VolunteerApplicationController::class, 'withdraw']
     );
 
 

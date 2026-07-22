@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { apiGet, apiPut, apiUpload, apiDelete } from "@/app/lib/api";
+import { apiGet, apiPut, apiUpload } from "@/app/lib/api";
 
 interface VolunteerSkill {
   id: number;
@@ -176,14 +176,6 @@ function IconUpload({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
-function IconTrash({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-    </svg>
-  );
-}
-
 function IconCheck({ className = "h-5 w-5" }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -215,13 +207,6 @@ export default function VolunteerProfilePage() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [photoUploading, setPhotoUploading] = useState(false);
-
-  const [isDocUploadOpen, setIsDocUploadOpen] = useState(false);
-  const [docUploading, setDocUploading] = useState(false);
-  const [docUploadError, setDocUploadError] = useState("");
-  const [docType, setDocType] = useState("citizenship");
-  const [docRemarks, setDocRemarks] = useState("");
-  const [deletingDocId, setDeletingDocId] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -258,7 +243,7 @@ export default function VolunteerProfilePage() {
 
     setPhotoUploading(true);
     try {
-      const response = await apiUpload<any>("/volunteer/profile-photo", formData);
+      await apiUpload<any>("/volunteer/profile-photo", formData);
       await fetchVolunteerProfile();
       setSuccessMessage("Profile photo updated!");
       setTimeout(() => setSuccessMessage(""), 5000);
@@ -323,8 +308,7 @@ export default function VolunteerProfilePage() {
         availability: availabilityToApi(formData.availability),
       };
 
-      const response = await apiPut<any>("/volunteer/profile", payload);
-      setProfile(mapApiResponse(response.data));
+      await apiPut<any>("/volunteer/profile", payload);
       setSuccessMessage("Profile updated successfully!");
       closeEditModal();
       setTimeout(() => setSuccessMessage(""), 5000);
@@ -334,58 +318,6 @@ export default function VolunteerProfilePage() {
       setSaveError(err.message || "Failed to save changes. Please try again.");
     } finally {
       setSaving(false);
-    }
-  };
-
-  const openDocUploadModal = () => {
-    setDocType("citizenship");
-    setDocRemarks("");
-    setDocUploadError("");
-    setIsDocUploadOpen(true);
-  };
-
-  const handleDocUpload = async () => {
-    const fileInput = document.getElementById("doc-file-input") as HTMLInputElement;
-    const file = fileInput?.files?.[0];
-    if (!file) {
-      setDocUploadError("Please select a file.");
-      return;
-    }
-
-    setDocUploading(true);
-    setDocUploadError("");
-
-    try {
-      const formData = new FormData();
-      formData.append("document", file);
-      formData.append("document_type", docType);
-      if (docRemarks) formData.append("remarks", docRemarks);
-
-      await apiUpload<any>("/volunteer/documents", formData);
-      setIsDocUploadOpen(false);
-      await fetchVolunteerProfile();
-      setSuccessMessage("Document uploaded!");
-      setTimeout(() => setSuccessMessage(""), 5000);
-    } catch (err: any) {
-      console.error(err);
-      setDocUploadError(err.message || "Failed to upload document.");
-    } finally {
-      setDocUploading(false);
-    }
-  };
-
-  const handleDocDelete = async (docId: number) => {
-    if (!confirm("Delete this document? This cannot be undone.")) return;
-    setDeletingDocId(docId);
-    try {
-      await apiDelete(`/volunteer/documents/${docId}`);
-      await fetchVolunteerProfile();
-    } catch (err: any) {
-      console.error(err);
-      setSaveError(err.message || "Failed to delete document.");
-      setTimeout(() => setSaveError(""), 5000);
-    } finally {
-      setDeletingDocId(null);
     }
   };
 
@@ -401,6 +333,9 @@ export default function VolunteerProfilePage() {
       year: "numeric", month: "long", day: "numeric",
     });
   };
+
+  const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const API_BASE = RAW_API_URL.replace(/\/+$/, "").replace(/\/api$/, "");
 
   const completionPercent = completion?.percent ?? 0;
 
@@ -583,6 +518,58 @@ export default function VolunteerProfilePage() {
                   </div>
                 )}
               </div>
+
+              {/* Documents */}
+              <div className="bg-white rounded-xl border border-[#CACDD3] p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-base font-semibold text-[#111827]">Documents</h2>
+                  <button onClick={() => router.push("/dashboard/volunteer/documents")}
+                    className="text-xs text-[#4F46C8] hover:text-[#4338CA] font-medium">
+                    Manage Documents &rarr;
+                  </button>
+                </div>
+                {profile.documents.length === 0 ? (
+                  <p className="text-sm text-[#6B7280]">No documents uploaded yet.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {profile.documents.map((doc) => {
+                      const previewUrl = `${API_BASE}/storage/${doc.file_path}`;
+                      const isImage = doc.mime_type.startsWith("image/");
+                      const isPdf = doc.mime_type === "application/pdf";
+                      return (
+                        <div key={doc.id} className="border border-[#CACDD3] rounded-lg overflow-hidden">
+                          <div className="flex items-center justify-between px-4 py-2.5 bg-[#F0F1F3]">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-[#111827] capitalize">
+                                {doc.document_type.replace("_", " ")}
+                              </p>
+                              <p className="text-xs text-[#6B7280]">{formatDate(doc.created_at)}</p>
+                            </div>
+                            <div className="shrink-0">
+                              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getDocumentStatusBadge(doc.status)}`}>
+                                {doc.status}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="p-2 bg-white">
+                            {isImage ? (
+                              <img src={previewUrl} alt={doc.document_type}
+                                className="w-full max-h-48 object-contain rounded" />
+                            ) : isPdf ? (
+                              <iframe src={previewUrl} className="w-full h-48 rounded bg-gray-50"
+                                title={doc.original_name} />
+                            ) : (
+                              <div className="w-full h-24 flex items-center justify-center bg-gray-50 rounded text-xs text-[#6B7280]">
+                                Preview not available.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Right Column */}
@@ -603,56 +590,13 @@ export default function VolunteerProfilePage() {
                   <div>
                     <p className={`text-sm font-semibold ${verifInfo.color}`}>{verifInfo.label}</p>
                     <p className="text-xs text-[#6B7280] mt-0.5">
-                      {documentStatus === "none" && "Upload verification documents below"}
+                      {documentStatus === "none" && "No documents uploaded yet"}
                       {documentStatus === "pending" && "Documents are being reviewed by admin"}
                       {documentStatus === "verified" && "Your identity has been verified"}
                       {documentStatus === "rejected" && "Upload new documents for re-verification"}
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* Verification Documents */}
-              <div className="bg-white rounded-xl border border-[#CACDD3] p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-base font-semibold text-[#111827]">Documents</h2>
-                  <button onClick={openDocUploadModal}
-                    className="text-xs text-[#4F46C8] hover:text-[#4338CA] font-medium">
-                    + Upload
-                  </button>
-                </div>
-                {profile.documents.length === 0 ? (
-                  <p className="text-sm text-[#6B7280]">No documents uploaded yet.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {profile.documents.map((doc) => (
-                      <div key={doc.id}
-                        className="flex items-center justify-between bg-[#F0F1F3] rounded-lg px-3 py-2.5">
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-[#111827] truncate capitalize">
-                            {doc.document_type.replace("_", " ")}
-                          </p>
-                          <p className="text-xs text-[#6B7280] truncate">{doc.original_name}</p>
-                        </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getDocumentStatusBadge(doc.status)}`}>
-                            {doc.status}
-                          </span>
-                          {doc.status === "pending" && (
-                            <button onClick={() => handleDocDelete(doc.id)} disabled={deletingDocId === doc.id}
-                              className="text-[#6B7280] hover:text-red-600 transition-colors disabled:opacity-50">
-                              {deletingDocId === doc.id ? (
-                                <IconSpinner className="w-3.5 h-3.5 border-2 border-gray-400 border-t-gray-600" />
-                              ) : (
-                                <IconTrash className="h-3.5 w-3.5" />
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
 
               {/* Emergency Contact */}
@@ -792,61 +736,6 @@ export default function VolunteerProfilePage() {
                 {saving ? (
                   <><IconSpinner />Saving...</>
                 ) : "Save changes"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Document Upload Modal */}
-      {isDocUploadOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-          onClick={(e) => { if (e.target === e.currentTarget) setIsDocUploadOpen(false); }}>
-          <div className="bg-white w-full max-w-lg rounded-2xl border border-[#CACDD3] overflow-hidden shadow-xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#CACDD3]">
-              <h2 className="text-base font-semibold text-[#111827]">Upload Document</h2>
-              <button onClick={() => setIsDocUploadOpen(false)} className="text-[#6B7280] hover:text-[#111827] transition-colors" aria-label="Close">
-                <IconX className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="px-6 py-5 space-y-5">
-              <div>
-                <label className="block text-xs text-[#6B7280] mb-1">Document type</label>
-                <select value={docType} onChange={(e) => setDocType(e.target.value)}
-                  className="w-full border border-[#CACDD3] rounded-lg px-3 py-2 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#4F46C8] bg-white">
-                  <option value="citizenship">Citizenship</option>
-                  <option value="passport">Passport</option>
-                  <option value="certificate">Certificate</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs text-[#6B7280] mb-1">File (JPG, PNG, PDF, DOC, DOCX - max 10MB)</label>
-                <input id="doc-file-input" type="file" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
-                  className="w-full border border-[#CACDD3] rounded-lg px-3 py-2 text-sm text-[#111827] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#4F46C8]/10 file:text-[#4F46C8] hover:file:bg-[#4F46C8]/20" />
-              </div>
-              <div>
-                <label className="block text-xs text-[#6B7280] mb-1">Remarks (optional)</label>
-                <textarea value={docRemarks} onChange={(e) => setDocRemarks(e.target.value)} rows={2}
-                  placeholder="Any additional notes..."
-                  className="w-full border border-[#CACDD3] rounded-lg px-3 py-2 text-sm text-[#111827] focus:outline-none focus:ring-2 focus:ring-[#4F46C8] resize-none" />
-              </div>
-              {docUploadError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-xs text-red-600">{docUploadError}</p>
-                </div>
-              )}
-            </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#CACDD3]">
-              <button onClick={() => setIsDocUploadOpen(false)} disabled={docUploading}
-                className="px-4 py-2 text-sm font-medium text-[#6B7280] hover:text-[#111827] border border-[#CACDD3] rounded-lg transition-colors disabled:opacity-50">
-                Cancel
-              </button>
-              <button onClick={handleDocUpload} disabled={docUploading}
-                className="px-5 py-2 text-sm font-medium text-white bg-[#4F46C8] hover:bg-[#4338CA] rounded-lg transition-colors disabled:opacity-60 flex items-center gap-2">
-                {docUploading ? (
-                  <><IconSpinner />Uploading...</>
-                ) : "Upload"}
               </button>
             </div>
           </div>

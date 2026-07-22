@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { apiGet } from '@/app/lib/api';
-import { Briefcase, Clock, CheckCircle2, XCircle, Hourglass, Inbox, AlertCircle } from 'lucide-react';
+import { apiGet, apiPost } from '@/app/lib/api';
+import { Briefcase, Clock, CheckCircle2, XCircle, Hourglass, Inbox, AlertCircle, ArrowLeft } from 'lucide-react';
+
+interface TaskSummary {
+  id: number;
+  title: string;
+  ngo: {
+    organization_name: string;
+  } | null;
+}
 
 interface ApplicationRecord {
   id: number;
   task_id: number;
-  volunteer_id: number;
+  volunteer_profile_id: number;
   status: string;
   applied_at: string;
   reviewed_by: number | null;
@@ -16,19 +24,12 @@ interface ApplicationRecord {
   remarks: string | null;
   created_at: string;
   updated_at: string;
-  task: {
-    id: number;
-    title: string;
-    user: {
-      ngoProfile: {
-        organization_name: string;
-      } | null;
-    };
-  };
+  task: TaskSummary | null;
 }
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; icon: any; label: string }> = {
   Pending: { bg: 'bg-amber-50', text: 'text-amber-700', icon: Hourglass, label: 'Pending Review' },
+  Shortlisted: { bg: 'bg-blue-50', text: 'text-blue-700', icon: Clock, label: 'Shortlisted' },
   Accepted: { bg: 'bg-green-50', text: 'text-green-700', icon: CheckCircle2, label: 'Accepted' },
   Rejected: { bg: 'bg-red-50', text: 'text-red-700', icon: XCircle, label: 'Rejected' },
   Withdrawn: { bg: 'bg-gray-100', text: 'text-gray-600', icon: XCircle, label: 'Withdrawn' },
@@ -39,21 +40,37 @@ export default function VolunteerApplicationsPage() {
   const [applications, setApplications] = useState<ApplicationRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [withdrawing, setWithdrawing] = useState<number | null>(null);
+
+  async function loadApplications() {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await apiGet<{ data: ApplicationRecord[] }>('/volunteer/applications');
+      setApplications(res.data ?? []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load applications.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        setLoading(true);
-        const res = await apiGet<{ data: ApplicationRecord[] }>('/volunteer/applications');
-        setApplications(res.data ?? []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load applications.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    loadApplications();
   }, []);
+
+  async function handleWithdraw(id: number) {
+    if (!confirm('Are you sure you want to withdraw this application?')) return;
+    setWithdrawing(id);
+    try {
+      await apiPost(`/volunteer/applications/${id}/withdraw`, {});
+      await loadApplications();
+    } catch (err: any) {
+      alert(err?.response?.data?.message || err.message || 'Failed to withdraw application.');
+    } finally {
+      setWithdrawing(null);
+    }
+  }
 
   if (loading) {
     return (
@@ -73,6 +90,12 @@ export default function VolunteerApplicationsPage() {
           <AlertCircle size={32} className="mx-auto text-red-500 mb-3" />
           <p className="text-[#111827] font-medium">Failed to load applications</p>
           <p className="text-sm text-[#6B7280] mt-1">{error}</p>
+          <button
+            onClick={loadApplications}
+            className="mt-4 bg-[#4F46C8] hover:bg-[#3f39a8] text-white px-5 py-2 rounded-xl font-medium transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -108,8 +131,9 @@ export default function VolunteerApplicationsPage() {
               const status = STATUS_STYLES[app.status] || STATUS_STYLES.Pending;
               const StatusIcon = status.icon;
               const title = app.task?.title || `Task #${app.task_id}`;
-              const ngoName = app.task?.user?.ngoProfile?.organization_name || 'NGO';
+              const ngoName = app.task?.ngo?.organization_name || 'NGO';
               const reviewedDate = app.reviewed_at || app.updated_at;
+              const canWithdraw = app.status === 'Pending' || app.status === 'Shortlisted';
 
               return (
                 <div
@@ -139,12 +163,23 @@ export default function VolunteerApplicationsPage() {
                     </div>
                   </div>
 
-                  <span
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 ${status.bg} ${status.text}`}
-                  >
-                    <StatusIcon size={13} />
-                    {status.label}
-                  </span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {canWithdraw && (
+                      <button
+                        onClick={() => handleWithdraw(app.id)}
+                        disabled={withdrawing === app.id}
+                        className="text-xs text-gray-500 hover:text-red-600 underline underline-offset-2 disabled:opacity-50"
+                      >
+                        {withdrawing === app.id ? 'Withdrawing...' : 'Withdraw'}
+                      </button>
+                    )}
+                    <span
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${status.bg} ${status.text}`}
+                    >
+                      <StatusIcon size={13} />
+                      {status.label}
+                    </span>
+                  </div>
                 </div>
               );
             })}

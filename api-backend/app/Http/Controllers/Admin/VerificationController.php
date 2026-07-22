@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\VerificationService;
+use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
@@ -31,9 +32,10 @@ class VerificationController extends Controller
         ]);
     }
 
-    public function rejectNgo($id)
+    public function rejectNgo(Request $request, $id)
     {
-        $ngo = $this->verificationService->rejectNgoById($id);
+        $reason = $request->input('reason');
+        $ngo = $this->verificationService->rejectNgoById($id, $reason);
 
         return response()->json([
             'message' => 'NGO rejected',

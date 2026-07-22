@@ -31,8 +31,13 @@ class VerifiedNgo
             ], 403);
         }
 
-        // Check if NGO is verified
-        if (!$user->ngoProfile || !$user->ngoProfile->is_verified) {
+        if (!$user->ngoProfile) {
+            return response()->json([
+                'message' => 'NGO profile not found',
+            ], 404);
+        }
+
+        if ($user->ngoProfile->verification_status !== 'verified') {
             return response()->json([
                 'message' => 'Your NGO must be verified by admin before accessing this resource',
             ], 403);
