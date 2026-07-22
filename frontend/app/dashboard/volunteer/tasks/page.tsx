@@ -70,7 +70,7 @@ export default function VolunteerTasksPage() {
       setToast({ message: 'Application submitted successfully!', type: 'success' })
       setTimeout(() => router.push('/dashboard/volunteer/applications'), 1200)
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err.message || 'Failed to apply. Please try again.'
+      const msg = err.message || 'Failed to apply. Please try again.'
       setToast({ message: msg, type: 'error' })
     } finally {
       setApplying(null)

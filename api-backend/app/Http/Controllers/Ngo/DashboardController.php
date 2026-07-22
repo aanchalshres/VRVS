@@ -100,10 +100,14 @@ class DashboardController extends Controller
             'organization_name',
             'registration_number',
             'description',
+            'mission',
+            'vision',
+            'logo',
             'website',
             'office_location',
             'city',
             'country',
+            'org_category_id',
             'pan_number',
         ];
 

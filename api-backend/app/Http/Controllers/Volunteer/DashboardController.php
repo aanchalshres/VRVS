@@ -22,7 +22,7 @@ class DashboardController extends Controller
 
         $profile->load('skills');
 
-        $applications = Application::where('volunteer_id', $profile->id)
+        $applications = Application::where('volunteer_profile_id', $profile->id)
             ->with(['task', 'task.ngo.user'])
             ->orderBy('created_at', 'desc')
             ->get();

@@ -12,6 +12,8 @@ import {
   CheckSquare,
   User,
   LogOut,
+  Bell,
+  ShieldCheck,
 } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -21,9 +23,9 @@ const menuItems = [
   { name: "My Tasks", href: "/dashboard/ngo/tasks", icon: FileText },
   { name: "Applications", href: "/dashboard/ngo/applications", icon: Users },
   { name: "Participations", href: "/dashboard/ngo/participations", icon: Users },
-  { name: "Verify Volunteers", href: "/dashboard/ngo/verification", icon: CheckSquare },
+  { name: "Verification", href: "/dashboard/ngo/verification", icon: ShieldCheck },
+  { name: "Notifications", href: "/dashboard/ngo/notifications", icon: Bell },
   { name: "Profile", href: "/dashboard/ngo/profile", icon: User },
-
 ];
 
 export default function OrgSidebar({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) {

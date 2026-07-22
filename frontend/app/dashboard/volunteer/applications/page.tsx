@@ -66,7 +66,7 @@ export default function VolunteerApplicationsPage() {
       await apiPost(`/volunteer/applications/${id}/withdraw`, {});
       await loadApplications();
     } catch (err: any) {
-      alert(err?.response?.data?.message || err.message || 'Failed to withdraw application.');
+      alert(err.message || 'Failed to withdraw application.');
     } finally {
       setWithdrawing(null);
     }

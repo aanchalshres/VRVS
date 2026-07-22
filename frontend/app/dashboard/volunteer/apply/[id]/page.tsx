@@ -36,7 +36,7 @@ export default function ApplyPage() {
         const res = await apiGet<{ data: TaskDetail }>(`/volunteer/tasks/${taskId}`);
         setTask(res.data ?? null);
       } catch (err: any) {
-        setError(err?.response?.data?.message || err.message || 'Failed to load task.');
+        setError(err.message || 'Failed to load task.');
       } finally {
         setLoading(false);
       }
@@ -52,7 +52,7 @@ export default function ApplyPage() {
       setResult({ success: true, message: 'Application submitted successfully!' });
       setTimeout(() => router.push('/dashboard/volunteer/applications'), 1500);
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err.message || 'Failed to apply.';
+      const msg = err.message || 'Failed to apply.';
       setResult({ success: false, message: msg });
     } finally {
       setSubmitting(false);

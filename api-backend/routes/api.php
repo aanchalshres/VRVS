@@ -16,6 +16,7 @@ use App\Http\Controllers\Ngo\ApplicationController as NgoApplicationController;
 use App\Http\Controllers\Ngo\ProfileController as NgoProfileController;
 use App\Http\Controllers\Ngo\DashboardController as NgoDashboardController;
 use App\Http\Controllers\Ngo\NotificationController as NgoNotificationController;
+use App\Http\Controllers\Ngo\DocumentController as NgoDocumentController;
 
 use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
 use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
@@ -40,6 +41,7 @@ Route::get('/health', function () {
 });
 
 Route::get('/skills', [SkillController::class, 'index']);
+Route::get('/categories', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
 
 
 /*
@@ -254,6 +256,43 @@ Route::put(
     [NgoProfileController::class, 'update']
 );
 
+Route::post(
+    '/ngo/profile/logo',
+    [NgoProfileController::class, 'uploadLogo']
+);
+
+Route::delete(
+    '/ngo/profile/logo',
+    [NgoProfileController::class, 'removeLogo']
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Documents (Verification)
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/documents',
+    [NgoDocumentController::class, 'index']
+);
+
+Route::post(
+    '/ngo/documents',
+    [NgoDocumentController::class, 'store']
+);
+
+Route::get(
+    '/ngo/documents/{id}',
+    [NgoDocumentController::class, 'show']
+);
+
+Route::delete(
+    '/ngo/documents/{id}',
+    [NgoDocumentController::class, 'destroy']
+);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -349,6 +388,18 @@ Route::middleware([
     Route::post(
         '/volunteer/applications/{id}/withdraw',
         [VolunteerApplicationController::class, 'withdraw']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assigned Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/assigned-tasks',
+        [VolunteerApplicationController::class, 'getAssignedTasks']
     );
 
 

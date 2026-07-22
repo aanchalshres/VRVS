@@ -30,6 +30,7 @@ export default function NGORegister() {
     address: '',
     city: '',
     country: '',
+    pan_number: '',
   })
 
   const [loading, setLoading] = useState(false)
@@ -70,6 +71,7 @@ export default function NGORegister() {
           officeLocation: form.address,
           city: form.city,
           country: form.country,
+          panNumber: form.pan_number,
         }),
       })
 
@@ -81,7 +83,7 @@ export default function NGORegister() {
           : data.message || 'Registration failed'
 
         // If the backend indicates the account already exists, nudge to login
-        if (res.status === 409 || /already (exists|registered)/i.test(description || '')) {
+        if (res.status === 409 || /already (exists|registered|been taken)/i.test(description || '')) {
           toast({
             title: 'Account Already Exists',
             description: 'An account with this email is already registered. Please login instead.',
@@ -199,6 +201,16 @@ export default function NGORegister() {
                     value={form.registration_number}
                     onChange={(e) =>
                       setForm({ ...form, registration_number: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div>
+                  <Label>PAN Number</Label>
+                  <Input
+                    value={form.pan_number}
+                    onChange={(e) =>
+                      setForm({ ...form, pan_number: e.target.value })
                     }
                   />
                 </div>
