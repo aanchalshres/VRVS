@@ -731,6 +731,11 @@ Route::middleware([
         [NgoTaskController::class, 'complete']
     );
 
+    Route::get(
+        '/ngo/tasks/{id}/recommended-volunteers',
+        [NgoTaskController::class, 'recommendedVolunteers']
+    );
+
     Route::put(
         '/ngo/tasks/{id}',
         [NgoTaskController::class, 'update']

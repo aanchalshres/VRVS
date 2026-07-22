@@ -9,6 +9,10 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ApplicationService
 {
+    public function __construct(
+        private RecommendationService $recommendationService
+    ) {}
+
     public function apply(int $taskId, VolunteerProfile $profile, ?string $message = null): Application
     {
         $task = Task::with('ngo')->findOrFail($taskId);
@@ -38,9 +42,12 @@ class ApplicationService
             abort(400, 'This task has reached its volunteer limit');
         }
 
+        $recommendationScore = $this->recommendationService->computeVolunteerTaskMatchScore($profile, $task);
+
         $application = Application::create([
             'task_id' => (int) $taskId,
             'volunteer_profile_id' => $profile->id,
+            'recommendation_score' => $recommendationScore,
             'status' => 'Pending',
             'applied_at' => now(),
             'remarks' => $message,
