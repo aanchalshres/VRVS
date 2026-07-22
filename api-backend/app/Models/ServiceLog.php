@@ -8,7 +8,7 @@ class ServiceLog extends Model
 {
     protected $table = 'service_logs';
     protected $fillable = [
-        'volunteer_id',
+        'volunteer_profile_id',
         'task_id',
         'check_in_time',
         'check_out_time',
@@ -17,13 +17,11 @@ class ServiceLog extends Model
         'feedback',
     ];
 
-    // ServiceLog.php
-
     public function volunteer()
     {
         return $this->belongsTo(
             VolunteerProfile::class,
-            'volunteer_id'
+            'volunteer_profile_id'
         );
     }
 

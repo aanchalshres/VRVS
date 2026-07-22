@@ -17,6 +17,7 @@ use App\Http\Controllers\Ngo\ProfileController as NgoProfileController;
 use App\Http\Controllers\Ngo\DashboardController as NgoDashboardController;
 use App\Http\Controllers\Ngo\NotificationController as NgoNotificationController;
 use App\Http\Controllers\Ngo\DocumentController as NgoDocumentController;
+use App\Http\Controllers\Ngo\AttendanceController as NgoAttendanceController;
 
 use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
 use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
@@ -25,6 +26,7 @@ use App\Http\Controllers\Volunteer\SkillController as VolunteerSkillController;
 use App\Http\Controllers\Volunteer\DocumentController as VolunteerDocumentController;
 use App\Http\Controllers\Volunteer\DashboardController as VolunteerDashboardController;
 use App\Http\Controllers\Volunteer\NotificationController as VolunteerNotificationController;
+use App\Http\Controllers\Volunteer\AttendanceController as VolunteerAttendanceController;
 
 
 /*
@@ -239,6 +241,16 @@ Route::post(
     [NgoApplicationController::class, 'reject']
 );
 
+Route::post(
+    '/ngo/applications/{id}/cancel',
+    [NgoApplicationController::class, 'cancel']
+);
+
+Route::get(
+    '/ngo/assignments',
+    [NgoApplicationController::class, 'assignments']
+);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -336,6 +348,34 @@ Route::delete(
     '/ngo/notifications/{id}',
     [NgoNotificationController::class, 'destroy']
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| Attendance
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/attendance',
+    [NgoAttendanceController::class, 'index']
+);
+
+Route::post(
+    '/ngo/attendance/{id}/approve',
+    [NgoAttendanceController::class, 'approve']
+);
+
+Route::post(
+    '/ngo/attendance/{id}/absent',
+    [NgoAttendanceController::class, 'markAbsent']
+);
+
+Route::get(
+    '/ngo/attendance/summary',
+    [NgoAttendanceController::class, 'summary']
+);
+
 
 });
 
@@ -505,6 +545,33 @@ Route::middleware([
     Route::delete(
         '/volunteer/notifications/{id}',
         [VolunteerNotificationController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/volunteer/attendance/check-in',
+        [VolunteerAttendanceController::class, 'checkIn']
+    );
+
+    Route::post(
+        '/volunteer/attendance/check-out',
+        [VolunteerAttendanceController::class, 'checkOut']
+    );
+
+    Route::get(
+        '/volunteer/attendance',
+        [VolunteerAttendanceController::class, 'history']
+    );
+
+    Route::get(
+        '/volunteer/attendance/hours',
+        [VolunteerAttendanceController::class, 'hours']
     );
 
 });

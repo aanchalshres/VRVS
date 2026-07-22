@@ -76,4 +76,9 @@ class Task extends Model
             'category_id'
         );
     }
+
+    public function serviceLogs()
+    {
+        return $this->hasMany(ServiceLog::class);
+    }
 }
