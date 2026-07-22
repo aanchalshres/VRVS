@@ -90,6 +90,7 @@ class TaskController extends Controller
         }
 
         $task->load(['skills', 'category']);
+        $task->touch();
 
         return response()->json([
             'message' => 'Task created',
@@ -147,6 +148,7 @@ class TaskController extends Controller
         }
 
         $task->load(['skills', 'category']);
+        $task->touch();
 
         return response()->json([
             'message' => 'Task updated',

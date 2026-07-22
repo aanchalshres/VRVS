@@ -51,7 +51,8 @@ class VolunteerProfile extends Model
         return $this->belongsToMany(
             Skill::class,
             'volunteer_skills'
-        )->withPivot('proficiency_level');
+        )->using(VolunteerSkill::class)
+         ->withPivot('proficiency_level');
     }
 
     public function applications()

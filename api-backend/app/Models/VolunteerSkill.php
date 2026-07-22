@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class VolunteerSkill extends Model
 {
+    protected $touches = ['volunteerProfile'];
+
     protected $fillable = [
     'volunteer_profile_id',
     'skill_id',
