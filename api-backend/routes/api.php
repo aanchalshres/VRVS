@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SkillController;
 
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\Admin\TaskController as AdminTaskController;
@@ -16,6 +17,10 @@ use App\Http\Controllers\Ngo\ApplicationController as NgoApplicationController;
 use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
 use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
 use App\Http\Controllers\Volunteer\ProfileController as VolunteerProfileController;
+use App\Http\Controllers\Volunteer\SkillController as VolunteerSkillController;
+use App\Http\Controllers\Volunteer\DocumentController as VolunteerDocumentController;
+use App\Http\Controllers\Volunteer\DashboardController as VolunteerDashboardController;
+use App\Http\Controllers\Volunteer\NotificationController as VolunteerNotificationController;
 
 
 /*
@@ -30,6 +35,8 @@ Route::get('/health', function () {
         'message' => 'API is running'
     ]);
 });
+
+Route::get('/skills', [SkillController::class, 'index']);
 
 
 /*
@@ -274,7 +281,100 @@ Route::middleware([
 
     Route::get(
         '/volunteer/profile',
-        [VolunteerProfileController::class, 'show']
+        [VolunteerProfileController::class, 'getProfile']
+    );
+
+    Route::put(
+        '/volunteer/profile',
+        [VolunteerProfileController::class, 'updateProfile']
+    );
+
+    Route::post(
+        '/volunteer/profile-photo',
+        [VolunteerProfileController::class, 'uploadPhoto']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Skills
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/skills',
+        [VolunteerSkillController::class, 'index']
+    );
+
+    Route::post(
+        '/volunteer/skills',
+        [VolunteerSkillController::class, 'sync']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Documents
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/documents',
+        [VolunteerDocumentController::class, 'index']
+    );
+
+    Route::post(
+        '/volunteer/documents',
+        [VolunteerDocumentController::class, 'store']
+    );
+
+    Route::get(
+        '/volunteer/documents/{id}',
+        [VolunteerDocumentController::class, 'show']
+    );
+
+    Route::delete(
+        '/volunteer/documents/{id}',
+        [VolunteerDocumentController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/dashboard',
+        [VolunteerDashboardController::class, 'index']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/notifications',
+        [VolunteerNotificationController::class, 'index']
+    );
+
+    Route::post(
+        '/volunteer/notifications/{id}/read',
+        [VolunteerNotificationController::class, 'markAsRead']
+    );
+
+    Route::post(
+        '/volunteer/notifications/read-all',
+        [VolunteerNotificationController::class, 'markAllAsRead']
+    );
+
+    Route::delete(
+        '/volunteer/notifications/{id}',
+        [VolunteerNotificationController::class, 'destroy']
     );
 
 });

@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
         // Register route middleware
         $middleware->alias([
+            'auth' => \App\Http\Middleware\Authenticate::class,
             'role' => \App\Http\Middleware\CheckRole::class,
             'verified_ngo' => \App\Http\Middleware\VerifiedNgo::class,
         ]);

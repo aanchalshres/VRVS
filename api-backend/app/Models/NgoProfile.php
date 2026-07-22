@@ -42,4 +42,9 @@ class NgoProfile extends Model
     {
         return $this->belongsTo(User::class, 'verified_by');
     }
+
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }

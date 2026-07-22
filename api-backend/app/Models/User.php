@@ -72,9 +72,9 @@ class User extends Authenticatable
             return $this->hasOne(VerificationWorkflow::class);
         }
 
-        public function documents()
+        public function reviewedDocuments()
         {
-            return $this->hasMany(Document::class);
+            return $this->hasMany(Document::class, 'reviewed_by');
         }
 
         public function verificationSessions()
@@ -95,11 +95,6 @@ class User extends Authenticatable
         public function reviewedApplications()
         {
             return $this->hasMany(Application::class, 'reviewed_by');
-        }
-
-        public function reviewedDocuments()
-        {
-            return $this->hasMany(Document::class, 'reviewed_by');
         }
 
         public function reviewsGiven()

@@ -63,4 +63,9 @@ class VolunteerProfile extends Model
     {
         return $this->hasMany(ServiceLog::class, 'volunteer_profile_id');
     }
+
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }
