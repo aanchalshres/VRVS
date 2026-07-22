@@ -16,6 +16,21 @@ class DocumentController extends Controller
             'data' => $profile->documents()
                 ->orderBy('created_at', 'desc')
                 ->get()
+                ->map(fn ($doc) => [
+                    'id' => $doc->id,
+                    'document_type' => $doc->document_type,
+                    'original_name' => $doc->original_name,
+                    'file_name' => $doc->file_name,
+                    'file_path' => $doc->file_path,
+                    'file_url' => $doc->file_path ? url('storage/' . $doc->file_path) : null,
+                    'mime_type' => $doc->mime_type,
+                    'file_size' => $doc->file_size,
+                    'status' => $doc->status,
+                    'reviewed_by' => $doc->reviewed_by,
+                    'reviewed_at' => $doc->reviewed_at,
+                    'remarks' => $doc->remarks,
+                    'created_at' => $doc->created_at,
+                ])
         ]);
     }
 

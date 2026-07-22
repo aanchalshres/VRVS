@@ -1,20 +1,9 @@
 "use client";
 import { Bell } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
-
-interface NgoNotification {
-  id: number;
-  user_id: number | null;
-  title: string;
-  message: string;
-  type: string;
-  is_read: boolean;
-  read_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+import { apiGet } from "@/app/lib/api";
 
 const OrgNavbar = ({ sidebarOpen }: { sidebarOpen?: boolean }) => {
   const { user } = useAuth();
@@ -33,39 +22,25 @@ const OrgNavbar = ({ sidebarOpen }: { sidebarOpen?: boolean }) => {
 
   const initials = getInitials(user?.name);
 
-  const loadUnreadCount = () => {
+  const loadUnreadCount = useCallback(async () => {
     try {
-      const stored: NgoNotification[] = JSON.parse(
-        localStorage.getItem("ngo_notifications") || "[]"
-      );
-      // Only count notifications addressed to this user, matching notifications.user_id
-      // Ensure we compare numbers with numbers. user.id may be string or number.
-      const uid = user?.id;
-      const uidNum = typeof uid === "string" ? parseInt(uid, 10) : uid;
-      const mine = uidNum != null
-        ? stored.filter((n) => n.user_id === uidNum)
-        : stored;
-      setUnreadCount(mine.filter((n) => !n.is_read).length);
+      const res = await apiGet<{ count: number }>("/volunteer/notifications/unread-count");
+      setUnreadCount(res.count ?? 0);
     } catch {
       setUnreadCount(0);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadUnreadCount();
-    window.addEventListener("notifications:updated", loadUnreadCount);
-    window.addEventListener("storage", loadUnreadCount);
-    return () => {
-      window.removeEventListener("notifications:updated", loadUnreadCount);
-      window.removeEventListener("storage", loadUnreadCount);
-    };
-  }, [user?.id]);
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, [loadUnreadCount]);
 
   return (
     <div className="h-16 flex items-center justify-end px-4 bg-[#F0F1F3] border-b border-[#CACDD3]">
       <div className="flex items-center gap-4 relative">
 
-        {/* Notification Bell */}
         <button
           onClick={() => router.push("/dashboard/volunteer/notifications")}
           className="relative p-2 rounded-full hover:bg-[#B9C0D4]/30 transition cursor-pointer"
@@ -79,7 +54,6 @@ const OrgNavbar = ({ sidebarOpen }: { sidebarOpen?: boolean }) => {
           )}
         </button>
 
-        {/* Profile Avatar Box */}
         <button
           onClick={() => router.push("/dashboard/volunteer/profile")}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#CACDD3] hover:bg-[#B9C0D4]/20 hover:border-[#4F46C8] transition-all cursor-pointer"

@@ -81,4 +81,9 @@ class Task extends Model
     {
         return $this->hasMany(ServiceLog::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }

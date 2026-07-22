@@ -21,15 +21,59 @@ class MatchingService
     /**
      * Rank tasks for a volunteer.
      */
-    public function rankTasksForVolunteer(VolunteerProfile $volunteer)
+    public function rankTasksForVolunteer(VolunteerProfile $volunteer, array $filters = [])
     {
-        $tasks = Task::whereIn('status', ['Open', 'Ongoing'])
+        $query = Task::whereIn('status', ['Open', 'Ongoing'])
             ->whereHas('ngo', function ($query) {
                 $query->where('verification_status', 'verified');
             })
             ->whereNotNull('tfidf_vector')
-            ->with(['ngo.user', 'skills'])
-            ->get();
+            ->with(['ngo.user', 'skills']);
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+
+        if (!empty($filters['urgency_level'])) {
+            $query->where('urgency_level', $filters['urgency_level']);
+        }
+
+        if (!empty($filters['task_type'])) {
+            $query->where('task_type', $filters['task_type']);
+        }
+
+        if (!empty($filters['location'])) {
+            $query->where(function ($q) use ($filters) {
+                $loc = $filters['location'];
+                $q->where('location', 'like', "%{$loc}%")
+                  ->orWhere('city', 'like', "%{$loc}%")
+                  ->orWhere('country', 'like', "%{$loc}%");
+            });
+        }
+
+        if (!empty($filters['skill'])) {
+            $query->whereHas('skills', function ($q) use ($filters) {
+                $q->where('skills.name', 'like', "%{$filters['skill']}%");
+            });
+        }
+
+        if (!empty($filters['date_from'])) {
+            $query->where('start_date', '>=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $query->where('end_date', '<=', $filters['date_to']);
+        }
+
+        $tasks = $query->get();
 
         return $tasks
             ->map(function ($task) use ($volunteer) {
@@ -95,8 +139,8 @@ class MatchingService
     {
         return Task::with([
                 'ngo.user',
-                'applications',
-                'skills'
+                'skills',
+                'category',
             ])
             ->whereHas('ngo', function ($query) {
                 $query->where('verification_status', 'verified');

@@ -10,7 +10,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
 
         {/* TOP SECTION */}
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
 
           {/* LOGO + DESCRIPTION */}
           <div>
@@ -73,81 +73,10 @@ const Footer = () => {
               </Link>
 
               <Link
-                href="/badges"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Badges
-              </Link>
-
-              <Link
                 href="/signup"
                 className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
               >
                 Join Us
-              </Link>
-
-            </div>
-          </div>
-
-          {/* RESOURCES */}
-          <div>
-            <h4 className="mb-4 text-sm font-semibold text-[#111827]">
-              Resources
-            </h4>
-
-            <div className="flex flex-col gap-2">
-
-              <Link
-                href="#"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Help Center
-              </Link>
-
-              <Link
-                href="#"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Guidelines
-              </Link>
-
-              <Link
-                href="#"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Safety
-              </Link>
-
-            </div>
-          </div>
-
-          {/* LEGAL */}
-          <div>
-            <h4 className="mb-4 text-sm font-semibold text-[#111827]">
-              Legal
-            </h4>
-
-            <div className="flex flex-col gap-2">
-
-              <Link
-                href="#"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Privacy Policy
-              </Link>
-
-              <Link
-                href="#"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Terms of Service
-              </Link>
-
-              <Link
-                href="#"
-                className="text-sm text-[#6B7280] hover:text-[#4F46C8] transition-colors"
-              >
-                Cookie Policy
               </Link>
 
             </div>

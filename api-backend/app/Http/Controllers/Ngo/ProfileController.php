@@ -103,7 +103,7 @@ class ProfileController extends Controller
                 'logo' => $path,
                 'logo_url' => url('storage/' . $path),
             ]
-        ]);
+        ], 201);
     }
 
     public function removeLogo(Request $request)

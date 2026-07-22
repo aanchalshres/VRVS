@@ -27,6 +27,26 @@ class Application extends Model
         'recommendation_score' => 'float',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($application) {
+            $task = $application->task;
+            $ngo = $task->ngo;
+            $volunteer = $application->volunteer;
+
+            if ($ngo && $volunteer && $ngo->user_id) {
+                $volunteerName = $volunteer->user->name ?? 'A volunteer';
+                app(\App\Services\NotificationService::class)->newApplication(
+                    $ngo->user_id,
+                    $volunteerName,
+                    $task->title,
+                    $application->id
+                );
+            }
+        });
+    }
 
     public function task()
     {
@@ -49,5 +69,11 @@ class Application extends Model
             User::class,
             'reviewed_by'
         );
+    }
+
+    public function certificate()
+    {
+        return $this->hasOne(Certificate::class, 'task_id', 'task_id')
+            ->whereColumn('volunteer_profile_id', 'volunteer_profile_id');
     }
 }

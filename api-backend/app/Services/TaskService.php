@@ -12,7 +12,8 @@ class TaskService
     public function getAllTasks()
     {
         return Task::with([
-            'ngoProfile',
+            'ngo',
+            'category',
             'applications'
         ])->get();
     }

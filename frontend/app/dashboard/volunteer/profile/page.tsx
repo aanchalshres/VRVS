@@ -207,6 +207,7 @@ export default function VolunteerProfilePage() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoRemoving, setPhotoRemoving] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -254,6 +255,23 @@ export default function VolunteerProfilePage() {
     } finally {
       setPhotoUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (!confirm("Remove your profile photo?")) return;
+    setPhotoRemoving(true);
+    try {
+      await apiDelete<any>("/volunteer/profile-photo");
+      await fetchVolunteerProfile();
+      setSuccessMessage("Profile photo removed.");
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch (err: any) {
+      console.error(err);
+      setSaveError(err.message || "Failed to remove photo.");
+      setTimeout(() => setSaveError(""), 5000);
+    } finally {
+      setPhotoRemoving(false);
     }
   };
 
@@ -385,20 +403,30 @@ export default function VolunteerProfilePage() {
             <div className="px-8 pb-6 relative">
               <div className="absolute -top-12 group">
                 {profile.profile_photo ? (
-                  <div className="relative">
+                  <div className="relative group">
                     <img src={profile.profile_photo} alt="Profile"
                       className="w-24 h-24 rounded-full object-cover border-4 border-white" />
-                    <button onClick={handlePhotoClick} disabled={photoUploading}
-                      className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity border-4 border-white disabled:opacity-100">
-                      {photoUploading ? (
-                        <IconSpinner className="w-6 h-6 border-2 border-white/40 border-t-white" />
-                      ) : (
-                        <IconCamera className="h-6 w-6 text-white" />
-                      )}
-                    </button>
+                    <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity border-4 border-white">
+                      <button onClick={handlePhotoClick} disabled={photoUploading}
+                        className="p-1 text-white hover:text-gray-200" title="Change photo">
+                        {photoUploading ? (
+                          <IconSpinner className="w-6 h-6 border-2 border-white/40 border-t-white" />
+                        ) : (
+                          <IconCamera className="h-6 w-6" />
+                        )}
+                      </button>
+                      <button onClick={handleRemovePhoto} disabled={photoRemoving}
+                        className="p-1 text-white hover:text-red-300 ml-1" title="Remove photo">
+                        {photoRemoving ? (
+                          <IconSpinner className="w-5 h-5 border-2 border-white/40 border-t-white" />
+                        ) : (
+                          <IconX className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 ) : (
-                  <div className="relative">
+                  <div className="relative group">
                     <div className="w-24 h-24 rounded-full border-4 border-white bg-[#B9C0D4] flex items-center justify-center text-2xl font-semibold text-[#111827]">
                       {getInitials(profile.name)}
                     </div>

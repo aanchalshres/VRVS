@@ -327,11 +327,7 @@ export default function VolunteerSkillsPage() {
 
   const downloadDocument = useCallback(async (doc: Document) => {
     try {
-      const token = localStorage.getItem("authToken");
-      const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/api$/, "");
-      const response = await fetch(`${API_URL}/api/volunteer/documents/${doc.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiCall(`/volunteer/documents/${doc.id}`);
       if (!response.ok) throw new Error("Download failed");
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

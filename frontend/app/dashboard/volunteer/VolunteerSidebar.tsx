@@ -12,6 +12,10 @@ import {
   User,
   LogOut,
   Users,
+  Star,
+  Award,
+  Settings,
+  Upload,
 } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -21,7 +25,11 @@ const menuItems = [
   { name: "My Applications", href: "/dashboard/volunteer/applications", icon: FileText },
   { name: "My Skills", href: "/dashboard/volunteer/skills", icon: CheckSquare },
   { name: "Profile", href: "/dashboard/volunteer/profile", icon: User },
-  { name: "Participations", href: "/dashboard/volunteer/participations", icon: Users }
+  { name: "Documents", href: "/dashboard/volunteer/documents", icon: Upload },
+  { name: "Participations", href: "/dashboard/volunteer/participations", icon: Users },
+  { name: "Ratings", href: "/dashboard/volunteer/ratings", icon: Star },
+  { name: "Certificates", href: "/dashboard/volunteer/certificates", icon: Award },
+  { name: "Settings", href: "/dashboard/volunteer/settings", icon: Settings },
 ];
 
 export default function VolunteerSidebar({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) {

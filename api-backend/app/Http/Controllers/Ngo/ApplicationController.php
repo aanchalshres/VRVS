@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Ngo;
 
 use App\Http\Controllers\Controller;
 use App\Models\Application;
-use App\Models\Task;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
@@ -66,6 +66,15 @@ class ApplicationController extends Controller
             'reviewed_at' => now(),
         ]);
 
+        $volunteerUser = $application->volunteer->user ?? null;
+        if ($volunteerUser) {
+            app(NotificationService::class)->volunteerAccepted(
+                $volunteerUser->id,
+                $request->user()->ngoProfile->organization_name,
+                $application->task->title
+            );
+        }
+
         return response()->json([
             'message' => 'Application accepted',
             'data' => $application->load(['volunteer.user', 'volunteer.skills', 'task'])
@@ -91,6 +100,15 @@ class ApplicationController extends Controller
             'reviewed_by' => $request->user()->id,
             'reviewed_at' => now(),
         ]);
+
+        $volunteerUser = $application->volunteer->user ?? null;
+        if ($volunteerUser) {
+            app(NotificationService::class)->volunteerRejected(
+                $volunteerUser->id,
+                $request->user()->ngoProfile->organization_name,
+                $application->task->title
+            );
+        }
 
         return response()->json([
             'message' => 'Application rejected',

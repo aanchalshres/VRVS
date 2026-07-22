@@ -42,7 +42,17 @@ class NotificationController extends Controller
 
         return response()->json([
             'message' => 'Notification marked as read',
-            'data' => $notification
+            'data' => [
+                'id' => $notification->id,
+                'user_id' => $notification->user_id,
+                'title' => $notification->title,
+                'message' => $notification->message,
+                'type' => $notification->type,
+                'is_read' => $notification->is_read,
+                'read_at' => $notification->read_at,
+                'created_at' => $notification->created_at,
+                'updated_at' => $notification->updated_at,
+            ]
         ]);
     }
 

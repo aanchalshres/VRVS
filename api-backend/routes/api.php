@@ -10,6 +10,22 @@ use App\Http\Controllers\Admin\TaskController as AdminTaskController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AssignmentController;
 use App\Http\Controllers\Admin\TfIdfController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\VolunteerController;
+use App\Http\Controllers\Admin\VolunteerVerificationController;
+use App\Http\Controllers\Admin\ApplicationController;
+use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\CertificateController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\AnalyticsController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\ExportController;
+use App\Http\Controllers\Admin\NGOManagementController;
+use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\SkillController as AdminSkillController;
 
 use App\Http\Controllers\Ngo\TaskController as NgoTaskController;
 use App\Http\Controllers\Ngo\ApplicationController as NgoApplicationController;
@@ -18,6 +34,9 @@ use App\Http\Controllers\Ngo\DashboardController as NgoDashboardController;
 use App\Http\Controllers\Ngo\NotificationController as NgoNotificationController;
 use App\Http\Controllers\Ngo\DocumentController as NgoDocumentController;
 use App\Http\Controllers\Ngo\AttendanceController as NgoAttendanceController;
+use App\Http\Controllers\Ngo\ReportsController as NgoReportsController;
+use App\Http\Controllers\Ngo\RatingController as NgoRatingController;
+use App\Http\Controllers\Ngo\CertificateController as NgoCertificateController;
 
 use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
 use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
@@ -27,6 +46,8 @@ use App\Http\Controllers\Volunteer\DocumentController as VolunteerDocumentContro
 use App\Http\Controllers\Volunteer\DashboardController as VolunteerDashboardController;
 use App\Http\Controllers\Volunteer\NotificationController as VolunteerNotificationController;
 use App\Http\Controllers\Volunteer\AttendanceController as VolunteerAttendanceController;
+use App\Http\Controllers\Volunteer\RatingController as VolunteerRatingController;
+use App\Http\Controllers\Volunteer\CertificateController as VolunteerCertificateController;
 
 
 /*
@@ -166,6 +187,507 @@ Route::middleware([
     Route::post(
         '/admin/tfidf/recompute',
         [TfIdfController::class, 'recompute']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reports
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/reports',
+        [ReportController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/reports/{id}',
+        [ReportController::class, 'show']
+    );
+
+    Route::put(
+        '/admin/reports/{id}',
+        [ReportController::class, 'update']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard - Activities & Recent NGOs
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/activities',
+        [DashboardController::class, 'activities']
+    );
+
+    Route::get(
+        '/admin/recent-ngos',
+        [DashboardController::class, 'recentNgos']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Volunteer Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/volunteers',
+        [VolunteerController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/volunteers/stats',
+        [VolunteerController::class, 'stats']
+    );
+
+    Route::get(
+        '/admin/volunteers/{id}',
+        [VolunteerController::class, 'show']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Volunteer Verification
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/volunteer-verification',
+        [VolunteerVerificationController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/volunteer-verification/pending',
+        [VolunteerVerificationController::class, 'pending']
+    );
+
+    Route::post(
+        '/admin/volunteer-verification/{id}/approve',
+        [VolunteerVerificationController::class, 'approveVolunteer']
+    );
+
+    Route::post(
+        '/admin/volunteer-verification/{id}/reject',
+        [VolunteerVerificationController::class, 'rejectVolunteer']
+    );
+
+    Route::get(
+        '/admin/volunteer-verification/{id}/history',
+        [VolunteerVerificationController::class, 'verificationHistory']
+    );
+
+    Route::post(
+        '/admin/documents/{documentId}/review',
+        [VolunteerVerificationController::class, 'reviewDocument']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/applications',
+        [ApplicationController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/applications/stats',
+        [ApplicationController::class, 'stats']
+    );
+
+    Route::get(
+        '/admin/applications/{id}',
+        [ApplicationController::class, 'show']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Attendance & Service Logs
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/attendance',
+        [AttendanceController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/attendance/summary',
+        [AttendanceController::class, 'summary']
+    );
+
+    Route::get(
+        '/admin/attendance/{id}',
+        [AttendanceController::class, 'show']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Opportunity Management (tasks)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/tasks/{id}',
+        [AdminTaskController::class, 'show']
+    );
+
+    Route::put(
+        '/admin/tasks/{id}/status',
+        [AdminTaskController::class, 'updateStatus']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Certificate Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/certificates',
+        [CertificateController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/certificates/stats',
+        [CertificateController::class, 'stats']
+    );
+
+    Route::get(
+        '/admin/certificates/{id}',
+        [CertificateController::class, 'show']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ratings & Reviews Moderation
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/reviews',
+        [ReviewController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/reviews/stats',
+        [ReviewController::class, 'stats']
+    );
+
+    Route::get(
+        '/admin/reviews/{id}',
+        [ReviewController::class, 'show']
+    );
+
+    Route::delete(
+        '/admin/reviews/{id}',
+        [ReviewController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reports & Analytics
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/analytics/dashboard',
+        [AnalyticsController::class, 'dashboard']
+    );
+
+    Route::get(
+        '/admin/analytics/monthly',
+        [AnalyticsController::class, 'monthly']
+    );
+
+    Route::get(
+        '/admin/analytics/ngos',
+        [AnalyticsController::class, 'ngos']
+    );
+
+    Route::get(
+        '/admin/analytics/volunteers',
+        [AnalyticsController::class, 'volunteers']
+    );
+
+    Route::get(
+        '/admin/analytics/opportunities',
+        [AnalyticsController::class, 'opportunities']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | System Settings
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/settings/profile',
+        [SettingsController::class, 'profile']
+    );
+
+    Route::put(
+        '/admin/settings/profile',
+        [SettingsController::class, 'updateProfile']
+    );
+
+    Route::post(
+        '/admin/settings/change-password',
+        [SettingsController::class, 'changePassword']
+    );
+
+    Route::get(
+        '/admin/settings',
+        [SettingsController::class, 'getSettings']
+    );
+
+    Route::put(
+        '/admin/settings',
+        [SettingsController::class, 'updateSettings']
+    );
+
+    Route::get(
+        '/admin/settings/notification-preferences',
+        [SettingsController::class, 'getNotificationPreferences']
+    );
+
+    Route::put(
+        '/admin/settings/notification-preferences',
+        [SettingsController::class, 'updateNotificationPreferences']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Notifications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/notifications',
+        [AdminNotificationController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/notifications/unread-count',
+        [AdminNotificationController::class, 'unreadCount']
+    );
+
+    Route::post(
+        '/admin/notifications/{id}/read',
+        [AdminNotificationController::class, 'markAsRead']
+    );
+
+    Route::post(
+        '/admin/notifications/read-all',
+        [AdminNotificationController::class, 'markAllAsRead']
+    );
+
+    Route::delete(
+        '/admin/notifications/{id}',
+        [AdminNotificationController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin User Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/admin-users',
+        [UserManagementController::class, 'index']
+    );
+
+    Route::post(
+        '/admin/admin-users',
+        [UserManagementController::class, 'store']
+    );
+
+    Route::get(
+        '/admin/admin-users/{id}',
+        [UserManagementController::class, 'show']
+    );
+
+    Route::put(
+        '/admin/admin-users/{id}',
+        [UserManagementController::class, 'update']
+    );
+
+    Route::post(
+        '/admin/admin-users/{id}/toggle-status',
+        [UserManagementController::class, 'toggleStatus']
+    );
+
+    Route::delete(
+        '/admin/admin-users/{id}',
+        [UserManagementController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CSV Export
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/export/volunteers',
+        [ExportController::class, 'volunteers']
+    );
+
+    Route::get(
+        '/admin/export/ngos',
+        [ExportController::class, 'ngos']
+    );
+
+    Route::get(
+        '/admin/export/applications',
+        [ExportController::class, 'applications']
+    );
+
+    Route::get(
+        '/admin/export/attendance',
+        [ExportController::class, 'attendance']
+    );
+
+    Route::get(
+        '/admin/export/tasks',
+        [ExportController::class, 'tasks']
+    );
+
+    Route::get(
+        '/admin/export/reports',
+        [ExportController::class, 'reports']
+    );
+
+    Route::get(
+        '/admin/export/service-logs',
+        [ExportController::class, 'serviceLogs']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGO Management (Suspend / Activate / Delete)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/admin/ngos/{id}/suspend',
+        [NGOManagementController::class, 'suspend']
+    );
+
+    Route::post(
+        '/admin/ngos/{id}/activate',
+        [NGOManagementController::class, 'activate']
+    );
+
+    Route::delete(
+        '/admin/ngos/{id}',
+        [NGOManagementController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Categories Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/categories',
+        [AdminCategoryController::class, 'index']
+    );
+
+    Route::post(
+        '/admin/categories',
+        [AdminCategoryController::class, 'store']
+    );
+
+    Route::get(
+        '/admin/categories/{id}',
+        [AdminCategoryController::class, 'show']
+    );
+
+    Route::put(
+        '/admin/categories/{id}',
+        [AdminCategoryController::class, 'update']
+    );
+
+    Route::delete(
+        '/admin/categories/{id}',
+        [AdminCategoryController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Skills Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/skills',
+        [AdminSkillController::class, 'index']
+    );
+
+    Route::post(
+        '/admin/skills',
+        [AdminSkillController::class, 'store']
+    );
+
+    Route::get(
+        '/admin/skills/{id}',
+        [AdminSkillController::class, 'show']
+    );
+
+    Route::put(
+        '/admin/skills/{id}',
+        [AdminSkillController::class, 'update']
+    );
+
+    Route::delete(
+        '/admin/skills/{id}',
+        [AdminSkillController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Activity Log
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/activity-logs',
+        [ActivityLogController::class, 'index']
+    );
+
+    Route::get(
+        '/admin/activity-logs/modules',
+        [ActivityLogController::class, 'modules']
+    );
+
+    Route::get(
+        '/admin/activity-logs/actions',
+        [ActivityLogController::class, 'actions']
     );
 
 });
@@ -377,6 +899,77 @@ Route::get(
 );
 
 
+/*
+|--------------------------------------------------------------------------
+| Reports & Analytics
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/reports',
+    [NgoReportsController::class, 'index']
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Ratings & Feedback
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/ratings',
+    [NgoRatingController::class, 'index']
+);
+
+Route::post(
+    '/ngo/ratings',
+    [NgoRatingController::class, 'store']
+);
+
+Route::get(
+    '/ngo/ratings/eligible',
+    [NgoRatingController::class, 'eligibleVolunteers']
+);
+
+Route::get(
+    '/ngo/ratings/volunteer/{volunteerProfileId}',
+    [NgoRatingController::class, 'volunteerHistory']
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| Certificates
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/certificates',
+    [NgoCertificateController::class, 'index']
+);
+
+Route::get(
+    '/ngo/certificates/eligible',
+    [NgoCertificateController::class, 'eligibleApplications']
+);
+
+Route::post(
+    '/ngo/certificates',
+    [NgoCertificateController::class, 'generate']
+);
+
+Route::get(
+    '/ngo/certificates/{id}',
+    [NgoCertificateController::class, 'show']
+);
+
+Route::get(
+    '/ngo/certificates/{id}/download',
+    [NgoCertificateController::class, 'download']
+);
+
+
 });
 
 
@@ -464,6 +1057,11 @@ Route::middleware([
         [VolunteerProfileController::class, 'uploadPhoto']
     );
 
+    Route::delete(
+        '/volunteer/profile-photo',
+        [VolunteerProfileController::class, 'removePhoto']
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -547,6 +1145,11 @@ Route::middleware([
         [VolunteerNotificationController::class, 'destroy']
     );
 
+    Route::get(
+        '/volunteer/notifications/unread-count',
+        [VolunteerNotificationController::class, 'unreadCount']
+    );
+
 
     /*
     |--------------------------------------------------------------------------
@@ -572,6 +1175,72 @@ Route::middleware([
     Route::get(
         '/volunteer/attendance/hours',
         [VolunteerAttendanceController::class, 'hours']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ratings & Feedback
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/ratings',
+        [VolunteerRatingController::class, 'index']
+    );
+
+    Route::get(
+        '/volunteer/ratings/received',
+        [VolunteerRatingController::class, 'received']
+    );
+
+    Route::get(
+        '/volunteer/ratings/eligible',
+        [VolunteerRatingController::class, 'eligibleTasks']
+    );
+
+    Route::post(
+        '/volunteer/ratings',
+        [VolunteerRatingController::class, 'store']
+    );
+
+    Route::put(
+        '/volunteer/ratings/{id}',
+        [VolunteerRatingController::class, 'update']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Certificates
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/certificates',
+        [VolunteerCertificateController::class, 'index']
+    );
+
+    Route::get(
+        '/volunteer/certificates/{id}',
+        [VolunteerCertificateController::class, 'show']
+    );
+
+    Route::get(
+        '/volunteer/certificates/{id}/download',
+        [VolunteerCertificateController::class, 'download']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/volunteer/change-password',
+        [VolunteerProfileController::class, 'changePassword']
     );
 
 });

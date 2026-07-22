@@ -122,11 +122,5 @@ class User extends Authenticatable
             return $this->hasMany(ActivityLog::class);
         }
 
-        public function badges()
-        {
-            return $this->belongsToMany(
-                Badge::class,
-                'user_badges'
-            )->withPivot('awarded_at');
-        }
+
 }

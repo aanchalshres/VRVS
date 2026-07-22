@@ -68,6 +68,23 @@ class NotificationController extends Controller
         ]);
     }
 
+    public function unreadCount(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'message' => 'Only volunteers can access this'
+            ], 403);
+        }
+
+        return response()->json([
+            'count' => $user->notifications()
+                ->where('is_read', false)
+                ->count()
+        ]);
+    }
+
     public function destroy(Request $request, $id)
     {
         $user = $request->user();

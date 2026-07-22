@@ -54,6 +54,10 @@ class VerificationService
 
         $this->verifyNgo($ngo);
 
+        if ($ngo->user_id) {
+            app(NotificationService::class)->verificationApproved($ngo->user_id);
+        }
+
         return $ngo;
     }
 
@@ -62,6 +66,13 @@ class VerificationService
         $ngo = NgoProfile::findOrFail($id);
 
         $this->rejectNgo($ngo, $reason);
+
+        if ($ngo->user_id) {
+            app(NotificationService::class)->verificationRejected(
+                $ngo->user_id,
+                $reason ?? 'No reason provided'
+            );
+        }
 
         return $ngo;
     }
@@ -78,6 +89,7 @@ class VerificationService
                 'pan_number' => $ngo->pan_number,
                 'office_location' => $ngo->office_location,
                 'verification_status' => $ngo->verification_status,
+                'status' => $ngo->verification_status,
                 'created_at' => $ngo->created_at,
                 'user' => [
                     'id' => $ngo->user?->id,
@@ -90,7 +102,11 @@ class VerificationService
 
     public function getNgoDetails(int $id): array
     {
-        $ngo = NgoProfile::with('user')->findOrFail($id);
+        $ngo = NgoProfile::with(['user', 'documents'])->findOrFail($id);
+
+        $registrationDoc = $ngo->documents->firstWhere('document_type', 'registration_certificate');
+        $panDoc = $ngo->documents->firstWhere('document_type', 'pan_document');
+        $letterheadDoc = $ngo->documents->firstWhere('document_type', 'letterhead');
 
         return [
             'id' => $ngo->id,
@@ -99,15 +115,16 @@ class VerificationService
             'pan_number' => $ngo->pan_number,
             'office_location' => $ngo->office_location,
             'verification_status' => $ngo->verification_status,
+            'status' => $ngo->verification_status,
             'created_at' => $ngo->created_at,
-            'registration_file_path' => $ngo->registration_file_path
-                ? url('storage/' . $ngo->registration_file_path)
+            'registration_file_path' => $registrationDoc
+                ? url('storage/' . $registrationDoc->file_path)
                 : null,
-            'pan_file_path' => $ngo->pan_file_path
-                ? url('storage/' . $ngo->pan_file_path)
+            'pan_file_path' => $panDoc
+                ? url('storage/' . $panDoc->file_path)
                 : null,
-            'letterhead_file_path' => $ngo->letterhead_file_path
-                ? url('storage/' . $ngo->letterhead_file_path)
+            'letterhead_file_path' => $letterheadDoc
+                ? url('storage/' . $letterheadDoc->file_path)
                 : null,
             'user' => [
                 'id' => $ngo->user?->id,

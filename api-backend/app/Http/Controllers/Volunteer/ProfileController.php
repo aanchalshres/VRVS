@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Volunteer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
@@ -238,6 +239,80 @@ class ProfileController extends Controller
             'data' => [
                 'profile_photo' => $url,
             ],
+        ]);
+    }
+
+    /**
+     * Remove profile photo
+     */
+    public function removePhoto(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only volunteers can remove profile photo.'
+            ], 403);
+        }
+
+        $profile = $user->volunteerProfile;
+
+        if ($profile->profile_photo) {
+            $oldRelativePath = null;
+            $storedUrl = $profile->profile_photo;
+            $storageUrlPrefix = asset('storage/');
+            if (str_starts_with($storedUrl, $storageUrlPrefix)) {
+                $oldRelativePath = substr($storedUrl, strlen($storageUrlPrefix));
+            } elseif (str_starts_with($storedUrl, '/storage/')) {
+                $oldRelativePath = substr($storedUrl, 9);
+            }
+            if ($oldRelativePath && Storage::disk('public')->exists($oldRelativePath)) {
+                Storage::disk('public')->delete($oldRelativePath);
+            }
+        }
+
+        $profile->update(['profile_photo' => null]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile photo removed successfully.',
+        ]);
+    }
+
+    /**
+     * Change password
+     */
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Only volunteers can change their password.'
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Current password is incorrect.'
+            ], 422);
+        }
+
+        $user->update([
+            'password' => $validated['new_password'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password changed successfully.',
         ]);
     }
 }

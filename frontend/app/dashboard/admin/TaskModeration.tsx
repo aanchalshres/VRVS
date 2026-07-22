@@ -9,7 +9,7 @@ import { StatusBadge } from '@/app/components/ui-custom/StatusBadge';
 import { ConfirmationModal } from '@/app/components/ui-custom/ConfirmationModal';
 import { EmptyState } from '@/app/components/ui-custom/EmptyState';
 import { TableSkeleton, StatsCardSkeleton } from '@/app/components/ui-custom/Skeleton';
-import { mockTasks, categories, districts } from '@/app/data/mockData';
+import { apiGet, apiDelete } from '@/app/lib/api';
 import {
   Select,
   SelectContent,
@@ -38,34 +38,84 @@ import {
   DialogDescription,
 } from '@/app/components/ui/dialog';
 
+const statusMap: Record<string, string> = {
+  'Open': 'active',
+  'active': 'active',
+  'Draft': 'pending',
+  'pending': 'pending',
+  'Completed': 'completed',
+  'completed': 'completed',
+  'Cancelled': 'removed',
+  'cancelled': 'removed',
+};
+
+function mapTask(raw: any): Task {
+  return {
+    id: String(raw.id),
+    title: raw.title,
+    ngoId: String(raw.ngo?.id ?? ''),
+    ngoName: raw.ngo?.organization_name ?? 'Unknown',
+    category: raw.category?.name ?? '',
+    district: raw.city ?? raw.location ?? '',
+    description: raw.description ?? '',
+    quota: raw.required_volunteers ?? 0,
+    filledQuota: raw.applications?.filter((a: any) => a.status === 'Accepted').length ?? 0,
+    status: (statusMap[raw.status] ?? 'pending') as Task['status'],
+    createdAt: raw.created_at ?? '',
+    startDate: raw.start_date ? raw.start_date.split('T')[0] : '',
+    endDate: raw.end_date ? raw.end_date.split('T')[0] : '',
+  };
+}
+
 export function TaskModeration() {
   const [isLoading, setIsLoading] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('All');
-  const [districtFilter, setDistrictFilter] = useState<string>('All');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [districtFilter, setDistrictFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Simulate loading data
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setTasks(mockTasks);
+  const fetchTasks = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await apiGet<any>('/api/admin/task-moderation');
+      const data = res.data ?? res ?? [];
+      setTasks(Array.isArray(data) ? data.map(mapTask) : []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load tasks');
+      setTasks([]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
   }, []);
+
+  const categories = useMemo(() => {
+    const set = new Set(tasks.map(t => t.category).filter(Boolean));
+    return ['all', ...Array.from(set)];
+  }, [tasks]);
+
+  const districts = useMemo(() => {
+    const set = new Set(tasks.map(t => t.district).filter(Boolean));
+    return ['all', ...Array.from(set)];
+  }, [tasks]);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       const matchesSearch =
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.ngoName.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = categoryFilter === 'All' || task.category === categoryFilter;
-      const matchesDistrict = districtFilter === 'All' || task.district === districtFilter;
+      const matchesCategory = categoryFilter === 'all' || task.category === categoryFilter;
+      const matchesDistrict = districtFilter === 'all' || task.district === districtFilter;
       const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
       return matchesSearch && matchesCategory && matchesDistrict && matchesStatus;
     });
@@ -90,22 +140,25 @@ export function TaskModeration() {
     setIsViewModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (selectedTask) {
-      setIsProcessing(true);
-      setTimeout(() => {
-        setTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
-        setIsProcessing(false);
-        setIsDeleteModalOpen(false);
-        setSelectedTask(null);
-      }, 800);
+  const confirmDelete = async () => {
+    if (!selectedTask) return;
+    setIsProcessing(true);
+    try {
+      await apiDelete(`/api/admin/tasks/${selectedTask.id}`);
+      setTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
+      setIsDeleteModalOpen(false);
+      setSelectedTask(null);
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete task');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   const clearFilters = () => {
     setSearchQuery('');
-    setCategoryFilter('All');
-    setDistrictFilter('All');
+    setCategoryFilter('all');
+    setDistrictFilter('all');
     setStatusFilter('all');
   };
 
@@ -187,6 +240,14 @@ export function TaskModeration() {
         </div>
       </div>
 
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm flex items-center justify-between">
+          <span>{error}</span>
+          <Button variant="ghost" size="sm" onClick={() => setError(null)}>Dismiss</Button>
+        </div>
+      )}
+
       {/* Stats Cards */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -244,7 +305,7 @@ export function TaskModeration() {
       )}
 
       {/* Filters */}
-        <div className="bg-white rounded-xl border border-[#CACDD3] p-4">
+      <div className="bg-white rounded-xl border border-[#CACDD3] p-4">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
@@ -264,7 +325,7 @@ export function TaskModeration() {
               <SelectContent>
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
-                    {cat}
+                    {cat === 'all' ? 'All Categories' : cat}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -277,7 +338,7 @@ export function TaskModeration() {
               <SelectContent>
                 {districts.map((d) => (
                   <SelectItem key={d} value={d}>
-                    {d}
+                    {d === 'all' ? 'All Districts' : d}
                   </SelectItem>
                 ))}
               </SelectContent>

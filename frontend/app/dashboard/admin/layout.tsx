@@ -11,7 +11,20 @@ import { cn } from "@/app/lib/utils";
 const pageConfig: Record<string, string> = {
   '/dashboard/admin': 'Dashboard',
   '/dashboard/admin/ngo-verification': 'NGO Verification',
+  '/dashboard/admin/volunteers': 'Volunteer Management',
+  '/dashboard/admin/volunteer-verification': 'Volunteer Verification',
   '/dashboard/admin/task-moderation': 'Task Moderation',
+  '/dashboard/admin/applications': 'Applications',
+  '/dashboard/admin/attendance': 'Attendance & Service Logs',
+  '/dashboard/admin/certificates': 'Certificate Management',
+  '/dashboard/admin/reviews': 'Ratings & Reviews',
+  '/dashboard/admin/notifications': 'Notifications',
+  '/dashboard/admin/admin-users': 'Admin Users',
+  '/dashboard/admin/analytics': 'Analytics',
+  '/dashboard/admin/categories': 'Categories',
+  '/dashboard/admin/skills': 'Skills',
+  '/dashboard/admin/activity-log': 'Activity Log',
+  '/dashboard/admin/reports': 'Reports',
   '/dashboard/admin/settings': 'Settings',
 };
 

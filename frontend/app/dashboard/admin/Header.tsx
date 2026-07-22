@@ -20,7 +20,7 @@ import {
   Home,
   ChevronRight,
 } from 'lucide-react';
-import { mockAdmin } from '@/app/data/mockData';
+import { useAuth } from '@/app/providers/AuthProvider';
 
 interface HeaderProps {
   pageTitle: string;
@@ -29,9 +29,13 @@ interface HeaderProps {
 }
 
 export function Header({ pageTitle, breadcrumbs = [], onSearch }: HeaderProps) {
+  const { user } = useAuth();
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notificationCount] = useState(3);
+
+  const displayName = user?.name || 'Admin';
+  const displayRole = user?.role === 'admin' ? 'Admin' : user?.role || 'Admin';
 
   const getInitials = (name: string) => {
     return name
@@ -170,11 +174,11 @@ export function Header({ pageTitle, breadcrumbs = [], onSearch }: HeaderProps) {
                 className="flex items-center gap-2 hover:bg-[#AAB2C8] transition-colors"
               >
                 <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg" style={{ backgroundColor: "#4F46C8" }}>
-                  {getInitials(mockAdmin.name)}
+                  {getInitials(displayName)}
                 </div>
                 <div className="hidden sm:block text-left">
-                  <p className="text-sm font-medium text-[#111827]">{mockAdmin.name}</p>
-                  <p className="text-xs text-[#6B7280]">{mockAdmin.role === 'super_admin' ? 'Super Admin' : 'Admin'}</p>
+                  <p className="text-sm font-medium text-[#111827]">{displayName}</p>
+                  <p className="text-xs text-[#6B7280]">{displayRole}</p>
                 </div>
                 <ChevronDown className="w-4 h-4 text-[#6B7280]" />
               </Button>
