@@ -222,10 +222,14 @@ class TaskController extends Controller
                         'name' => $s->name,
                         'proficiency_level' => $s->pivot->proficiency_level ?? null,
                     ]),
+                    'recommendation_score' => $v->recommendation_score,
+                    'semantic_match_score' => $v->semantic_match_score ?? 0,
+                    'distance_score' => $v->distance_score ?? 0,
+                    'skill_overlap_score' => $v->skill_overlap_score ?? 0,
+                    'availability_score' => $v->availability_score ?? 0,
                     'trust_score' => $v->trust_score ?? 0.5,
                     'average_rating' => $v->average_rating ?? 0,
                     'total_service_hours' => $v->total_service_hours ?? 0,
-                    'recommendation_score' => $v->recommendation_score,
                 ];
             }),
         ]);

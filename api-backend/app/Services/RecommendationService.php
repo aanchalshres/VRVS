@@ -10,9 +10,11 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RecommendationService
 {
-    private const SKILL_WEIGHT = 0.5;
-    private const DISTANCE_WEIGHT = 0.3;
-    private const TRUST_WEIGHT = 0.2;
+    public const WEIGHT_SEMANTIC = 0.30;
+    public const WEIGHT_DISTANCE = 0.20;
+    public const WEIGHT_SKILL = 0.20;
+    public const WEIGHT_AVAILABILITY = 0.10;
+    public const WEIGHT_TRUST = 0.20;
 
     public function __construct(
         private SimilarityCalculatorInterface $similarity,
@@ -20,37 +22,50 @@ class RecommendationService
         private TrustScoreService $trustService
     ) {}
 
+    public function computeAllScores(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): array {
+        $volunteer->loadMissing('skills');
+        $task->loadMissing('skills');
+
+        $semanticScore = $this->semanticMatchScore($volunteer, $task);
+        $distanceScore = $this->geographicDistanceScore($volunteer, $task);
+        $skillScore = $this->skillOverlapScore($volunteer, $task);
+        $availabilityScore = $this->availabilityOverlapScore($volunteer, $task);
+        $trustScore = $this->getTrustScore($volunteer);
+
+        $finalScore = $this->weightedScore(
+            $semanticScore,
+            $distanceScore,
+            $skillScore,
+            $availabilityScore,
+            $trustScore
+        );
+
+        return [
+            'recommendation_score' => round($finalScore * 100, 1),
+            'semantic_match_score' => round($semanticScore, 4),
+            'distance_score' => round($distanceScore, 4),
+            'skill_overlap_score' => round($skillScore, 4),
+            'availability_score' => round($availabilityScore, 4),
+            'trust_score' => round($trustScore, 4),
+        ];
+    }
+
     public function computeVolunteerTaskScore(
         VolunteerProfile $volunteer,
         Task $task
     ): float {
-        $skillScore = $this->similarity->calculate(
-            $volunteer->tfidf_vector ?? [],
-            $task->tfidf_vector ?? []
-        );
+        $scores = $this->computeAllScores($volunteer, $task);
+        return $scores['recommendation_score'] / 100;
+    }
 
-        $distanceScore = 0;
-        if (
-            $volunteer->latitude &&
-            $volunteer->longitude &&
-            $task->latitude &&
-            $task->longitude
-        ) {
-            $km = $this->distance->calculate(
-                $volunteer->latitude,
-                $volunteer->longitude,
-                $task->latitude,
-                $task->longitude
-            );
-            $distanceScore = max(0, 1 - ($km / 500));
-        }
-
-        $trustScore = $this->getTrustScore($volunteer);
-
-        return
-            (self::SKILL_WEIGHT * $skillScore) +
-            (self::DISTANCE_WEIGHT * $distanceScore) +
-            (self::TRUST_WEIGHT * $trustScore);
+    public function computeVolunteerTaskMatchScore(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): float {
+        return $this->computeAllScores($volunteer, $task)['recommendation_score'];
     }
 
     public function getTrustScore(VolunteerProfile $volunteer): float
@@ -65,15 +80,10 @@ class RecommendationService
         return $volunteer->fresh()->trust_score ?? 0.5;
     }
 
-    public function computeVolunteerTaskMatchScore(
-        VolunteerProfile $volunteer,
-        Task $task
-    ): float {
-        return round($this->computeVolunteerTaskScore($volunteer, $task) * 100, 1);
-    }
-
     public function rankVolunteersForTask(Task $task): Collection
     {
+        $task->loadMissing('skills');
+
         $volunteers = VolunteerProfile::with(['user', 'skills'])
             ->whereHas('user', function ($q) {
                 $q->where('is_active', true);
@@ -87,9 +97,13 @@ class RecommendationService
             ->get();
 
         $volunteers->each(function ($volunteer) use ($task) {
-            $score = $this->computeVolunteerTaskMatchScore($volunteer, $task);
-            $volunteer->recommendation_score = $score;
-            $volunteer->trust_score = $this->getTrustScore($volunteer);
+            $scores = $this->computeAllScores($volunteer, $task);
+            $volunteer->recommendation_score = $scores['recommendation_score'];
+            $volunteer->semantic_match_score = $scores['semantic_match_score'];
+            $volunteer->distance_score = $scores['distance_score'];
+            $volunteer->skill_overlap_score = $scores['skill_overlap_score'];
+            $volunteer->availability_score = $scores['availability_score'];
+            $volunteer->trust_score = $scores['trust_score'];
         });
 
         return $volunteers->sortByDesc('recommendation_score')->values();
@@ -99,6 +113,8 @@ class RecommendationService
         VolunteerProfile $volunteer,
         array $filters = []
     ): Collection {
+        $volunteer->loadMissing('skills');
+
         $query = Task::whereIn('status', ['Open', 'Ongoing'])
             ->whereHas('ngo', function ($q) {
                 $q->where('verification_status', 'verified');
@@ -152,15 +168,128 @@ class RecommendationService
 
         $tasks = $query->get();
 
-        $trustScore = $this->getTrustScore($volunteer);
-
-        $tasks->each(function ($task) use ($volunteer, $trustScore) {
-            $score = $this->computeVolunteerTaskMatchScore($volunteer, $task);
-            $task->recommendation_score = $score;
-            $task->match_score = $score;
-            $task->trust_score = $trustScore;
+        $tasks->each(function ($task) use ($volunteer) {
+            $scores = $this->computeAllScores($volunteer, $task);
+            $task->recommendation_score = $scores['recommendation_score'];
+            $task->match_score = $scores['recommendation_score'];
+            $task->semantic_match_score = $scores['semantic_match_score'];
+            $task->distance_score = $scores['distance_score'];
+            $task->skill_overlap_score = $scores['skill_overlap_score'];
+            $task->availability_score = $scores['availability_score'];
+            $task->trust_score = $scores['trust_score'];
         });
 
         return $tasks->sortByDesc('recommendation_score')->values();
+    }
+
+    private function semanticMatchScore(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): float {
+        return $this->similarity->calculate(
+            $volunteer->tfidf_vector ?? [],
+            $task->tfidf_vector ?? []
+        );
+    }
+
+    private function geographicDistanceScore(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): float {
+        if (
+            !$volunteer->latitude ||
+            !$volunteer->longitude ||
+            !$task->latitude ||
+            !$task->longitude
+        ) {
+            return 0.5;
+        }
+
+        $km = $this->distance->calculate(
+            $volunteer->latitude,
+            $volunteer->longitude,
+            $task->latitude,
+            $task->longitude
+        );
+
+        return max(0, min(1, 1 - ($km / 500)));
+    }
+
+    private function skillOverlapScore(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): float {
+        $volunteerSkills = $volunteer->skills->pluck('id')->toArray();
+        $taskSkills = $task->skills->pluck('id')->toArray();
+
+        if (empty($taskSkills)) {
+            return 0.5;
+        }
+
+        if (empty($volunteerSkills)) {
+            return 0;
+        }
+
+        $intersection = array_intersect($volunteerSkills, $taskSkills);
+        $union = array_unique(array_merge($volunteerSkills, $taskSkills));
+
+        $jaccard = count($intersection) / max(count($union), 1);
+
+        $requiredCoverage = count($intersection) / max(count($taskSkills), 1);
+
+        return (0.5 * $jaccard) + (0.5 * $requiredCoverage);
+    }
+
+    private function availabilityOverlapScore(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): float {
+        $volAvailability = $volunteer->availability;
+
+        if (
+            $volAvailability &&
+            in_array($volAvailability, ['Unavailable', 'Busy'])
+        ) {
+            return 0.1;
+        }
+
+        $taskStart = $task->start_date;
+        $taskEnd = $task->end_date;
+
+        if (!$taskStart && !$taskEnd) {
+            return $volAvailability === 'Available' ? 1.0 : 0.8;
+        }
+
+        $now = now();
+
+        if ($taskStart && $taskStart->isPast() && $taskEnd && $taskEnd->isPast()) {
+            return 0.3;
+        }
+
+        if ($taskStart && $taskStart->isPast() && (!$taskEnd || $taskEnd->isFuture())) {
+            return 0.7;
+        }
+
+        if ($taskStart && $taskStart->isFuture()) {
+            return 0.9;
+        }
+
+        return 0.5;
+    }
+
+    private function weightedScore(
+        float $semantic,
+        float $distance,
+        float $skill,
+        float $availability,
+        float $trust
+    ): float {
+        return min(1.0, max(0.01,
+            (self::WEIGHT_SEMANTIC * $semantic) +
+            (self::WEIGHT_DISTANCE * $distance) +
+            (self::WEIGHT_SKILL * $skill) +
+            (self::WEIGHT_AVAILABILITY * $availability) +
+            (self::WEIGHT_TRUST * $trust)
+        ));
     }
 }

@@ -37,6 +37,7 @@ use App\Http\Controllers\Ngo\AttendanceController as NgoAttendanceController;
 use App\Http\Controllers\Ngo\ReportsController as NgoReportsController;
 use App\Http\Controllers\Ngo\RatingController as NgoRatingController;
 use App\Http\Controllers\Ngo\CertificateController as NgoCertificateController;
+use App\Http\Controllers\Ngo\WorkflowController as NgoWorkflowController;
 
 use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
 use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
@@ -48,6 +49,7 @@ use App\Http\Controllers\Volunteer\NotificationController as VolunteerNotificati
 use App\Http\Controllers\Volunteer\AttendanceController as VolunteerAttendanceController;
 use App\Http\Controllers\Volunteer\RatingController as VolunteerRatingController;
 use App\Http\Controllers\Volunteer\CertificateController as VolunteerCertificateController;
+use App\Http\Controllers\Volunteer\WorkflowController as VolunteerWorkflowController;
 
 
 /*
@@ -954,6 +956,33 @@ Route::get(
     [NgoCertificateController::class, 'index']
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| Workflow Automation
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/ngo/tasks/{id}/shortlist',
+    [NgoWorkflowController::class, 'shortlist']
+);
+
+Route::post(
+    '/ngo/tasks/{id}/generate-shortlist',
+    [NgoWorkflowController::class, 'generateShortlist']
+);
+
+Route::get(
+    '/ngo/tasks/{id}/prioritized-applications',
+    [NgoWorkflowController::class, 'prioritizedApplications']
+);
+
+Route::get(
+    '/ngo/strategies',
+    [NgoWorkflowController::class, 'strategies']
+);
+
 Route::get(
     '/ngo/certificates/eligible',
     [NgoCertificateController::class, 'eligibleApplications']
@@ -1246,6 +1275,23 @@ Route::middleware([
     Route::post(
         '/volunteer/change-password',
         [VolunteerProfileController::class, 'changePassword']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Workflow Automation
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/recommended-ngos',
+        [VolunteerWorkflowController::class, 'recommendedNgos']
+    );
+
+    Route::get(
+        '/volunteer/strategies',
+        [VolunteerWorkflowController::class, 'strategies']
     );
 
 });
