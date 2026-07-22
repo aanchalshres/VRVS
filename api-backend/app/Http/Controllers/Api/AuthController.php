@@ -58,7 +58,6 @@ class AuthController extends Controller
                     'primary_location' => $validated['location'] ?? null,
                     'availability' => 'Available',
                     'trust_score' => 0.5,
-                    'reliability_score' => 0,
                     'total_service_hours' => 0,
                     'average_rating' => 0,
                 ]);

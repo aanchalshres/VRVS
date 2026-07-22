@@ -10,7 +10,7 @@ use App\Algorithms\Contracts\TrustCalculatorInterface;
 
 use App\Algorithms\Matching\CosineSimilarity;
 use App\Algorithms\Assignment\HungarianMatcher;
-use App\Algorithms\Ranking\TrustScoreCalculator;
+use App\Services\TrustScoreService;
 
 class AlgorithmServiceProvider extends ServiceProvider
 {
@@ -28,7 +28,7 @@ class AlgorithmServiceProvider extends ServiceProvider
 
         $this->app->bind(
             TrustCalculatorInterface::class,
-            TrustScoreCalculator::class
+            TrustScoreService::class
         );
     }
 

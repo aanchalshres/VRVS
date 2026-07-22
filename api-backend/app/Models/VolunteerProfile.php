@@ -27,7 +27,6 @@ class VolunteerProfile extends Model
         'trust_score',
         'trust_updated_at',
         'trust_score_components',
-        'reliability_score',
         'total_service_hours',
         'average_rating',
     ];
@@ -38,7 +37,6 @@ class VolunteerProfile extends Model
         'trust_updated_at' => 'datetime',
         'trust_score_components' => 'array',
         'trust_score' => 'float',
-        'reliability_score' => 'decimal:2',
         'total_service_hours' => 'decimal:2',
         'average_rating' => 'decimal:2',
     ];

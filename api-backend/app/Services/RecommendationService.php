@@ -10,12 +10,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RecommendationService
 {
-    public const WEIGHT_SEMANTIC = 0.30;
-    public const WEIGHT_DISTANCE = 0.20;
-    public const WEIGHT_SKILL = 0.20;
-    public const WEIGHT_AVAILABILITY = 0.10;
-    public const WEIGHT_TRUST = 0.20;
-
     public function __construct(
         private SimilarityCalculatorInterface $similarity,
         private HaversineDistance $distance,
@@ -284,12 +278,17 @@ class RecommendationService
         float $availability,
         float $trust
     ): float {
+        $w = config('workflow.strategies.recommendation.weights', [
+            'semantic' => 0.30, 'distance' => 0.20, 'skill' => 0.20,
+            'availability' => 0.10, 'trust' => 0.20,
+        ]);
+
         return min(1.0, max(0.01,
-            (self::WEIGHT_SEMANTIC * $semantic) +
-            (self::WEIGHT_DISTANCE * $distance) +
-            (self::WEIGHT_SKILL * $skill) +
-            (self::WEIGHT_AVAILABILITY * $availability) +
-            (self::WEIGHT_TRUST * $trust)
+            ($w['semantic'] * $semantic) +
+            ($w['distance'] * $distance) +
+            ($w['skill'] * $skill) +
+            ($w['availability'] * $availability) +
+            ($w['trust'] * $trust)
         ));
     }
 }

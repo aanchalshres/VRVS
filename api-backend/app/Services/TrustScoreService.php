@@ -7,7 +7,7 @@ use App\Models\Document;
 use App\Models\ServiceLog;
 use App\Models\VolunteerProfile;
 
-class TrustScoreService
+class TrustScoreService implements \App\Algorithms\Contracts\TrustCalculatorInterface
 {
     private const WEIGHT_ATTENDANCE = 0.25;
     private const WEIGHT_COMPLETION = 0.20;
