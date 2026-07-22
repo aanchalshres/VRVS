@@ -1,6 +1,7 @@
 <?php
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Models\VolunteerProfile;
 use App\Jobs\RecomputeTfIdfJob;
