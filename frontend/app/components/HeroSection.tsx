@@ -146,7 +146,7 @@ export default function Hero() {
               Trusted Emergency Response Network
             </div>
 
-            <div className="inline-flex items-center gap-1.5 bg-white border border-black/[0.08] rounded-full p-1 shadow-sm">
+            {/* <div className="inline-flex items-center gap-1.5 bg-white border border-black/[0.08] rounded-full p-1 shadow-sm">
               <button
                 type="button"
                 onClick={() => openLogin('volunteer')}
@@ -164,7 +164,7 @@ export default function Hero() {
                 <Building2 size={13} />
                 NGO Login
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Headline */}

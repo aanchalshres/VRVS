@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkflowTransition extends Model
 {
+    public $timestamps = false;
+
     protected $table = 'workflow_transitions';
     protected $fillable = [
     'from_state_id',

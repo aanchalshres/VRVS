@@ -9,9 +9,15 @@ import {
   Plus,
   FileText,
   Users,
-  CheckSquare,
+  UserCheck,
   User,
   LogOut,
+  Bell,
+  ShieldCheck,
+  ClipboardCheck,
+  BarChart3,
+  Star,
+  Award,
 } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -20,10 +26,14 @@ const menuItems = [
   { name: "Post Task", href: "/dashboard/ngo/post-task", icon: Plus },
   { name: "My Tasks", href: "/dashboard/ngo/tasks", icon: FileText },
   { name: "Applications", href: "/dashboard/ngo/applications", icon: Users },
-  { name: "Participations", href: "/dashboard/ngo/participations", icon: Users },
-  { name: "Verify Volunteers", href: "/dashboard/ngo/verification", icon: CheckSquare },
+  { name: "Volunteers", href: "/dashboard/ngo/participations", icon: UserCheck },
+  { name: "Verification", href: "/dashboard/ngo/verification", icon: ShieldCheck },
+  { name: "Attendance", href: "/dashboard/ngo/attendance", icon: ClipboardCheck },
+  { name: "Reports", href: "/dashboard/ngo/reports", icon: BarChart3 },
+  { name: "Ratings", href: "/dashboard/ngo/ratings", icon: Star },
+  { name: "Certificates", href: "/dashboard/ngo/certificates", icon: Award },
+  { name: "Notifications", href: "/dashboard/ngo/notifications", icon: Bell },
   { name: "Profile", href: "/dashboard/ngo/profile", icon: User },
-
 ];
 
 export default function OrgSidebar({ isOpen, toggleSidebar }: { isOpen: boolean; toggleSidebar: () => void }) {

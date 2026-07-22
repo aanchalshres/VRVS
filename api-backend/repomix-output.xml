@@ -1,0 +1,7200 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+app/
+  Algorithms/
+    Assignment/
+      HungarianMatcher.php
+    Contracts/
+      AssignmentSolverInterface.php
+      SimilarityCalculatorInterface.php
+      TrustCalculatorInterface.php
+    Matching/
+      CosineSimilarity.php
+      HaversineDistance.php
+      TfIdfVectorizer.php
+    Ranking/
+      TrustScoreCalculator.php
+  Console/
+    Commands/
+      ComputeTfIdfVectors.php
+  Http/
+    Controllers/
+      Admin/
+        AssignmentController.php
+        DashboardController.php
+        TaskController.php
+        TfIdfController.php
+        VerificationController.php
+      Api/
+        AuthController.php
+      Ngo/
+        ApplicationController.php
+        ProfileController.php
+        TaskController.php
+      Verification/
+        DocumentController.php
+        VerificationImageController.php
+        VerificationSessionController.php
+        VerificationStateLogController.php
+        VerificationWorkflowController.php
+      Volunteer/
+        ApplicationController.php
+        AttendanceController.php
+        ProfileController.php
+        TaskController.php
+      Workflow/
+        WorkflowStateController.php
+        WorkflowTransitionController.php
+      Controller.php
+    Middleware/
+      Authenticate.php
+      CheckRole.php
+      VerifiedNgo.php
+  Jobs/
+    RecomputeTfIdfJob.php
+  Models/
+    ActivityLog.php
+    Application.php
+    Badge.php
+    Category.php
+    Document.php
+    NgoProfile.php
+    Notification.php
+    Report.php
+    Review.php
+    ServiceLog.php
+    Skill.php
+    Task.php
+    TaskSkill.php
+    User.php
+    UserBadge.php
+    VerificationImage.php
+    VerificationSession.php
+    VerificationStateLog.php
+    VerificationWorkflow.php
+    VolunteerProfile.php
+    VolunteerSkill.php
+    WorkflowState.php
+    WorkflowTransition.php
+  Providers/
+    AlgorithmServiceProvider.php
+    AppServiceProvider.php
+  Services/
+    ApplicationService.php
+    AssignmentService.php
+    AttendanceService.php
+    MatchingService.php
+    NgoProfileService.php
+    RankingService.php
+    TaskService.php
+    VerificationService.php
+    VolunteerProfileService.php
+bootstrap/
+  cache/
+    .gitignore
+  app.php
+  providers.php
+config/
+  app.php
+  auth.php
+  cache.php
+  cors.php
+  database.php
+  filesystems.php
+  logging.php
+  mail.php
+  queue.php
+  sanctum.php
+  services.php
+  session.php
+database/
+  factories/
+    UserFactory.php
+  migrations/
+    0001_01_01_000000_create_users_table.php
+    0001_01_01_000001_create_cache_table.php
+    0001_01_01_000002_create_jobs_table.php
+    2026_02_11_121353_create_skills_table.php
+    2026_02_11_121354_create_ngo_profiles_table.php
+    2026_02_11_121354_create_volunteer_profiles_table.php
+    2026_02_11_121355_create_categories_table.php
+    2026_02_11_121355_create_tasks_table.php
+    2026_02_11_121356_create_task_skills_table.php
+    2026_02_11_121357_create_applications_table.php
+    2026_02_11_121357_create_badges_table.php
+    2026_02_11_121357_create_service_logs_table.php
+    2026_02_11_121358_create_notifications_table.php
+    2026_02_11_121358_create_user_badges_table.php
+    2026_02_11_121359_create_reviews_table.php
+    2026_02_13_071245_create_personal_access_tokens_table.php
+    2026_05_26_064045_create_volunteer_skills_table.php
+    2026_05_26_064119_create_workflow_states_table.php
+    2026_05_26_064131_create_workflow_transitions_table.php
+    2026_05_26_064153_create_verification_workflows_table.php
+    2026_05_26_064203_create_verification_state_logs_table.php
+    2026_05_26_064211_create_verification_sessions_table.php
+    2026_05_26_064224_create_verification_images_table.php
+    2026_05_26_064234_create_documents_table.php
+    2026_05_26_064243_create_reports_table.php
+    2026_05_26_064310_create_activity_logs_table.php
+  seeders/
+    DatabaseSeeder.php
+  .gitignore
+public/
+  .htaccess
+  favicon.ico
+  index.php
+  robots.txt
+resources/
+  css/
+    app.css
+  js/
+    app.js
+    bootstrap.js
+routes/
+  api.php
+  console.php
+  web.php
+storage/
+  app/
+    private/
+      .gitignore
+    public/
+      .gitignore
+    .gitignore
+  framework/
+    cache/
+      data/
+        .gitignore
+      .gitignore
+    sessions/
+      .gitignore
+    testing/
+      .gitignore
+    views/
+      .gitignore
+    .gitignore
+  logs/
+    .gitignore
+tests/
+  Feature/
+    ExampleTest.php
+  Unit/
+    ExampleTest.php
+  Pest.php
+  TestCase.php
+.editorconfig
+.env.example
+.gitattributes
+.gitignore
+artisan
+composer.json
+package.json
+phpunit.xml
+vite.config.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="app/Algorithms/Assignment/HungarianMatcher.php">
+<?php
+
+namespace App\Services;
+
+class HungarianMatcher
+{
+   
+    public function solve(array $costMatrix): array
+    {
+        $n    = count($costMatrix);
+        $u    = array_fill(0, $n + 1, 0);
+        $v    = array_fill(0, $n + 1, 0);
+        $p    = array_fill(0, $n + 1, 0);
+        $way  = array_fill(0, $n + 1, 0);
+
+        for ($i = 1; $i <= $n; $i++) {
+            $p[0]    = $i;
+            $j0      = 0;
+            $minVal  = array_fill(0, $n + 1, PHP_INT_MAX);
+            $used    = array_fill(0, $n + 1, false);
+
+            do {
+                $used[$j0] = true;
+                $i0        = $p[$j0];
+                $delta     = PHP_INT_MAX;
+                $j1        = -1;
+
+                for ($j = 1; $j <= $n; $j++) {
+                    if (!$used[$j]) {
+                        $cur = ($costMatrix[$i0 - 1][$j - 1] ?? 0) - $u[$i0] - $v[$j];
+                        if ($cur < $minVal[$j]) {
+                            $minVal[$j] = $cur;
+                            $way[$j]    = $j0;
+                        }
+                        if ($minVal[$j] < $delta) {
+                            $delta = $minVal[$j];
+                            $j1    = $j;
+                        }
+                    }
+                }
+
+                for ($j = 0; $j <= $n; $j++) {
+                    if ($used[$j]) {
+                        $u[$p[$j]] += $delta;
+                        $v[$j]     -= $delta;
+                    } else {
+                        $minVal[$j] -= $delta;
+                    }
+                }
+
+                $j0 = $j1;
+            } while ($p[$j0] !== 0);
+
+            do {
+                $j1      = $way[$j0];
+                $p[$j0]  = $p[$j1];
+                $j0      = $j1;
+            } while ($j0);
+        }
+
+        $result = [];
+        for ($j = 1; $j <= $n; $j++) {
+            if ($p[$j]) {
+                $result[$p[$j] - 1] = $j - 1;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Build cost matrix from scores.
+     * cost = 1 - finalScore (Hungarian minimizes, we want to maximize score)
+     */
+    public function buildCostMatrix(array $volunteers, array $tasks, callable $scoreFn): array
+    {
+        $matrix = [];
+
+        foreach ($volunteers as $i => $volunteer) {
+            $row = [];
+            foreach ($tasks as $j => $task) {
+                $score   = $scoreFn($volunteer, $task); // 0–1
+                $row[$j] = round(1 - $score, 6);        // invert: low cost = high score
+            }
+            $matrix[$i] = $row;
+        }
+
+        return $matrix;
+    }
+}
+</file>
+
+<file path="app/Algorithms/Contracts/AssignmentSolverInterface.php">
+<?php
+
+namespace App\Algorithms\Contracts;
+
+interface AssignmentSolverInterface
+{
+    /**
+     * Solve a cost matrix.
+     *
+     * @param array $costMatrix
+     * @return array
+     *
+     * Example:
+     * [
+     *     0 => 2,
+     *     1 => 0,
+     *     2 => 1,
+     * ]
+     * meaning:
+     * volunteer[0] -> task[2]
+     * volunteer[1] -> task[0]
+     * volunteer[2] -> task[1]
+     */
+    public function solve(array $costMatrix): array;
+}
+</file>
+
+<file path="app/Algorithms/Contracts/SimilarityCalculatorInterface.php">
+<?php
+
+namespace App\Algorithms\Contracts;
+
+interface SimilarityCalculatorInterface
+{
+    public function calculate(
+        array $vectorA,
+        array $vectorB
+    ): float;
+}
+</file>
+
+<file path="app/Algorithms/Contracts/TrustCalculatorInterface.php">
+
+</file>
+
+<file path="app/Algorithms/Matching/CosineSimilarity.php">
+<?php
+
+namespace App\Algorithms\Matching;
+
+use App\Algorithms\Contracts\SimilarityCalculatorInterface;
+
+class CosineSimilarity implements SimilarityCalculatorInterface
+{
+    public function calculate(array $vectorA, array $vectorB): float
+    {
+        $dotProduct = 0;
+
+        $magnitudeA = 0;
+
+        $magnitudeB = 0;
+
+        foreach ($vectorA as $term => $weight) {
+
+            $dotProduct +=
+                $weight * ($vectorB[$term] ?? 0);
+
+            $magnitudeA +=
+                $weight ** 2;
+        }
+
+        foreach ($vectorB as $weight) {
+
+            $magnitudeB +=
+                $weight ** 2;
+        }
+
+        $denominator =
+            sqrt($magnitudeA)
+            *
+            sqrt($magnitudeB);
+
+        return $denominator > 0
+            ? $dotProduct / $denominator
+            : 0;
+    }
+}
+</file>
+
+<file path="app/Algorithms/Matching/HaversineDistance.php">
+<?php
+
+namespace App\Algorithms\Matching;
+
+class HaversineDistance
+{
+    public function calculate(
+        float $lat1,
+        float $lon1,
+        float $lat2,
+        float $lon2
+    ): float
+    {
+        $R = 6371;
+
+        $dLat = deg2rad($lat2 - $lat1);
+
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a =
+            sin($dLat / 2) ** 2
+            +
+            cos(deg2rad($lat1))
+            *
+            cos(deg2rad($lat2))
+            *
+            sin($dLon / 2) ** 2;
+
+        return
+            $R
+            *
+            2
+            *
+            atan2(
+                sqrt($a),
+                sqrt(1 - $a)
+            );
+    }
+}
+</file>
+
+<file path="app/Algorithms/Matching/TfIdfVectorizer.php">
+<?php
+
+namespace App\Algorithms\Matching;
+
+class TfIdfVectorizer
+{
+    public function compute(array $docs): array
+    {
+        $totalDocs = count($docs);
+        $termFrequencies = [];
+        $documentFrequency = [];
+
+        foreach ($docs as $doc) {
+            $terms = $this->tokenise($doc['text']);
+
+            $termCount = count($terms);
+
+            $tf = [];
+
+            foreach (array_count_values($terms) as $term => $count) {
+                $tf[$term] = $count / max($termCount, 1);
+
+                $documentFrequency[$term] =
+                    ($documentFrequency[$term] ?? 0) + 1;
+            }
+
+            $termFrequencies[$doc['id']] = $tf;
+        }
+
+        $vectors = [];
+
+        foreach ($termFrequencies as $id => $tf) {
+
+            $vector = [];
+
+            foreach ($tf as $term => $tfScore) {
+
+                $idf = log(
+                    ($totalDocs + 1)
+                    /
+                    (($documentFrequency[$term] ?? 0) + 1)
+                ) + 1;
+
+                $weight = $tfScore * $idf;
+
+                if ($weight > 0) {
+                    $vector[$term] = round($weight, 6);
+                }
+            }
+
+            arsort($vector);
+
+            $vectors[$id] = $vector;
+        }
+
+        return $vectors;
+    }
+
+    private function tokenise(string $text): array
+    {
+        $text = strtolower($text);
+
+        $text = preg_replace('/[^a-z0-9\s]/', '', $text);
+
+        $words = preg_split(
+            '/\s+/',
+            trim($text),
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        );
+
+        $stopWords = [
+            'the','a','an','and','or','but','in','on','at','to',
+            'for','of','with','by','is','are','was','were','be',
+            'been','have','has','had','do','does','did','will',
+            'would','could','should'
+        ];
+
+        return array_values(
+            array_filter(
+                $words,
+                fn ($w) => !in_array($w, $stopWords)
+            )
+        );
+    }
+}
+</file>
+
+<file path="app/Algorithms/Ranking/TrustScoreCalculator.php">
+<?php
+
+namespace App\Services;
+
+use App\Models\VolunteerProfile;
+
+class TrustScoreCalculator
+{
+    const WEIGHTS = [
+        'gov_id_uploaded'     =>  0.15,
+        'liveness_passed'     =>  0.12,
+        'task_completed'      =>  0.08,
+        'review_5star'        =>  0.06,
+        'review_1star'        => -0.10,
+        'no_show'             => -0.12,
+        'account_flagged'     => -0.20,
+        'prior_participation' =>  0.04,
+    ];
+
+    public function update(VolunteerProfile $profile, string $event): void
+    {
+        $delta = self::WEIGHTS[$event] ?? 0;
+
+        // Decay toward 0.5 if inactive
+        $daysSinceUpdate = now()->diffInDays($profile->trust_updated_at ?? now());
+        $decayed         = $profile->trust_score + ($daysSinceUpdate * -0.001);
+
+        $newScore = $this->clamp($decayed + $delta, 0.1, 0.99);
+
+        $profile->update([
+            'trust_score'      => $newScore,
+            'trust_updated_at' => now(),
+        ]);
+    }
+
+    public function initialize(VolunteerProfile $profile): void
+    {
+        // Beta(2,2) prior — neutral starting point
+        $profile->update([
+            'trust_score'      => 0.5,
+            'trust_updated_at' => now(),
+        ]);
+    }
+
+    private function clamp(float $value, float $min, float $max): float
+    {
+        return max($min, min($max, $value));
+    }
+}
+</file>
+
+<file path="app/Console/Commands/ComputeTfIdfVectors.php">
+<?php
+
+namespace App\Console\Commands;
+
+use App\Models\Task;
+use App\Models\VolunteerProfile;
+use App\Services\TfIdfService;
+use Illuminate\Console\Command;
+
+class ComputeTfIdfVectors extends Command
+{
+    protected $signature   = 'tfidf:compute {--type=all : volunteers|tasks|all}';
+    protected $description = 'Pre-compute TF-IDF vectors for volunteer profiles and tasks';
+
+    public function handle(TfIdfService $tfidf): int
+    {
+        $type = $this->option('type');
+
+        if (in_array($type, ['volunteers', 'all'])) {
+          $this->computeFor(
+            VolunteerProfile::with('skills', 'serviceLogs.task')->get(),
+            fn($v) => implode(' ', array_filter([
+                $v->bio ?? '',
+                $v->skills->pluck('name')->implode(' '),
+                $v->serviceLogs
+                    ->where('participation_status', 'completed')
+                    ->map(fn($log) => $log->task->title . ' ' . $log->task->description)
+                    ->implode(' '),
+            ])),
+            'volunteer_profiles',
+            $tfidf
+          );
+        }
+
+        if (in_array($type, ['tasks', 'all'])) {
+            $this->computeFor(
+                Task::with('skills')->get(),
+                fn($t) => implode(' ', array_filter([
+                    $t->title ?? '',
+                    $t->description ?? '',
+                    $t->skills->pluck('name')->implode(' '),
+                ])),
+                'tasks',
+                $tfidf
+            );
+        }
+
+        return Command::SUCCESS;
+    }
+
+    private function computeFor($records, callable $textExtractor, string $label, TfIdfService $tfidf): void
+    {
+        $this->info("Computing TF-IDF for {$label}...");
+
+        $docs = $records->map(fn($r) => [
+            'id'   => $r->id,
+            'text' => $textExtractor($r),
+        ])->toArray();
+
+        $vectors = $tfidf->compute($docs);
+
+        foreach ($records as $record) {
+            $record->update(['tfidf_vector' => $vectors[$record->id] ?? []]);
+        }
+
+        $this->info("  ✓ Updated " . count($vectors) . " {$label} records.");
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Admin/AssignmentController.php">
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Services\AssignmentService;
+use Illuminate\Http\Request;
+
+class AssignmentController extends Controller
+{
+    public function __construct(
+        private AssignmentService $assignmentService
+    ) {}
+
+    public function batchAssign(Request $request)
+    {
+        $validated = $request->validate([
+            'application_ids' => ['required', 'array'],
+            'task_ids'        => ['required', 'array'],
+        ]);
+
+        $assignments = $this->assignmentService->batchAssign(
+            $validated['application_ids'],
+            $validated['task_ids']
+        );
+
+        return response()->json([
+            'message' => 'Optimal assignments computed',
+            'assignments' => $assignments,
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Admin/DashboardController.php">
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+
+class DashboardController extends Controller
+{
+    public function getSystemStats()
+    {
+        $stats = [
+            'total_users'        => DB::table('users')->count(),
+            'total_volunteers'   => DB::table('users')
+                ->where('role', 'volunteer')
+                ->count(),
+
+            'total_ngos'         => DB::table('users')
+                ->where('role', 'ngo')
+                ->count(),
+
+            'verified_ngos'      => DB::table('ngo_profiles')
+                ->where('verification_status', 'verified')
+                ->count(),
+
+            'pending_ngos'       => DB::table('ngo_profiles')
+                ->where('verification_status', 'pending')
+                ->count(),
+
+            'total_tasks'        => DB::table('tasks')->count(),
+
+            'active_tasks'       => DB::table('tasks')
+                ->where('status', 'active')
+                ->count(),
+
+            'total_applications' => DB::table('applications')->count(),
+        ];
+
+        return response()->json([
+            'data' => $stats,
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Admin/TaskController.php">
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Services\TaskService;
+
+class TaskController extends Controller
+{
+    public function __construct(
+        private TaskService $taskService
+    ) {}
+
+    public function getTaskModeration()
+    {
+        $tasks = $this->taskService->getAllTasks();
+
+        return response()->json([
+            'data'  => $tasks,
+            'total' => $tasks->count(),
+        ]);
+    }
+
+    public function deleteTask($id)
+    {
+        $this->taskService->deleteTask($id);
+
+        return response()->json([
+            'message' => 'Task deleted successfully'
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Admin/TfIdfController.php">
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Task;
+use App\Models\VolunteerProfile;
+use App\Jobs\RecomputeTfIdfJob;
+use Illuminate\Http\JsonResponse;
+
+class TfIdfController extends Controller
+{
+    public function recompute(): JsonResponse
+    {
+        RecomputeTfIdfJob::dispatch();
+
+        return response()->json(['message' => 'Recomputation queued']);
+    }
+    public function showVolunteer(int $id): JsonResponse
+    {
+        $profile = VolunteerProfile::findOrFail($id);
+        return response()->json(['tfidf_vector' => $profile->tfidf_vector]);
+    }
+
+    public function showTask(int $id): JsonResponse
+    {
+        $task = Task::findOrFail($id);
+        return response()->json(['tfidf_vector' => $task->tfidf_vector]);
+    }
+
+
+
+}
+</file>
+
+<file path="app/Http/Controllers/Admin/VerificationController.php">
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Services\VerificationService;
+
+class VerificationController extends Controller
+{
+    public function __construct(
+        private VerificationService $verificationService
+    ) {}
+
+    public function getNgoVerification()
+    {
+        $ngos = $this->verificationService->getPendingNgos();
+
+        return response()->json([
+            'data' => $ngos,
+            'total' => $ngos->count(),
+        ]);
+    }
+
+    public function verifyNgo($id)
+    {
+        $ngo = $this->verificationService->verifyNgoById($id);
+
+        return response()->json([
+            'message' => 'NGO verified successfully',
+            'data' => $ngo,
+        ]);
+    }
+
+    public function rejectNgo($id)
+    {
+        $ngo = $this->verificationService->rejectNgoById($id);
+
+        return response()->json([
+            'message' => 'NGO rejected',
+            'data' => $ngo,
+        ]);
+    }
+
+    public function ngos()
+    {
+        return response()->json(
+            $this->verificationService->getAllNgos()
+        );
+    }
+
+    public function ngoDetails($id)
+    {
+        return response()->json(
+            $this->verificationService->getNgoDetails($id)
+        );
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Api/AuthController.php">
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+
+class AuthController extends Controller
+{
+    // =========================
+    // REGISTER (Volunteer + NGO)
+    // =========================
+
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'required|string|max:20|unique:users,phone',
+            'password' => 'required|string|min:6',
+            'role' => 'required|in:volunteer,ngo',
+
+            // NGO fields
+            'website' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'city' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
+            'organizationName' => 'nullable|string|max:255',
+            'registrationNumber' => 'nullable|string|max:255',
+            'officeLocation' => 'nullable|string|max:255',
+            'panNumber' => 'nullable|string|max:255',
+            'registrationFile' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
+            'panFile' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
+            'letterhead' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
+
+            // Volunteer field
+            'location' => 'nullable|string|max:255',
+        ]);
+
+        $user = DB::transaction(function () use ($validated, $request) {
+
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
+                'password' => Hash::make($validated['password']),
+                'role' => $validated['role'],
+            ]);
+
+            // Volunteer profile
+            if ($validated['role'] === 'volunteer') {
+
+                $user->volunteerProfile()->create([
+                    'bio' => null,
+                    'primary_location' => $validated['location'] ?? null,
+                    'availability' => 'Available',
+                    'trust_score' => 0.5,
+                    'reliability_score' => 0,
+                    'total_service_hours' => 0,
+                    'average_rating' => 0,
+                ]);
+            }
+
+            // NGO profile
+            if ($validated['role'] === 'ngo') {
+
+                // Store uploaded files (optional)
+                if ($request->hasFile('registrationFile')) {
+                    $request->file('registrationFile')
+                            ->store('ngo-documents', 'public');
+                }
+
+                if ($request->hasFile('panFile')) {
+                    $request->file('panFile')
+                            ->store('ngo-documents', 'public');
+                }
+
+                if ($request->hasFile('letterhead')) {
+                    $request->file('letterhead')
+                            ->store('ngo-documents', 'public');
+                }
+
+                $user->ngoProfile()->create([
+                    'organization_name' =>
+                        $request->input('organizationName')
+                        ?? $validated['name'],
+
+                    'registration_number' =>
+                        $request->input('registrationNumber'),
+
+                    'office_location' =>
+                        $request->input('officeLocation'),
+
+                    'website' =>
+                        $request->input('website'),
+
+                    'description' =>
+                        $request->input('description'),
+
+                    'city' =>
+                        $request->input('city'),
+
+                    'country' =>
+                        $request->input('country'),
+
+                    'pan_number' =>
+                        $request->input('panNumber'),
+
+                    'verification_status' => 'pending',
+                ]);
+            }
+
+            return $user;
+        });
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Registration successful',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'phone' => $user->phone,
+                'ngoProfile' => $user->ngoProfile,
+                'volunteerProfile' => $user->volunteerProfile,
+            ],
+        ], 201);
+    }
+
+
+    // =========================
+    // LOGIN
+    // =========================
+    public function login(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+
+        if (!$user || !Hash::check($validated['password'], $user->password)) {
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'phone' => $user->phone,
+                'ngoProfile' => $user->ngoProfile,
+                'volunteerProfile' => $user->volunteerProfile,
+            ],
+        ]);
+    }
+
+    // =========================
+    // GET CURRENT USER
+    // =========================
+    public function me(Request $request)
+    {
+        $user = $request->user();
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'phone' => $user->phone,
+                'ngoProfile' => $user->ngoProfile,
+                'volunteerProfile' => $user->volunteerProfile,
+            ],
+        ]);
+    }
+
+    // =========================
+    // LOGOUT
+    // =========================
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logged out successfully',
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Ngo/ApplicationController.php">
+<?php
+
+namespace App\Http\Controllers\Ngo;
+
+use App\Http\Controllers\Controller;
+use App\Models\Application;
+use Illuminate\Http\Request;
+
+class ApplicationController extends Controller
+{
+    public function index(Request $request)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        $applications = Application::whereHas('task', function ($q) use ($ngo) {
+            $q->where('ngo_id', $ngo->id);
+        })
+        ->with([
+            'volunteer.user',
+            'task'
+        ])
+        ->get();
+
+        return response()->json([
+            'data' => $applications
+        ]);
+    }
+
+
+    public function accept(Request $request, $id)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        $application = Application::whereHas('task', function ($q) use ($ngo) {
+            $q->where('ngo_id', $ngo->id);
+        })
+        ->findOrFail($id);
+
+
+        if ($application->status !== 'Pending') {
+            return response()->json([
+                'message' => 'Application already processed'
+            ], 422);
+        }
+
+
+        $application->update([
+            'status' => 'Accepted',
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
+        ]);
+
+
+        return response()->json([
+            'message' => 'Application accepted',
+            'data' => $application->load(['volunteer.user', 'task'])
+        ]);
+    }
+
+
+    public function reject(Request $request, $id)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        $application = Application::whereHas('task', function ($q) use ($ngo) {
+            $q->where('ngo_id', $ngo->id);
+        })
+        ->findOrFail($id);
+
+
+        if ($application->status !== 'Pending') {
+            return response()->json([
+                'message' => 'Application already processed'
+            ], 422);
+        }
+
+
+        $application->update([
+            'status' => 'Rejected',
+            'reviewed_by' => $request->user()->id,
+            'reviewed_at' => now(),
+        ]);
+
+
+        return response()->json([
+            'message' => 'Application rejected',
+            'data' => $application->load(['volunteer.user', 'task'])
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Ngo/ProfileController.php">
+<?php
+
+namespace App\Http\Controllers\Ngo;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ProfileController extends Controller
+{
+    public function show(Request $request)
+    {
+        return response()->json([
+            'data' => $request->user()
+                ->load('ngoProfile')
+        ]);
+    }
+
+
+    public function update(Request $request)
+    {
+        $profile = $request->user()->ngoProfile;
+
+        $profile->update(
+            $request->validate([
+                'organization_name'=>'sometimes|string',
+                'office_location'=>'sometimes|string',
+            ])
+        );
+
+
+        return response()->json([
+            'message'=>'Profile updated',
+            'data'=>$profile
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Ngo/TaskController.php">
+<?php
+
+namespace App\Http\Controllers\Ngo;
+
+use App\Http\Controllers\Controller;
+use App\Models\Task;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+class TaskController extends Controller
+{
+    public function index(Request $request)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        return response()->json([
+            'data' => Task::where('ngo_id', $ngo->id)
+                ->with(['skills', 'category'])
+                ->get()
+        ]);
+    }
+
+
+    public function store(Request $request)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+
+            'category_id' => 'required|exists:categories,id',
+            'task_type' => 'required|string',
+
+            'location' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+
+            'required_volunteers' => 'required|integer|min:1',
+        ]);
+
+
+        $task = Task::create([
+            'ngo_id' => $ngo->id,
+
+            'title' => $validated['title'],
+            'slug' => Str::slug($validated['title']),
+
+            'description' => $validated['description'],
+
+            'category_id' => $validated['category_id'],
+            'task_type' => $validated['task_type'],
+
+            'location' => $validated['location'] ?? null,
+            'latitude' => $validated['latitude'] ?? null,
+            'longitude' => $validated['longitude'] ?? null,
+
+            'required_volunteers' => $validated['required_volunteers'],
+
+            'status' => 'active',
+
+            'tfidf_vector' => null,
+        ]);
+
+
+        return response()->json([
+            'message' => 'Task created',
+            'data' => $task
+        ], 201);
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        $task = Task::where('ngo_id', $ngo->id)
+            ->findOrFail($id);
+
+
+        $validated = $request->validate([
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+
+            'category_id' => 'sometimes|exists:categories,id',
+            'task_type' => 'sometimes|string',
+
+            'location' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+
+            'required_volunteers' => 'sometimes|integer|min:1',
+        ]);
+
+
+        if (isset($validated['title'])) {
+            $validated['slug'] = Str::slug($validated['title']);
+        }
+
+
+        $task->update($validated);
+
+
+        return response()->json([
+            'message' => 'Task updated',
+            'data' => $task
+        ]);
+    }
+
+
+    public function destroy(Request $request, $id)
+    {
+        $ngo = $request->user()->ngoProfile;
+
+        $task = Task::where('ngo_id', $ngo->id)
+            ->findOrFail($id);
+
+
+        $task->delete();
+
+
+        return response()->json([
+            'message' => 'Task deleted'
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Verification/DocumentController.php">
+<?php
+
+namespace App\Http\Controllers\Verification;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class DocumentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Verification/VerificationImageController.php">
+<?php
+
+namespace App\Http\Controllers\Verification;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class VerificationImageController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Verification/VerificationSessionController.php">
+<?php
+
+namespace App\Http\Controllers\Verification;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class VerificationSessionController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Verification/VerificationStateLogController.php">
+<?php
+
+namespace App\Http\Controllers\Verification;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class VerificationStateLogController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Verification/VerificationWorkflowController.php">
+<?php
+
+namespace App\Http\Controllers\Verification;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class VerificationWorkflowController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Volunteer/ApplicationController.php">
+<?php
+
+namespace App\Http\Controllers\Volunteer;
+
+use App\Http\Controllers\Controller;
+use App\Models\Application;
+use App\Models\Task;
+use Illuminate\Http\Request;
+
+class ApplicationController extends Controller
+{
+    public function applyForTask(Request $request, $id)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'message' => 'Only volunteers can apply for tasks'
+            ], 403);
+        }
+
+        $task = Task::with('user.ngoProfile')->findOrFail($id);
+
+        if (!$task->user?->ngoProfile || !$task->user->ngoProfile->is_verified) {
+            return response()->json([
+                'message' => 'Cannot apply to this task'
+            ], 403);
+        }
+
+        $volunteerId = $user->volunteerProfile->id;
+
+        $existing = Application::where('task_id', $id)
+            ->where('volunteer_id', $volunteerId)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'message' => 'You have already applied'
+            ], 409);
+        }
+
+        $accepted = Application::where('task_id', $id)
+            ->where('status', 'Accepted')
+            ->count();
+
+        if ($accepted >= $task->quota) {
+            return response()->json([
+                'message' => 'Task quota is full'
+            ], 400);
+        }
+
+        $application = Application::create([
+            'task_id' => $id,
+            'volunteer_id' => $volunteerId,
+            'status' => 'Pending',
+            'remarks' => $request->message,
+        ]);
+
+        return response()->json([
+            'message' => 'Application submitted successfully',
+            'data' => $application,
+        ], 201);
+    }
+
+
+    public function getApplications(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'message' => 'Only volunteers can access this'
+            ], 403);
+        }
+
+        return response()->json([
+            'data' => Application::where(
+                'volunteer_id',
+                $user->volunteerProfile->id
+            )
+            ->with(['task', 'task.user.ngoProfile'])
+            ->get()
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Volunteer/AttendanceController.php">
+
+</file>
+
+<file path="app/Http/Controllers/Volunteer/ProfileController.php">
+<?php
+
+namespace App\Http\Controllers\Volunteer;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class ProfileController extends Controller
+{
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'message' => 'Only volunteers can access this'
+            ], 403);
+        }
+
+        return response()->json([
+            'data' => $user->load('volunteerProfile'),
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Volunteer/TaskController.php">
+<?php
+
+namespace App\Http\Controllers\Volunteer;
+
+use App\Http\Controllers\Controller;
+use App\Services\MatchingService;
+use Illuminate\Http\Request;
+
+class TaskController extends Controller
+{
+    public function __construct(
+        private MatchingService $matchingService
+    ) {}
+
+    public function getTasks(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'message' => 'Only volunteers can access this'
+            ], 403);
+        }
+
+        return response()->json([
+            'data' => $this->matchingService
+                ->rankTasksForVolunteer($user->volunteerProfile)
+        ]);
+    }
+
+    public function getTaskDetail(Request $request, $id)
+    {
+        $user = $request->user();
+
+        if ($user->role !== 'volunteer') {
+            return response()->json([
+                'message' => 'Only volunteers can access this'
+            ], 403);
+        }
+
+        return response()->json([
+            'data' => $this->matchingService
+                ->getTaskDetail($id)
+        ]);
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Workflow/WorkflowStateController.php">
+<?php
+
+namespace App\Http\Controllers\Workflow;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class WorkflowStateController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Workflow/WorkflowTransitionController.php">
+<?php
+
+namespace App\Http\Controllers\Workflow;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class WorkflowTransitionController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Http/Controllers/Controller.php">
+<?php
+
+namespace App\Http\Controllers;
+
+abstract class Controller
+{
+    //
+}
+</file>
+
+<file path="app/Http/Middleware/Authenticate.php">
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Http\Request;
+
+class Authenticate extends Middleware
+{
+    /**
+     * Get the path the user should be redirected to when they are not authenticated.
+     */
+    protected function redirectTo(Request $request): ?string
+    {
+        // For API requests, don't redirect - return null to let exception handler deal with it
+        if ($request->is('api/*')) {
+            return null;
+        }
+
+        // For web requests, redirect to login
+        return $request->expectsJson() ? null : route('login');
+    }
+}
+</file>
+
+<file path="app/Http/Middleware/CheckRole.php">
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class CheckRole
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  string|array  $roles
+     */
+    public function handle(Request $request, Closure $next, ...$roles): Response
+    {
+        // Check if user is authenticated
+        if (!$request->user()) {
+            return response()->json([
+                'message' => 'Unauthenticated',
+            ], 401);
+        }
+
+        // Check if user's role matches any of the allowed roles
+        if (!in_array($request->user()->role, $roles)) {
+            return response()->json([
+                'message' => 'Unauthorized. This action is only available to ' . implode(', ', $roles) . ' users.',
+            ], 403);
+        }
+
+        return $next($request);
+    }
+}
+</file>
+
+<file path="app/Http/Middleware/VerifiedNgo.php">
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class VerifiedNgo
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = $request->user();
+
+        // Check if user is authenticated
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated',
+            ], 401);
+        }
+
+        // Check if user is an NGO
+        if ($user->role !== 'ngo') {
+            return response()->json([
+                'message' => 'Only NGOs can access this resource',
+            ], 403);
+        }
+
+        // Check if NGO is verified
+        if (!$user->ngoProfile || !$user->ngoProfile->is_verified) {
+            return response()->json([
+                'message' => 'Your NGO must be verified by admin before accessing this resource',
+            ], 403);
+        }
+
+        return $next($request);
+    }
+}
+</file>
+
+<file path="app/Jobs/RecomputeTfIdfJob.php">
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Task;
+use App\Models\VolunteerProfile;
+use App\Services\TfIdfService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class RecomputeTfIdfJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function handle(TfIdfService $tfidf): void
+    {
+        $this->computeFor(
+            VolunteerProfile::with('skills', 'serviceLogs.task')->get(),
+            fn($v) => implode(' ', array_filter([
+                $v->bio ?? '',
+                $v->skills->pluck('name')->implode(' '),
+                $v->serviceLogs
+                    ->where('participation_status', 'completed')
+                    ->map(fn($log) => $log->task->title . ' ' . $log->task->description)
+                    ->implode(' '),
+            ])),
+            $tfidf
+        );
+        $this->computeFor(
+            Task::with('skills')->get(),
+            fn($t) => implode(' ', array_filter([
+                $t->title ?? '',
+                $t->description ?? '',
+                $t->skills->pluck('name')->implode(' '),
+            ])),
+            $tfidf
+        );
+    }
+    private function computeFor($records, callable $textExtractor, TfIdfService $tfidf): void
+    {
+        $docs = $records->map(fn($r) => [
+            'id'   => $r->id,
+            'text' => $textExtractor($r),
+        ])->toArray();
+
+        $vectors = $tfidf->compute($docs);
+
+        foreach ($records as $record) {
+            $record->update(['tfidf_vector' => $vectors[$record->id] ?? []]);
+        }
+    }
+}
+</file>
+
+<file path="app/Models/ActivityLog.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ActivityLog extends Model
+{
+    protected $table = 'activity_logs';
+    protected $fillable = [
+        'user_id',
+        'action',
+        'module',
+        'description',
+        'ip_address',
+    ];
+
+
+    // ActivityLog.php
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+</file>
+
+<file path="app/Models/Application.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class Application extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'task_id',
+        'volunteer_profile_id',
+        'recommendation_score',
+        'status',
+        'applied_at',
+        'reviewed_by',
+        'reviewed_at',
+        'remarks',
+    ];
+
+
+    protected $casts = [
+        'applied_at'  => 'datetime',
+        'reviewed_at' => 'datetime',
+        'recommendation_score' => 'float',
+    ];
+
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+
+
+    public function volunteer()
+    {
+        return $this->belongsTo(
+            VolunteerProfile::class,
+            'volunteer_profile_id'
+        );
+    }
+
+
+    public function reviewer()
+    {
+        return $this->belongsTo(
+            User::class,
+            'reviewed_by'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/Badge.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Badge extends Model
+{
+    protected $table = 'badges';
+    protected $fillable = [
+        'name',
+        'description',
+        'icon',
+        'minimum_hours',
+    ];
+
+    // Badge.php
+
+    public function users()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_badges'
+        )->withPivot('awarded_at');
+    }
+}
+</file>
+
+<file path="app/Models/Category.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Category extends Model
+{
+    protected $table = 'categories';
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
+    // Category.php
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+}
+</file>
+
+<file path="app/Models/Document.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Document extends Model
+{
+    protected $table = 'documents';
+    protected $fillable = [
+    'user_id',
+    'document_type',
+    'original_name',
+    'file_name',
+    'file_path',
+    'mime_type',
+    'file_size',
+    'status',
+    'reviewed_by',
+    'reviewed_at',
+    'remarks',
+    'expires_at',
+ ];
+    // Document.php
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function reviewer()
+    {
+        return $this->belongsTo(
+            User::class,
+            'reviewed_by'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/NgoProfile.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class NgoProfile extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+    'user_id',
+    'organization_name',
+    'registration_number',
+    'description',
+    'logo',
+    'website',
+    'office_location',
+    'city',
+    'country',
+    'latitude',
+    'longitude',
+    'pan_number',
+    'verification_status',
+    'verified_by',
+    'verified_at',
+    'rejection_reason',
+    ];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'ngo_id');
+    }
+
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+}
+</file>
+
+<file path="app/Models/Notification.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Notification extends Model
+{
+    protected $table = 'notifications';
+    protected $fillable = [
+        'user_id',
+        'title',
+        'message',
+        'type',
+        'is_read',
+        'read_at',
+    ];
+
+    // Notification.php
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+</file>
+
+<file path="app/Models/Report.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Report extends Model
+{
+    protected $table = 'reports';
+    protected $fillable = [
+        'reported_by',
+        'against_user_id',
+        'task_id',
+        'reason',
+        'status',
+        'resolved_by',
+        'resolved_at',
+        'resolution_notes',
+    ];
+
+   // Report.php
+
+    public function reporter()
+    {
+        return $this->belongsTo(
+            User::class,
+            'reported_by'
+        );
+    }
+
+    public function againstUser()
+    {
+        return $this->belongsTo(
+            User::class,
+            'against_user_id'
+        );
+    }
+
+    public function resolver()
+    {
+        return $this->belongsTo(
+            User::class,
+            'resolved_by'
+        );
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+}
+</file>
+
+<file path="app/Models/Review.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Review extends Model
+{
+    protected $table = 'reviews';
+    protected $fillable = [
+        'reviewer_id',
+        'reviewee_id',
+        'task_id',
+        'rating',
+        'comment',
+    ];
+
+        // Review.php
+
+    public function reviewer()
+    {
+        return $this->belongsTo(
+            User::class,
+            'reviewer_id'
+        );
+    }
+
+    public function reviewee()
+    {
+        return $this->belongsTo(
+            User::class,
+            'reviewee_id'
+        );
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+}
+</file>
+
+<file path="app/Models/ServiceLog.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ServiceLog extends Model
+{
+    protected $table = 'service_logs';
+    protected $fillable = [
+        'volunteer_id',
+        'task_id',
+        'check_in_time',
+        'check_out_time',
+        'hours',
+        'participation_status',
+        'feedback',
+    ];
+
+    // ServiceLog.php
+
+    public function volunteer()
+    {
+        return $this->belongsTo(
+            VolunteerProfile::class,
+            'volunteer_id'
+        );
+    }
+
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+}
+</file>
+
+<file path="app/Models/Skill.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Skill extends Model
+{
+    protected $table = 'skills';
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
+    // Skill.php
+
+    // Skill.php
+
+    public function volunteers()
+    {
+        return $this->belongsToMany(
+            VolunteerProfile::class,
+            'volunteer_skills'
+        )->withPivot('proficiency_level');
+    }
+
+    public function tasks()
+    {
+        return $this->belongsToMany(
+            Task::class,
+            'task_skills'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/Task.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Task extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'ngo_id',
+        'title',
+        'slug',
+        'description',
+        'category_id',
+        'task_type',
+        'location',
+        'latitude',
+        'longitude',
+        'required_volunteers',
+        'status',
+        'tfidf_vector',
+    ];
+
+
+    protected $casts = [
+        'tfidf_vector' => 'array',
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
+
+
+    public function ngo()
+    {
+        return $this->belongsTo(
+            NgoProfile::class,
+            'ngo_id'
+        );
+    }
+
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
+
+    public function skills()
+    {
+        return $this->belongsToMany(
+            Skill::class,
+            'task_skills'
+        );
+    }
+
+
+    public function category()
+    {
+        return $this->belongsTo(
+            Category::class,
+            'category_id'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/TaskSkill.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class TaskSkill extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'task_id',
+        'skill_id',
+    ];
+
+    // Relationships
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+    
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class);
+    }
+}
+</file>
+
+<file path="app/Models/User.php">
+<?php
+
+namespace App\Models;
+
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+
+
+
+class User extends Authenticatable
+{
+    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasFactory, Notifiable;
+    use HasApiTokens;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+   protected $fillable = [
+    'role',
+    'name',
+    'email',
+    'phone',
+    'password',
+    'email_verified_at',
+    'is_active',
+    'last_login_at',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+   // User.php
+
+        public function ngoProfile()
+        {
+            return $this->hasOne(NgoProfile::class);
+        }
+
+        public function volunteerProfile()
+        {
+            return $this->hasOne(VolunteerProfile::class);
+        }
+
+        public function verificationWorkflow()
+        {
+            return $this->hasOne(VerificationWorkflow::class);
+        }
+
+        public function documents()
+        {
+            return $this->hasMany(Document::class);
+        }
+
+        public function verificationSessions()
+        {
+            return $this->hasMany(VerificationSession::class);
+        }
+
+        public function notifications()
+        {
+            return $this->hasMany(Notification::class);
+        }
+
+        public function createdTasks()
+        {
+            return $this->hasMany(Task::class, 'created_by');
+        }
+
+        public function reviewedApplications()
+        {
+            return $this->hasMany(Application::class, 'reviewed_by');
+        }
+
+        public function reviewedDocuments()
+        {
+            return $this->hasMany(Document::class, 'reviewed_by');
+        }
+
+        public function reviewsGiven()
+        {
+            return $this->hasMany(Review::class, 'reviewer_id');
+        }
+
+        public function reviewsReceived()
+        {
+            return $this->hasMany(Review::class, 'reviewee_id');
+        }
+
+        public function reportsMade()
+        {
+            return $this->hasMany(Report::class, 'reported_by');
+        }
+
+        public function resolvedReports()
+        {
+            return $this->hasMany(Report::class, 'resolved_by');
+        }
+
+        public function activityLogs()
+        {
+            return $this->hasMany(ActivityLog::class);
+        }
+
+        public function badges()
+        {
+            return $this->belongsToMany(
+                Badge::class,
+                'user_badges'
+            )->withPivot('awarded_at');
+        }
+}
+</file>
+
+<file path="app/Models/UserBadge.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class UserBadge extends Model
+{
+     protected $table = 'user_badges';
+    protected $fillable = [
+        'user_id',
+        'badge_id',
+        'awarded_at',
+    ];
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function badge()
+    {
+        return $this->belongsTo(Badge::class);
+    }
+}
+</file>
+
+<file path="app/Models/VerificationImage.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VerificationImage extends Model
+{
+    protected $table = 'verification_images';
+    protected $fillable = [
+    'verification_session_id',
+    'image_type',
+    'file_path',
+    'captured_at',
+   ];
+    // VerificationImage.php
+
+    public function verificationSession()
+    {
+        return $this->belongsTo(
+            VerificationSession::class
+        );
+    }
+}
+</file>
+
+<file path="app/Models/VerificationSession.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VerificationSession extends Model
+{
+    protected $table = 'verification_sessions';
+    protected $fillable = [
+        'user_id',
+        'started_at',
+        'completed_at',
+        'status',
+        'ip_address',
+        'device_info',
+    ];
+
+   // VerificationSession.php
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(
+            VerificationImage::class
+        );
+    }
+}
+</file>
+
+<file path="app/Models/VerificationStateLog.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VerificationStateLog extends Model
+{
+    protected $table = 'verification_state_logs';
+    protected $fillable = [
+    'workflow_id',
+    'from_state_id',
+    'to_state_id',
+    'changed_by',
+    'remarks',
+    ];
+
+    // VerificationStateLog.php
+
+    public function workflow()
+    {
+        return $this->belongsTo(
+            VerificationWorkflow::class,
+            'workflow_id'
+        );
+    }
+
+    public function fromState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'from_state_id'
+        );
+    }
+
+    public function toState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'to_state_id'
+        );
+    }
+
+    public function changedBy()
+    {
+        return $this->belongsTo(
+            User::class,
+            'changed_by'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/VerificationWorkflow.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VerificationWorkflow extends Model
+{
+    protected $table = 'verification_workflows';
+    protected $fillable = [
+    'user_id',
+    'current_state_id',
+    'started_at',
+    'completed_at',
+    ];
+
+    // VerificationWorkflow.php
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function currentState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'current_state_id'
+        );
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(
+            VerificationStateLog::class,
+            'workflow_id'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/VolunteerProfile.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class VolunteerProfile extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'profile_photo',
+        'gender',
+        'date_of_birth',
+        'bio',
+        'primary_location',
+        'city',
+        'country',
+        'latitude',
+        'longitude',
+        'emergency_contact_name',
+        'emergency_contact_phone',
+        'availability',
+        'tfidf_vector',
+        'trust_score',
+        'trust_updated_at',
+        'reliability_score',
+        'total_service_hours',
+        'average_rating',
+    ];
+
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'tfidf_vector' => 'array',
+        'trust_updated_at' => 'datetime',
+        'trust_score' => 'float',
+        'reliability_score' => 'decimal:2',
+        'total_service_hours' => 'decimal:2',
+        'average_rating' => 'decimal:2',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function skills()
+    {
+        return $this->belongsToMany(
+            Skill::class,
+            'volunteer_skills'
+        )->withPivot('proficiency_level');
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'volunteer_profile_id');
+    }
+
+    public function serviceLogs()
+    {
+        return $this->hasMany(ServiceLog::class, 'volunteer_profile_id');
+    }
+}
+</file>
+
+<file path="app/Models/VolunteerSkill.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class VolunteerSkill extends Model
+{
+    protected $fillable = [
+    'volunteer_profile_id',
+    'skill_id',
+    'proficiency_level',
+    ];
+    public function volunteerProfile()
+    {
+        return $this->belongsTo(
+            VolunteerProfile::class,
+            'volunteer_profile_id'
+        );
+    }
+
+    public function skill()
+    {
+        return $this->belongsTo(Skill::class);
+    }
+}
+</file>
+
+<file path="app/Models/WorkflowState.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class WorkflowState extends Model
+{
+    protected $table = 'workflow_states';
+   protected $fillable = [
+    'code',
+    'name',
+    'description',
+    'sequence_order',
+    'is_final',
+  ];
+
+    // WorkflowState.php
+
+    public function outgoingTransitions()
+    {
+        return $this->hasMany(
+            WorkflowTransition::class,
+            'from_state_id'
+        );
+    }
+
+    public function incomingTransitions()
+    {
+        return $this->hasMany(
+            WorkflowTransition::class,
+            'to_state_id'
+        );
+    }
+
+    public function workflows()
+    {
+        return $this->hasMany(
+            VerificationWorkflow::class,
+            'current_state_id'
+        );
+    }
+}
+</file>
+
+<file path="app/Models/WorkflowTransition.php">
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class WorkflowTransition extends Model
+{
+    protected $table = 'workflow_transitions';
+    protected $fillable = [
+    'from_state_id',
+    'to_state_id',
+    'action',
+ ];
+
+
+    // WorkflowTransition.php
+
+    public function fromState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'from_state_id'
+        );
+    }
+
+    public function toState()
+    {
+        return $this->belongsTo(
+            WorkflowState::class,
+            'to_state_id'
+        );
+    }
+}
+</file>
+
+<file path="app/Providers/AlgorithmServiceProvider.php">
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+use App\Algorithms\Contracts\SimilarityCalculatorInterface;
+use App\Algorithms\Contracts\AssignmentSolverInterface;
+use App\Algorithms\Contracts\TrustCalculatorInterface;
+
+use App\Algorithms\Matching\CosineSimilarity;
+use App\Algorithms\Assignment\HungarianMatcher;
+use App\Algorithms\Ranking\TrustScoreCalculator;
+
+class AlgorithmServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->app->bind(
+            SimilarityCalculatorInterface::class,
+            CosineSimilarity::class
+        );
+
+        $this->app->bind(
+            AssignmentSolverInterface::class,
+            HungarianMatcher::class
+        );
+
+        $this->app->bind(
+            TrustCalculatorInterface::class,
+            TrustScoreCalculator::class
+        );
+    }
+
+    public function boot(): void
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Providers/AppServiceProvider.php">
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        //
+    }
+}
+</file>
+
+<file path="app/Services/ApplicationService.php">
+
+</file>
+
+<file path="app/Services/AssignmentService.php">
+<?php
+
+namespace App\Services;
+
+use App\Algorithms\Contracts\AssignmentSolverInterface;
+use App\Models\Application;
+use App\Models\Task;
+
+
+class AssignmentService
+{
+    public function __construct(
+        private MatchingService $matchingService,
+        private AssignmentSolverInterface $solver,
+        private ApplicationService $applicationService,
+    ) {}
+
+    public function batchAssign(array $applicationIds, array $taskIds): array
+    {
+        $applications = Application::whereIn('id', $applicationIds)
+            ->with(['volunteer.user'])
+            ->get();
+
+        $tasks = Task::whereIn('id', $taskIds)
+            ->whereNotNull('tfidf_vector')
+            ->get();
+
+        $volunteers = $applications
+            ->map(fn ($application) => $application->volunteer)
+            ->filter()
+            ->values();
+
+        if ($volunteers->isEmpty() || $tasks->isEmpty()) {
+            return [];
+        }
+
+        // Build the cost matrix using MatchingService
+        $costMatrix = [];
+
+        foreach ($volunteers as $i => $volunteer) {
+            foreach ($tasks as $j => $task) {
+                $score = $this->matchingService
+                    ->calculateVolunteerTaskScore($volunteer, $task);
+
+                // Hungarian minimizes cost
+                $costMatrix[$i][$j] = 1 - $score;
+            }
+        }
+
+        // Hungarian requires square matrix
+        $size = max(count($volunteers), count($tasks));
+
+        for ($i = 0; $i < $size; $i++) {
+            for ($j = 0; $j < $size; $j++) {
+                $costMatrix[$i][$j] = $costMatrix[$i][$j] ?? 1;
+            }
+        }
+
+        $assignments = $this->solver->solve($costMatrix);
+
+        $result = [];
+
+        foreach ($assignments as $volunteerIndex => $taskIndex) {
+
+            $volunteer = $volunteers[$volunteerIndex] ?? null;
+            $task = $tasks[$taskIndex] ?? null;
+
+            if (!$volunteer || !$task) {
+                continue;
+            }
+
+            // Leave commented until ApplicationService::accept() exists
+            // $this->applicationService->accept($volunteer, $task);
+
+            $result[] = [
+                'volunteer_id'   => $volunteer->id,
+                'volunteer_name' => $volunteer->user->name ?? null,
+                'task_id'        => $task->id,
+                'task_title'     => $task->title,
+                'score'          => round(
+                    1 - $costMatrix[$volunteerIndex][$taskIndex],
+                    3
+                ),
+            ];
+        }
+
+        return $result;
+    }
+}
+</file>
+
+<file path="app/Services/AttendanceService.php">
+<?php
+
+namespace App\Services;
+
+use App\Models\ServiceLog;
+use App\Models\Task;
+use App\Models\VolunteerProfile;
+use Carbon\Carbon;
+
+class AttendanceService
+{
+    /**
+     * Volunteer checks in to a task.
+     */
+    public function checkIn(
+        VolunteerProfile $volunteer,
+        Task $task
+    ): ServiceLog {
+        return ServiceLog::create([
+            'volunteer_profile_id' => $volunteer->id,
+            'task_id'              => $task->id,
+            'check_in_time'        => now(),
+            'participation_status' => 'active',
+        ]);
+    }
+
+    /**
+     * Volunteer checks out.
+     */
+    public function checkOut(ServiceLog $serviceLog): ServiceLog
+    {
+        $checkOutTime = now();
+
+        $hours = $this->calculateHours(
+            $serviceLog->check_in_time,
+            $checkOutTime
+        );
+
+        $serviceLog->update([
+            'check_out_time'       => $checkOutTime,
+            'hours'                => $hours,
+            'participation_status' => 'completed',
+        ]);
+
+        return $serviceLog->fresh();
+    }
+
+    /**
+     * Calculate total service hours.
+     */
+    private function calculateHours($checkIn, $checkOut): float
+    {
+        return round(
+            Carbon::parse($checkIn)
+                ->diffInMinutes($checkOut) / 60,
+            2
+        );
+    }
+}
+</file>
+
+<file path="app/Services/MatchingService.php">
+<?php
+
+namespace App\Services;
+
+use App\Algorithms\Contracts\SimilarityCalculatorInterface;
+use App\Algorithms\Matching\HaversineDistance;
+use App\Models\Task;
+use App\Models\VolunteerProfile;
+
+class MatchingService
+{
+    private const SKILL_WEIGHT = 0.5;
+    private const DISTANCE_WEIGHT = 0.3;
+    private const TRUST_WEIGHT = 0.2;
+
+    public function __construct(
+        private SimilarityCalculatorInterface $similarity,
+        private HaversineDistance $distance
+    ) {}
+
+    /**
+     * Rank tasks for a volunteer.
+     */
+    public function rankTasksForVolunteer(VolunteerProfile $volunteer)
+    {
+        $tasks = Task::where('status', 'active')
+            ->whereHas('user.ngoProfile', function ($query) {
+                $query->where('is_verified', true);
+            })
+            ->whereNotNull('tfidf_vector')
+            ->with(['user.ngoProfile', 'skills'])
+            ->get();
+
+        return $tasks
+            ->map(function ($task) use ($volunteer) {
+
+                $skillScore = empty($volunteer->tfidf_vector)
+                    ? 0
+                    : $this->similarity->calculate(
+                        $volunteer->tfidf_vector,
+                        $task->tfidf_vector ?? []
+                    );
+
+                $distanceScore = 0;
+
+                if (
+                    $volunteer->latitude &&
+                    $volunteer->longitude &&
+                    $task->latitude &&
+                    $task->longitude
+                ) {
+                    $km = $this->distance->calculate(
+                        $volunteer->latitude,
+                        $volunteer->longitude,
+                        $task->latitude,
+                        $task->longitude
+                    );
+
+                    $distanceScore = max(0, 1 - ($km / 500));
+                }
+
+                $trustScore = $volunteer->trust_score ?? 0.5;
+
+                $task->match_score = round(
+                    $this->calculateScore(
+                        $skillScore,
+                        $distanceScore,
+                        $trustScore
+                    ) * 100,
+                    1
+                );
+
+                return $task;
+            })
+            ->sortByDesc('match_score')
+            ->values();
+    }
+
+    /**
+     * Basic NGO-side ranking.
+     * Phase 1: order applicants by application date.
+     */
+    public function rankVolunteersForTask(Task $task)
+    {
+        return $task->applications()
+            ->with('volunteer.user')
+            ->orderBy('created_at')
+            ->get();
+    }
+
+    /**
+     * Get one task if it belongs to a verified NGO.
+     */
+    public function getTaskDetail(int $taskId): Task
+    {
+        return Task::with([
+                'user.ngoProfile',
+                'applications',
+                'skills'
+            ])
+            ->whereHas('user.ngoProfile', function ($query) {
+                $query->where('is_verified', true);
+            })
+            ->findOrFail($taskId);
+    }
+
+    private function calculateScore(
+        float $skill,
+        float $distance,
+        float $trust
+    ): float {
+
+        return
+            (self::SKILL_WEIGHT * $skill) +
+            (self::DISTANCE_WEIGHT * $distance) +
+            (self::TRUST_WEIGHT * $trust);
+    }
+
+
+    public function calculateVolunteerTaskScore(
+    VolunteerProfile $volunteer,
+    Task $task
+): float {
+    $skillScore = $this->similarity->calculate(
+        $volunteer->tfidf_vector ?? [],
+        $task->tfidf_vector ?? []
+    );
+
+    $distanceScore = 0;
+
+    if (
+        $volunteer->latitude &&
+        $volunteer->longitude &&
+        $task->latitude &&
+        $task->longitude
+    ) {
+        $km = $this->distance->calculate(
+            $volunteer->latitude,
+            $volunteer->longitude,
+            $task->latitude,
+            $task->longitude
+        );
+
+        $distanceScore = max(0, 1 - ($km / 500));
+    }
+
+    $trustScore = $volunteer->trust_score ?? 0.5;
+
+    return $this->calculateScore(
+        $skillScore,
+        $distanceScore,
+        $trustScore
+    );
+}
+}
+</file>
+
+<file path="app/Services/NgoProfileService.php">
+
+</file>
+
+<file path="app/Services/RankingService.php">
+
+</file>
+
+<file path="app/Services/TaskService.php">
+<?php
+
+namespace App\Services;
+
+use App\Models\Task;
+
+class TaskService
+{
+    /**
+     * Get all tasks for admin moderation.
+     */
+    public function getAllTasks()
+    {
+        return Task::with([
+            'ngoProfile',
+            'applications'
+        ])->get();
+    }
+
+    /**
+     * Delete a task.
+     */
+    public function deleteTask(int $id): void
+    {
+        $task = Task::findOrFail($id);
+
+        $task->delete();
+    }
+}
+</file>
+
+<file path="app/Services/VerificationService.php">
+<?php
+
+namespace App\Services;
+
+use App\Models\NgoProfile;
+use App\Models\User;
+use App\Models\VerificationSession;
+
+class VerificationService
+{
+    /**
+     * Verify an NGO.
+     */
+    public function verifyNgo(NgoProfile $ngoProfile): NgoProfile
+    {
+        $ngoProfile->update([
+            'verification_status' => 'verified',
+        ]);
+
+        return $ngoProfile->fresh();
+    }
+
+    /**
+     * Reject an NGO.
+     */
+    public function rejectNgo(
+        NgoProfile $ngoProfile,
+        ?string $reason = null
+    ): NgoProfile {
+        $ngoProfile->update([
+            'verification_status' => 'rejected',
+        ]);
+
+        // Save $reason later if you add a rejection_reason column.
+
+        return $ngoProfile->fresh();
+    }
+
+    /**
+     * Get all pending NGOs.
+     */
+    public function getPendingNgos()
+    {
+        return NgoProfile::where('verification_status', 'pending')
+            ->with('user')
+            ->get();
+    }
+
+    public function verifyNgoById(int $id): NgoProfile
+    {
+        $ngo = NgoProfile::findOrFail($id);
+
+        $this->verifyNgo($ngo);
+
+        return $ngo;
+    }
+
+    public function rejectNgoById(int $id): NgoProfile
+    {
+        $ngo = NgoProfile::findOrFail($id);
+
+        $this->rejectNgo($ngo);
+
+        return $ngo;
+    }
+
+    public function getAllNgos()
+    {
+        return NgoProfile::with('user')
+            ->latest()
+            ->get()
+            ->map(fn ($ngo) => [
+                'id' => $ngo->id,
+                'organization_name' => $ngo->organization_name,
+                'registration_number' => $ngo->registration_number,
+                'pan_number' => $ngo->pan_number,
+                'office_location' => $ngo->office_location,
+                'verification_status' => $ngo->verification_status,
+                'created_at' => $ngo->created_at,
+                'user' => [
+                    'id' => $ngo->user?->id,
+                    'name' => $ngo->user?->name,
+                    'email' => $ngo->user?->email,
+                    'phone' => $ngo->user?->phone,
+                ],
+            ]);
+    }
+
+    public function getNgoDetails(int $id): array
+    {
+        $ngo = NgoProfile::with('user')->findOrFail($id);
+
+        return [
+            'id' => $ngo->id,
+            'organization_name' => $ngo->organization_name,
+            'registration_number' => $ngo->registration_number,
+            'pan_number' => $ngo->pan_number,
+            'office_location' => $ngo->office_location,
+            'verification_status' => $ngo->verification_status,
+            'created_at' => $ngo->created_at,
+            'registration_file_path' => $ngo->registration_file_path
+                ? url('storage/' . $ngo->registration_file_path)
+                : null,
+            'pan_file_path' => $ngo->pan_file_path
+                ? url('storage/' . $ngo->pan_file_path)
+                : null,
+            'letterhead_file_path' => $ngo->letterhead_file_path
+                ? url('storage/' . $ngo->letterhead_file_path)
+                : null,
+            'user' => [
+                'id' => $ngo->user?->id,
+                'name' => $ngo->user?->name,
+                'email' => $ngo->user?->email,
+                'phone' => $ngo->user?->phone,
+            ],
+        ];
+    }
+
+    /**
+     * Start a volunteer verification session.
+     * Called when the volunteer begins the KYC process.
+     */
+    public function startVolunteerVerification(User $user): VerificationSession
+    {
+        return VerificationSession::create([
+            'user_id' => $user->id,
+            'status'  => 'pending',
+        ]);
+    }
+}
+</file>
+
+<file path="app/Services/VolunteerProfileService.php">
+
+</file>
+
+<file path="bootstrap/cache/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="bootstrap/app.php">
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware): void {
+        // $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+        // Register route middleware
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckRole::class,
+            'verified_ngo' => \App\Http\Middleware\VerifiedNgo::class,
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions): void {
+        // Handle authentication exceptions
+        $exceptions->render(function (AuthenticationException $exception, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+
+            return null;
+        });
+
+        // Handle route not found exceptions from auth redirects
+        $exceptions->render(function (RouteNotFoundException $exception, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+
+            return null;
+        });
+    })->create();
+</file>
+
+<file path="bootstrap/providers.php">
+<?php
+
+return [
+    App\Providers\AppServiceProvider::class,
+    App\Providers\AlgorithmServiceProvider::class,
+];
+</file>
+
+<file path="config/app.php">
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Name
+    |--------------------------------------------------------------------------
+    |
+    | This value is the name of your application, which will be used when the
+    | framework needs to place the application's name in a notification or
+    | other UI elements where an application name needs to be displayed.
+    |
+    */
+
+    'name' => env('APP_NAME', 'Laravel'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Environment
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the "environment" your application is currently
+    | running in. This may determine how you prefer to configure various
+    | services the application utilizes. Set this in your ".env" file.
+    |
+    */
+
+    'env' => env('APP_ENV', 'production'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Debug Mode
+    |--------------------------------------------------------------------------
+    |
+    | When your application is in debug mode, detailed error messages with
+    | stack traces will be shown on every error that occurs within your
+    | application. If disabled, a simple generic error page is shown.
+    |
+    */
+
+    'debug' => (bool) env('APP_DEBUG', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application URL
+    |--------------------------------------------------------------------------
+    |
+    | This URL is used by the console to properly generate URLs when using
+    | the Artisan command line tool. You should set this to the root of
+    | the application so that it's available within Artisan commands.
+    |
+    */
+
+    'url' => env('APP_URL', 'http://localhost'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Timezone
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default timezone for your application, which
+    | will be used by the PHP date and date-time functions. The timezone
+    | is set to "UTC" by default as it is suitable for most use cases.
+    |
+    */
+
+    'timezone' => 'UTC',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Application Locale Configuration
+    |--------------------------------------------------------------------------
+    |
+    | The application locale determines the default locale that will be used
+    | by Laravel's translation / localization methods. This option can be
+    | set to any locale for which you plan to have translation strings.
+    |
+    */
+
+    'locale' => env('APP_LOCALE', 'en'),
+
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+
+    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Encryption Key
+    |--------------------------------------------------------------------------
+    |
+    | This key is utilized by Laravel's encryption services and should be set
+    | to a random, 32 character string to ensure that all encrypted values
+    | are secure. You should do this prior to deploying the application.
+    |
+    */
+
+    'cipher' => 'AES-256-CBC',
+
+    'key' => env('APP_KEY'),
+
+    'previous_keys' => [
+        ...array_filter(
+            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
+        ),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Maintenance Mode Driver
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options determine the driver used to determine and
+    | manage Laravel's "maintenance mode" status. The "cache" driver will
+    | allow maintenance mode to be controlled across multiple machines.
+    |
+    | Supported drivers: "file", "cache"
+    |
+    */
+
+    'maintenance' => [
+        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
+        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
+
+];
+</file>
+
+<file path="config/auth.php">
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Defaults
+    |--------------------------------------------------------------------------
+    |
+    | This option defines the default authentication "guard" and password
+    | reset "broker" for your application. You may change these values
+    | as required, but they're a perfect start for most applications.
+    |
+    */
+
+    'defaults' => [
+        'guard' => env('AUTH_GUARD', 'web'),
+        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guards
+    |--------------------------------------------------------------------------
+    |
+    | Next, you may define every authentication guard for your application.
+    | Of course, a great default configuration has been defined for you
+    | which utilizes session storage plus the Eloquent user provider.
+    |
+    | All authentication guards have a user provider, which defines how the
+    | users are actually retrieved out of your database or other storage
+    | system used by the application. Typically, Eloquent is utilized.
+    |
+    | Supported: "session"
+    |
+    */
+
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Providers
+    |--------------------------------------------------------------------------
+    |
+    | All authentication guards have a user provider, which defines how the
+    | users are actually retrieved out of your database or other storage
+    | system used by the application. Typically, Eloquent is utilized.
+    |
+    | If you have multiple user tables or models you may configure multiple
+    | providers to represent the model / table. These providers may then
+    | be assigned to any extra authentication guards you have defined.
+    |
+    | Supported: "database", "eloquent"
+    |
+    */
+
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resetting Passwords
+    |--------------------------------------------------------------------------
+    |
+    | These configuration options specify the behavior of Laravel's password
+    | reset functionality, including the table utilized for token storage
+    | and the user provider that is invoked to actually retrieve users.
+    |
+    | The expiry time is the number of minutes that each reset token will be
+    | considered valid. This security feature keeps tokens short-lived so
+    | they have less time to be guessed. You may change this as needed.
+    |
+    | The throttle setting is the number of seconds a user must wait before
+    | generating more password reset tokens. This prevents the user from
+    | quickly generating a very large amount of password reset tokens.
+    |
+    */
+
+    'passwords' => [
+        'users' => [
+            'provider' => 'users',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Confirmation Timeout
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the number of seconds before a password confirmation
+    | window expires and users are asked to re-enter their password via the
+    | confirmation screen. By default, the timeout lasts for three hours.
+    |
+    */
+
+    'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+
+];
+</file>
+
+<file path="config/cache.php">
+<?php
+
+use Illuminate\Support\Str;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the default cache store that will be used by the
+    | framework. This connection is utilized if another isn't explicitly
+    | specified when running a cache operation inside the application.
+    |
+    */
+
+    'default' => env('CACHE_STORE', 'database'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Stores
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define all of the cache "stores" for your application as
+    | well as their drivers. You may even define multiple stores for the
+    | same cache driver to group types of items stored in your caches.
+    |
+    | Supported drivers: "array", "database", "file", "memcached",
+    |                    "redis", "dynamodb", "octane",
+    |                    "failover", "null"
+    |
+    */
+
+    'stores' => [
+
+        'array' => [
+            'driver' => 'array',
+            'serialize' => false,
+        ],
+
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_CACHE_CONNECTION'),
+            'table' => env('DB_CACHE_TABLE', 'cache'),
+            'lock_connection' => env('DB_CACHE_LOCK_CONNECTION'),
+            'lock_table' => env('DB_CACHE_LOCK_TABLE'),
+        ],
+
+        'file' => [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/data'),
+            'lock_path' => storage_path('framework/cache/data'),
+        ],
+
+        'memcached' => [
+            'driver' => 'memcached',
+            'persistent_id' => env('MEMCACHED_PERSISTENT_ID'),
+            'sasl' => [
+                env('MEMCACHED_USERNAME'),
+                env('MEMCACHED_PASSWORD'),
+            ],
+            'options' => [
+                // Memcached::OPT_CONNECT_TIMEOUT => 2000,
+            ],
+            'servers' => [
+                [
+                    'host' => env('MEMCACHED_HOST', '127.0.0.1'),
+                    'port' => env('MEMCACHED_PORT', 11211),
+                    'weight' => 100,
+                ],
+            ],
+        ],
+
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_CACHE_CONNECTION', 'cache'),
+            'lock_connection' => env('REDIS_CACHE_LOCK_CONNECTION', 'default'),
+        ],
+
+        'dynamodb' => [
+            'driver' => 'dynamodb',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'table' => env('DYNAMODB_CACHE_TABLE', 'cache'),
+            'endpoint' => env('DYNAMODB_ENDPOINT'),
+        ],
+
+        'octane' => [
+            'driver' => 'octane',
+        ],
+
+        'failover' => [
+            'driver' => 'failover',
+            'stores' => [
+                'database',
+                'array',
+            ],
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Key Prefix
+    |--------------------------------------------------------------------------
+    |
+    | When utilizing the APC, database, memcached, Redis, and DynamoDB cache
+    | stores, there might be other applications using the same cache. For
+    | that reason, you may prefix every cache key to avoid collisions.
+    |
+    */
+
+    'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
+
+];
+</file>
+
+<file path="config/cors.php">
+<?php
+return [
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => ['http://localhost:3000'],
+    'allowed_origins_patterns' => [],
+    'allowed_headers' => ['*'],
+    'exposed_headers' => [],
+    'max_age' => 0,
+    'supports_credentials' => true,
+];
+</file>
+
+<file path="config/database.php">
+<?php
+
+use Illuminate\Support\Str;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Database Connection Name
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which of the database connections below you wish
+    | to use as your default connection for database operations. This is
+    | the connection which will be utilized unless another connection
+    | is explicitly specified when you execute a query / statement.
+    |
+    */
+
+    'default' => env('DB_CONNECTION', 'pgsql'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database Connections
+    |--------------------------------------------------------------------------
+    |
+    | Below are all of the database connections defined for your application.
+    | An example configuration is provided for each database system which
+    | is supported by Laravel. You're free to add / remove connections.
+    |
+    */
+
+    'connections' => [
+
+        'sqlite' => [
+            'driver' => 'sqlite',
+            'url' => env('DB_URL'),
+            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+            'busy_timeout' => null,
+            'journal_mode' => null,
+            'synchronous' => null,
+            'transaction_mode' => 'DEFERRED',
+        ],
+
+        'mysql' => [
+            'driver' => 'mysql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'mariadb' => [
+            'driver' => 'mariadb',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'pgsql' => [
+            'driver' => 'pgsql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+        ],
+
+        'sqlsrv' => [
+            'driver' => 'sqlsrv',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '1433'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            // 'encrypt' => env('DB_ENCRYPT', 'yes'),
+            // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Migration Repository Table
+    |--------------------------------------------------------------------------
+    |
+    | This table keeps track of all the migrations that have already run for
+    | your application. Using this information, we can determine which of
+    | the migrations on disk haven't actually been run on the database.
+    |
+    */
+
+    'migrations' => [
+        'table' => 'migrations',
+        'update_date_on_publish' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redis Databases
+    |--------------------------------------------------------------------------
+    |
+    | Redis is an open source, fast, and advanced key-value store that also
+    | provides a richer body of commands than a typical key-value system
+    | such as Memcached. You may define your connection settings here.
+    |
+    */
+
+    'redis' => [
+
+        'client' => env('REDIS_CLIENT', 'phpredis'),
+
+        'options' => [
+            'cluster' => env('REDIS_CLUSTER', 'redis'),
+            'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
+            'persistent' => env('REDIS_PERSISTENT', false),
+        ],
+
+        'default' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'username' => env('REDIS_USERNAME'),
+            'password' => env('REDIS_PASSWORD'),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_DB', '0'),
+            'max_retries' => env('REDIS_MAX_RETRIES', 3),
+            'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
+            'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
+            'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+        ],
+
+        'cache' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '127.0.0.1'),
+            'username' => env('REDIS_USERNAME'),
+            'password' => env('REDIS_PASSWORD'),
+            'port' => env('REDIS_PORT', '6379'),
+            'database' => env('REDIS_CACHE_DB', '1'),
+            'max_retries' => env('REDIS_MAX_RETRIES', 3),
+            'backoff_algorithm' => env('REDIS_BACKOFF_ALGORITHM', 'decorrelated_jitter'),
+            'backoff_base' => env('REDIS_BACKOFF_BASE', 100),
+            'backoff_cap' => env('REDIS_BACKOFF_CAP', 1000),
+        ],
+
+    ],
+
+];
+</file>
+
+<file path="config/filesystems.php">
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Filesystem Disk
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the default filesystem disk that should be used
+    | by the framework. The "local" disk, as well as a variety of cloud
+    | based disks are available to your application for file storage.
+    |
+    */
+
+    'default' => env('FILESYSTEM_DISK', 'local'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filesystem Disks
+    |--------------------------------------------------------------------------
+    |
+    | Below you may configure as many filesystem disks as necessary, and you
+    | may even configure multiple disks for the same driver. Examples for
+    | most supported storage drivers are configured here for reference.
+    |
+    | Supported drivers: "local", "ftp", "sftp", "s3"
+    |
+    */
+
+    'disks' => [
+
+        'local' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'public' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
+        's3' => [
+            'driver' => 's3',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_DEFAULT_REGION'),
+            'bucket' => env('AWS_BUCKET'),
+            'url' => env('AWS_URL'),
+            'endpoint' => env('AWS_ENDPOINT'),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Symbolic Links
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the symbolic links that will be created when the
+    | `storage:link` Artisan command is executed. The array keys should be
+    | the locations of the links and the values should be their targets.
+    |
+    */
+
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
+    ],
+
+];
+</file>
+
+<file path="config/logging.php">
+<?php
+
+use Monolog\Handler\NullHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\SyslogUdpHandler;
+use Monolog\Processor\PsrLogMessageProcessor;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Log Channel
+    |--------------------------------------------------------------------------
+    |
+    | This option defines the default log channel that is utilized to write
+    | messages to your logs. The value provided here should match one of
+    | the channels present in the list of "channels" configured below.
+    |
+    */
+
+    'default' => env('LOG_CHANNEL', 'stack'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Deprecations Log Channel
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the log channel that should be used to log warnings
+    | regarding deprecated PHP and library features. This allows you to get
+    | your application ready for upcoming major versions of dependencies.
+    |
+    */
+
+    'deprecations' => [
+        'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
+        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Log Channels
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the log channels for your application. Laravel
+    | utilizes the Monolog PHP logging library, which includes a variety
+    | of powerful log handlers and formatters that you're free to use.
+    |
+    | Available drivers: "single", "daily", "slack", "syslog",
+    |                    "errorlog", "monolog", "custom", "stack"
+    |
+    */
+
+    'channels' => [
+
+        'stack' => [
+            'driver' => 'stack',
+            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'ignore_exceptions' => false,
+        ],
+
+        'single' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
+        'daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        'slack' => [
+            'driver' => 'slack',
+            'url' => env('LOG_SLACK_WEBHOOK_URL'),
+            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
+            'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
+            'level' => env('LOG_LEVEL', 'critical'),
+            'replace_placeholders' => true,
+        ],
+
+        'papertrail' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => env('LOG_PAPERTRAIL_HANDLER', SyslogUdpHandler::class),
+            'handler_with' => [
+                'host' => env('PAPERTRAIL_URL'),
+                'port' => env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+            ],
+            'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'stderr' => [
+            'driver' => 'monolog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'handler' => StreamHandler::class,
+            'handler_with' => [
+                'stream' => 'php://stderr',
+            ],
+            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'processors' => [PsrLogMessageProcessor::class],
+        ],
+
+        'syslog' => [
+            'driver' => 'syslog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'facility' => env('LOG_SYSLOG_FACILITY', LOG_USER),
+            'replace_placeholders' => true,
+        ],
+
+        'errorlog' => [
+            'driver' => 'errorlog',
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ],
+
+        'null' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ],
+
+        'emergency' => [
+            'path' => storage_path('logs/laravel.log'),
+        ],
+
+    ],
+
+];
+</file>
+
+<file path="config/mail.php">
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Mailer
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the default mailer that is used to send all email
+    | messages unless another mailer is explicitly specified when sending
+    | the message. All additional mailers can be configured within the
+    | "mailers" array. Examples of each type of mailer are provided.
+    |
+    */
+
+    'default' => env('MAIL_MAILER', 'log'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mailer Configurations
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure all of the mailers used by your application plus
+    | their respective settings. Several examples have been configured for
+    | you and you are free to add your own as your application requires.
+    |
+    | Laravel supports a variety of mail "transport" drivers that can be used
+    | when delivering an email. You may specify which one you're using for
+    | your mailers below. You may also add additional mailers if needed.
+    |
+    | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
+    |            "postmark", "resend", "log", "array",
+    |            "failover", "roundrobin"
+    |
+    */
+
+    'mailers' => [
+
+        'smtp' => [
+            'transport' => 'smtp',
+            'scheme' => env('MAIL_SCHEME'),
+            'url' => env('MAIL_URL'),
+            'host' => env('MAIL_HOST', '127.0.0.1'),
+            'port' => env('MAIL_PORT', 2525),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
+
+        'ses' => [
+            'transport' => 'ses',
+        ],
+
+        'postmark' => [
+            'transport' => 'postmark',
+            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
+            // 'client' => [
+            //     'timeout' => 5,
+            // ],
+        ],
+
+        'resend' => [
+            'transport' => 'resend',
+        ],
+
+        'sendmail' => [
+            'transport' => 'sendmail',
+            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+        ],
+
+        'log' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
+        ],
+
+        'array' => [
+            'transport' => 'array',
+        ],
+
+        'failover' => [
+            'transport' => 'failover',
+            'mailers' => [
+                'smtp',
+                'log',
+            ],
+            'retry_after' => 60,
+        ],
+
+        'roundrobin' => [
+            'transport' => 'roundrobin',
+            'mailers' => [
+                'ses',
+                'postmark',
+            ],
+            'retry_after' => 60,
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Global "From" Address
+    |--------------------------------------------------------------------------
+    |
+    | You may wish for all emails sent by your application to be sent from
+    | the same address. Here you may specify a name and address that is
+    | used globally for all emails that are sent by your application.
+    |
+    */
+
+    'from' => [
+        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
+    ],
+
+];
+</file>
+
+<file path="config/queue.php">
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Queue Connection Name
+    |--------------------------------------------------------------------------
+    |
+    | Laravel's queue supports a variety of backends via a single, unified
+    | API, giving you convenient access to each backend using identical
+    | syntax for each. The default queue connection is defined below.
+    |
+    */
+
+    'default' => env('QUEUE_CONNECTION', 'database'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Queue Connections
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the connection options for every queue backend
+    | used by your application. An example configuration is provided for
+    | each backend supported by Laravel. You're also free to add more.
+    |
+    | Drivers: "sync", "database", "beanstalkd", "sqs", "redis",
+    |          "deferred", "background", "failover", "null"
+    |
+    */
+
+    'connections' => [
+
+        'sync' => [
+            'driver' => 'sync',
+        ],
+
+        'database' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => env('DB_QUEUE', 'default'),
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'after_commit' => false,
+        ],
+
+        'beanstalkd' => [
+            'driver' => 'beanstalkd',
+            'host' => env('BEANSTALKD_QUEUE_HOST', 'localhost'),
+            'queue' => env('BEANSTALKD_QUEUE', 'default'),
+            'retry_after' => (int) env('BEANSTALKD_QUEUE_RETRY_AFTER', 90),
+            'block_for' => 0,
+            'after_commit' => false,
+        ],
+
+        'sqs' => [
+            'driver' => 'sqs',
+            'key' => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'prefix' => env('SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+            'queue' => env('SQS_QUEUE', 'default'),
+            'suffix' => env('SQS_SUFFIX'),
+            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'after_commit' => false,
+        ],
+
+        'redis' => [
+            'driver' => 'redis',
+            'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
+            'queue' => env('REDIS_QUEUE', 'default'),
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
+            'block_for' => null,
+            'after_commit' => false,
+        ],
+
+        'deferred' => [
+            'driver' => 'deferred',
+        ],
+
+        'background' => [
+            'driver' => 'background',
+        ],
+
+        'failover' => [
+            'driver' => 'failover',
+            'connections' => [
+                'database',
+                'deferred',
+            ],
+        ],
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Job Batching
+    |--------------------------------------------------------------------------
+    |
+    | The following options configure the database and table that store job
+    | batching information. These options can be updated to any database
+    | connection and table which has been defined by your application.
+    |
+    */
+
+    'batching' => [
+        'database' => env('DB_CONNECTION', 'sqlite'),
+        'table' => 'job_batches',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Failed Queue Jobs
+    |--------------------------------------------------------------------------
+    |
+    | These options configure the behavior of failed queue job logging so you
+    | can control how and where failed jobs are stored. Laravel ships with
+    | support for storing failed jobs in a simple file or in a database.
+    |
+    | Supported drivers: "database-uuids", "dynamodb", "file", "null"
+    |
+    */
+
+    'failed' => [
+        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
+        'database' => env('DB_CONNECTION', 'sqlite'),
+        'table' => 'failed_jobs',
+    ],
+
+];
+</file>
+
+<file path="config/sanctum.php">
+<?php
+
+use Laravel\Sanctum\Sanctum;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stateful Domains
+    |--------------------------------------------------------------------------
+    |
+    | Requests from the following domains / hosts will receive stateful API
+    | authentication cookies. Typically, these should include your local
+    | and production domains which access your API via a frontend SPA.
+    |
+    */
+
+    'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
+        '%s%s',
+        'localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1',
+        Sanctum::currentApplicationUrlWithPort(),
+        // Sanctum::currentRequestHost(),
+    ))),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sanctum Guards
+    |--------------------------------------------------------------------------
+    |
+    | This array contains the authentication guards that will be checked when
+    | Sanctum is trying to authenticate a request. If none of these guards
+    | are able to authenticate the request, Sanctum will use the bearer
+    | token that's present on an incoming request for authentication.
+    |
+    */
+
+    'guard' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expiration Minutes
+    |--------------------------------------------------------------------------
+    |
+    | This value controls the number of minutes until an issued token will be
+    | considered expired. This will override any values set in the token's
+    | "expires_at" attribute, but first-party sessions are not affected.
+    |
+    */
+
+    'expiration' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Prefix
+    |--------------------------------------------------------------------------
+    |
+    | Sanctum can prefix new tokens in order to take advantage of numerous
+    | security scanning initiatives maintained by open source platforms
+    | that notify developers if they commit tokens into repositories.
+    |
+    | See: https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning
+    |
+    */
+
+    'token_prefix' => env('SANCTUM_TOKEN_PREFIX', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Sanctum Middleware
+    |--------------------------------------------------------------------------
+    |
+    | When authenticating your first-party SPA with Sanctum you may need to
+    | customize some of the middleware Sanctum uses while processing the
+    | request. You may change the middleware listed below as required.
+    |
+    */
+
+    'middleware' => [
+        'authenticate_session' => Laravel\Sanctum\Http\Middleware\AuthenticateSession::class,
+        'encrypt_cookies' => Illuminate\Cookie\Middleware\EncryptCookies::class,
+        'validate_csrf_token' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+    ],
+
+];
+</file>
+
+<file path="config/services.php">
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Third Party Services
+    |--------------------------------------------------------------------------
+    |
+    | This file is for storing the credentials for third party services such
+    | as Mailgun, Postmark, AWS and more. This file provides the de facto
+    | location for this type of information, allowing packages to have
+    | a conventional file to locate the various service credentials.
+    |
+    */
+
+    'postmark' => [
+        'key' => env('POSTMARK_API_KEY'),
+    ],
+
+    'resend' => [
+        'key' => env('RESEND_API_KEY'),
+    ],
+
+    'ses' => [
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    ],
+
+    'slack' => [
+        'notifications' => [
+            'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
+            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+        ],
+    ],
+
+];
+</file>
+
+<file path="config/session.php">
+<?php
+
+use Illuminate\Support\Str;
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Session Driver
+    |--------------------------------------------------------------------------
+    |
+    | This option determines the default session driver that is utilized for
+    | incoming requests. Laravel supports a variety of storage options to
+    | persist session data. Database storage is a great default choice.
+    |
+    | Supported: "file", "cookie", "database", "memcached",
+    |            "redis", "dynamodb", "array"
+    |
+    */
+
+    'driver' => env('SESSION_DRIVER', 'database'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Lifetime
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the number of minutes that you wish the session
+    | to be allowed to remain idle before it expires. If you want them
+    | to expire immediately when the browser is closed then you may
+    | indicate that via the expire_on_close configuration option.
+    |
+    */
+
+    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+
+    'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Encryption
+    |--------------------------------------------------------------------------
+    |
+    | This option allows you to easily specify that all of your session data
+    | should be encrypted before it's stored. All encryption is performed
+    | automatically by Laravel and you may use the session like normal.
+    |
+    */
+
+    'encrypt' => env('SESSION_ENCRYPT', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session File Location
+    |--------------------------------------------------------------------------
+    |
+    | When utilizing the "file" session driver, the session files are placed
+    | on disk. The default storage location is defined here; however, you
+    | are free to provide another location where they should be stored.
+    |
+    */
+
+    'files' => storage_path('framework/sessions'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Database Connection
+    |--------------------------------------------------------------------------
+    |
+    | When using the "database" or "redis" session drivers, you may specify a
+    | connection that should be used to manage these sessions. This should
+    | correspond to a connection in your database configuration options.
+    |
+    */
+
+    'connection' => env('SESSION_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Database Table
+    |--------------------------------------------------------------------------
+    |
+    | When using the "database" session driver, you may specify the table to
+    | be used to store sessions. Of course, a sensible default is defined
+    | for you; however, you're welcome to change this to another table.
+    |
+    */
+
+    'table' => env('SESSION_TABLE', 'sessions'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Cache Store
+    |--------------------------------------------------------------------------
+    |
+    | When using one of the framework's cache driven session backends, you may
+    | define the cache store which should be used to store the session data
+    | between requests. This must match one of your defined cache stores.
+    |
+    | Affects: "dynamodb", "memcached", "redis"
+    |
+    */
+
+    'store' => env('SESSION_STORE'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Sweeping Lottery
+    |--------------------------------------------------------------------------
+    |
+    | Some session drivers must manually sweep their storage location to get
+    | rid of old sessions from storage. Here are the chances that it will
+    | happen on a given request. By default, the odds are 2 out of 100.
+    |
+    */
+
+    'lottery' => [2, 100],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Cookie Name
+    |--------------------------------------------------------------------------
+    |
+    | Here you may change the name of the session cookie that is created by
+    | the framework. Typically, you should not need to change this value
+    | since doing so does not grant a meaningful security improvement.
+    |
+    */
+
+    'cookie' => env(
+        'SESSION_COOKIE',
+        Str::slug((string) env('APP_NAME', 'laravel')).'-session'
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Cookie Path
+    |--------------------------------------------------------------------------
+    |
+    | The session cookie path determines the path for which the cookie will
+    | be regarded as available. Typically, this will be the root path of
+    | your application, but you're free to change this when necessary.
+    |
+    */
+
+    'path' => env('SESSION_PATH', '/'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session Cookie Domain
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the domain and subdomains the session cookie is
+    | available to. By default, the cookie will be available to the root
+    | domain without subdomains. Typically, this shouldn't be changed.
+    |
+    */
+
+    'domain' => env('SESSION_DOMAIN'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | HTTPS Only Cookies
+    |--------------------------------------------------------------------------
+    |
+    | By setting this option to true, session cookies will only be sent back
+    | to the server if the browser has a HTTPS connection. This will keep
+    | the cookie from being sent to you when it can't be done securely.
+    |
+    */
+
+    'secure' => env('SESSION_SECURE_COOKIE'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | HTTP Access Only
+    |--------------------------------------------------------------------------
+    |
+    | Setting this value to true will prevent JavaScript from accessing the
+    | value of the cookie and the cookie will only be accessible through
+    | the HTTP protocol. It's unlikely you should disable this option.
+    |
+    */
+
+    'http_only' => env('SESSION_HTTP_ONLY', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Same-Site Cookies
+    |--------------------------------------------------------------------------
+    |
+    | This option determines how your cookies behave when cross-site requests
+    | take place, and can be used to mitigate CSRF attacks. By default, we
+    | will set this value to "lax" to permit secure cross-site requests.
+    |
+    | See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value
+    |
+    | Supported: "lax", "strict", "none", null
+    |
+    */
+
+    'same_site' => env('SESSION_SAME_SITE', 'lax'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Partitioned Cookies
+    |--------------------------------------------------------------------------
+    |
+    | Setting this value to true will tie the cookie to the top-level site for
+    | a cross-site context. Partitioned cookies are accepted by the browser
+    | when flagged "secure" and the Same-Site attribute is set to "none".
+    |
+    */
+
+    'partitioned' => env('SESSION_PARTITIONED_COOKIE', false),
+
+];
+</file>
+
+<file path="database/factories/UserFactory.php">
+<?php
+
+namespace Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ */
+class UserFactory extends Factory
+{
+    /**
+     * The current password being used by the factory.
+     */
+    protected static ?string $password;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'email_verified_at' => now(),
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
+}
+</file>
+
+<file path="database/migrations/0001_01_01_000000_create_users_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->enum('role', ['volunteer', 'ngo', 'admin']);
+            $table->string('phone')->unique()->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamp('last_login_at')->nullable();
+            $table->rememberToken();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+            $table->timestamp('deleted_at')->nullable();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+</file>
+
+<file path="database/migrations/0001_01_01_000001_create_cache_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('cache', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->mediumText('value');
+            $table->integer('expiration')->index();
+        });
+
+        Schema::create('cache_locks', function (Blueprint $table) {
+            $table->string('key')->primary();
+            $table->string('owner');
+            $table->integer('expiration')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('cache');
+        Schema::dropIfExists('cache_locks');
+    }
+};
+</file>
+
+<file path="database/migrations/0001_01_01_000002_create_jobs_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('queue')->index();
+            $table->longText('payload');
+            $table->unsignedTinyInteger('attempts');
+            $table->unsignedInteger('reserved_at')->nullable();
+            $table->unsignedInteger('available_at');
+            $table->unsignedInteger('created_at');
+        });
+
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
+        });
+
+        Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->id();
+            $table->string('uuid')->unique();
+            $table->text('connection');
+            $table->text('queue');
+            $table->longText('payload');
+            $table->longText('exception');
+            $table->timestamp('failed_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('jobs');
+        Schema::dropIfExists('job_batches');
+        Schema::dropIfExists('failed_jobs');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121353_create_skills_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('skills', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('skills');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121354_create_ngo_profiles_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('ngo_profiles', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
+            $table->string('organization_name');
+            $table->string('registration_number')->nullable();
+            $table->text('description')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('website')->nullable();
+            $table->string('office_location')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('pan_number')->nullable();
+            $table->enum('verification_status', ['pending', 'under_review', 'verified', 'rejected'])->default('pending');
+            $table->foreignId('verified_by')->nullable()->constrained('users')->onDelete('set null')->comment('The user who has verified')->default(false);
+            $table->timestamp('verified_at')->nullable();
+            $table->text('rejection_reason')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('ngo_profiles');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121354_create_volunteer_profiles_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('volunteer_profiles', function (Blueprint $table) {
+            $table->id();
+            $table->json('tfidf_vector')->nullable();
+            $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
+            $table->string('profile_photo')->nullable();
+            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->text('bio')->nullable();
+            $table->text('primary_location')->nullable();
+            $table->string('city')->nullable();
+            $table->string('country')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->string('emergency_contact_name')->nullable();
+            $table->string('emergency_contact_phone')->nullable();
+            $table->enum('availability', ['Available', 'Unavailable', 'Busy'])->default('Available'); // available, unavailable, busy
+            $table->float('trust_score')->default(0.5);
+            $table->timestamp('trust_updated_at')->nullable();
+            $table->decimal('reliability_score', 5, 2)->default(0.00);
+            $table->decimal('total_service_hours', 10, 2)->default(0.00);
+            $table->decimal('average_rating', 3, 2)->default(0.00);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('volunteer_profiles');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121355_create_categories_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('categories', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('categories');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121355_create_tasks_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tasks', function (Blueprint $table) {
+    $table->id();
+    $table->json('tfidf_vector')->nullable();
+    $table->foreignId('ngo_id')->constrained('ngo_profiles')->onDelete('cascade');
+    $table->foreignId('category_id')->constrained('categories');
+    $table->string('title');
+    $table->string('slug')->unique();
+    $table->text('description')->nullable();
+    $table->enum('task_type', ['Event', 'Emergency', 'Campaign', 'Task']); // event, emergency, campaign, task
+    $table->enum('selection_logic', ['FCFS', 'Weighted']);
+    $table->text('location')->nullable();
+    $table->string('city')->nullable();
+    $table->string('country')->nullable();
+    $table->decimal('latitude', 10, 8)->nullable();
+    $table->decimal('longitude', 11, 8)->nullable();
+    $table->dateTime('start_date')->nullable();
+    $table->dateTime('end_date')->nullable();
+    $table->dateTime('application_deadline')->nullable();
+    $table->integer('required_volunteers')->nullable();
+    $table->enum('status', ['Draft', 'Open', 'Ongoing', 'Completed', 'Cancelled'])->default('Draft');// draft, open, ongoing, completed, cancelled
+    $table->enum('urgency_level', ['Low', 'Medium', 'High'])->default('Low');
+    $table->string('cover_image')->nullable();
+    $table->foreignId('created_by')->constrained('users')->onDelete('set null');
+    $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();
+    $table->timestamp('deleted_at')->nullable();
+    });
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tasks');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121356_create_task_skills_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('task_skills', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
+    $table->foreignId('skill_id')->constrained('skills')->onDelete('cascade');
+    $table->timestamps();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('task_skills');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121357_create_applications_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('applications', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
+    $table->foreignId('volunteer_profile_id')->constrained('volunteer_profiles')->onDelete('cascade');
+    $table->decimal('recommendation_score', 5, 2)->nullable();
+    $table->enum('status', ['Pending', 'Shortlisted', 'Accepted', 'Rejected', 'Withdrawn'])->default('Pending'); // pending, shortlisted, accepted, rejected, withdrawn
+    $table->timestamp('applied_at')->useCurrent();
+    $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
+    $table->timestamp('reviewed_at')->nullable();
+    $table->text('remarks')->nullable();
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('applications');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121357_create_badges_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('badges', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('description')->nullable();
+    $table->string('icon')->nullable();
+    $table->integer('minimum_hours')->unsigned()->default(0);
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('badges');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121357_create_service_logs_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+    Schema::create('service_logs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('volunteer_profile_id')->constrained('volunteer_profiles')->onDelete('cascade');
+    $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
+    $table->datetime('check_in_time')->nullable();
+    $table->datetime('check_out_time')->nullable();
+    $table->decimal('hours', 6, 2)->default(0.00);
+    $table->enum('participation_status',['assigned','active','completed','absent'])->default('assigned');
+    $table->text('feedback')->nullable();
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('service_logs');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121358_create_notifications_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('notifications', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    $table->string('title');
+    $table->string('type');
+    $table->text('message');
+    $table->boolean('is_read')->default(false);
+    $table->timestamp('read_at')->nullable();
+    $table->timestamp('created_at')->useCurrent();
+    $table->timestamp('updated_at')->useCurrent();});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('notifications');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121358_create_user_badges_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+       Schema::create('user_badges', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    $table->foreignId('badge_id')->constrained('badges')->onDelete('cascade');
+    $table->timestamp('awarded_at')->useCurrent();
+    $table->timestamps();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('user_badges');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_11_121359_create_reviews_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('reviews', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('reviewer_id')->constrained('users')->onDelete('cascade'); // person giving review
+    $table->foreignId('reviewee_id')->constrained('users')->onDelete('cascade'); // person being reviewed
+    $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
+    $table->tinyInteger('rating')->unsigned(); // 1-5
+    $table->text('comment')->nullable();
+    $table->timestamps();
+});
+
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('reviews');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_02_13_071245_create_personal_access_tokens_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('personal_access_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('tokenable');
+            $table->text('name');
+            $table->string('token', 64)->unique();
+            $table->text('abilities')->nullable();
+            $table->timestamp('last_used_at')->nullable();
+            $table->timestamp('expires_at')->nullable()->index();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('personal_access_tokens');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064045_create_volunteer_skills_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('volunteer_skills', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('volunteer_profile_id');
+            $table->unsignedBigInteger('skill_id');
+            $table->foreign('volunteer_profile_id')->references('id')->on('volunteer_profiles')->onDelete('cascade');
+            $table->foreign('skill_id')->references('id')->on('skills')->onDelete('cascade');
+            $table->enum('proficiency_level', ['beginner', 'intermediate', 'expert'])->default('beginner');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('volunteer_skills');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064119_create_workflow_states_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('workflow_states', function (Blueprint $table) {
+            $table->id();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->text('description');
+            $table->integer('sequence')->default(0);
+            $table->boolean('is_final')->default(false);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('workflow_states');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064131_create_workflow_transitions_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('workflow_transitions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('from_state_id')->constrained('workflow_states')->onDelete('cascade');
+            $table->foreignId('to_state_id')->constrained('workflow_states')->onDelete('cascade');
+            $table->string('action');
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('workflow_transitions');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064153_create_verification_workflows_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('verification_workflows', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('current_state_id')->constrained('workflow_states')->onDelete('set null');
+            $table->timestamp('started_at')->useCurrent();
+            $table->timestamp('completed_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('verification_workflows');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064203_create_verification_state_logs_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('verification_state_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('workflow_id')->constrained('verification_workflows')->onDelete('cascade');
+            $table->foreignId('from_state_id')->nullable()->constrained('workflow_states')->onDelete('cascade');
+            $table->foreignId('to_state_id')->constrained('workflow_states')->onDelete('cascade');
+            $table->foreignId('changed_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->text('remarks')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('verification_state_logs');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064211_create_verification_sessions_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('verification_sessions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->timestamp('started_at')->useCurrent();
+            $table->timestamp('completed_at')->nullable();
+            $table->enum('status', ['pending', 'in_progress', 'completed', 'rejected'])->default('pending');
+            $table->string('ip_address')->nullable();
+            $table->text('device_info')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('verification_sessions');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064224_create_verification_images_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('verification_images', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('verification_session_id')->constrained()->onDelete('cascade');
+            $table->string('image_type');
+            $table->string('file_path');
+            $table->timestamp('captured_at')->useCurrent();
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('verification_images');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064234_create_documents_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('document_type');
+            $table->string('original_name');
+            $table->string('file_name');
+            $table->string('file_path');
+            $table->string('mime_type');
+            $table->integer('file_size')->unsigned();
+            $table->enum('status', ['pending', 'verified', 'rejected'])->default('pending');
+            $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamp('reviewed_at')->nullable();
+            $table->text('remarks')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('documents');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064243_create_reports_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('reports', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reported_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('against_user_id')->constrained('users')->onDelete('cascade');
+            $table->string('report_type');
+            $table->foreignId('task_id')->nullable()->constrained()->onDelete('set null');
+            $table->text('reason');
+            $table->enum('status', ['open', 'reviewed', 'resolved', 'rejected'])->default('open');
+            $table->foreignId('resolved_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamp('resolved_at')->nullable();
+            $table->text('resolution_notes')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('reports');
+    }
+};
+</file>
+
+<file path="database/migrations/2026_05_26_064310_create_activity_logs_table.php">
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('activity_logs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('action');
+            $table->string('module')->nullable();
+            $table->text('description')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->timestamp('created_at')->useCurrent();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('activity_logs');
+    }
+};
+</file>
+
+<file path="database/seeders/DatabaseSeeder.php">
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    use WithoutModelEvents;
+
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        // User::factory(10)->create();
+
+        User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+    }
+}
+</file>
+
+<file path="database/.gitignore">
+*.sqlite*
+</file>
+
+<file path="public/.htaccess">
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+</file>
+
+<file path="public/index.php">
+<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Register the Composer autoloader...
+require __DIR__.'/../vendor/autoload.php';
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$app->handleRequest(Request::capture());
+</file>
+
+<file path="public/robots.txt">
+User-agent: *
+Disallow:
+</file>
+
+<file path="resources/css/app.css">
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+</file>
+
+<file path="resources/js/app.js">
+import './bootstrap';
+</file>
+
+<file path="resources/js/bootstrap.js">
+import axios from 'axios';
+window.axios = axios;
+
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+</file>
+
+<file path="routes/api.php">
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Api\AuthController;
+
+use App\Http\Controllers\Admin\VerificationController;
+use App\Http\Controllers\Admin\TaskController as AdminTaskController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AssignmentController;
+use App\Http\Controllers\Admin\TfIdfController;
+
+use App\Http\Controllers\Ngo\TaskController as NgoTaskController;
+use App\Http\Controllers\Ngo\ApplicationController as NgoApplicationController;
+
+use App\Http\Controllers\Volunteer\TaskController as VolunteerTaskController;
+use App\Http\Controllers\Volunteer\ApplicationController as VolunteerApplicationController;
+use App\Http\Controllers\Volunteer\ProfileController as VolunteerProfileController;
+
+
+/*
+|--------------------------------------------------------------------------
+| Health Check
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'message' => 'API is running'
+    ]);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Authentication
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/user', [AuthController::class, 'me']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware([
+    'auth:sanctum',
+    'role:admin'
+])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGO Verification
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/ngo-verification',
+        [VerificationController::class, 'getNgoVerification']
+    );
+
+    Route::post(
+        '/admin/ngo-verify/{id}',
+        [VerificationController::class, 'verifyNgo']
+    );
+
+    Route::post(
+        '/admin/ngo-reject/{id}',
+        [VerificationController::class, 'rejectNgo']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NGO Listing
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ngos',
+        [VerificationController::class, 'ngos']
+    );
+
+    Route::get(
+        '/ngos/{id}',
+        [VerificationController::class, 'ngoDetails']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task Moderation
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/task-moderation',
+        [AdminTaskController::class, 'index']
+    );
+
+    Route::delete(
+        '/admin/tasks/{id}',
+        [AdminTaskController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/stats',
+        [DashboardController::class, 'stats']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Assignment
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/admin/batch-assign',
+        [AssignmentController::class, 'batchAssign']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TF-IDF
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/admin/tfidf/recompute',
+        [TfIdfController::class, 'recompute']
+    );
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| NGO Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware([
+    'auth:sanctum',
+    'role:ngo'
+])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tasks
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ngo/tasks',
+        [NgoTaskController::class, 'index']
+    );
+
+    Route::post(
+        '/ngo/tasks',
+        [NgoTaskController::class, 'store']
+    );
+
+    Route::put(
+        '/ngo/tasks/{id}',
+        [NgoTaskController::class, 'update']
+    );
+
+    Route::delete(
+        '/ngo/tasks/{id}',
+        [NgoTaskController::class, 'destroy']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Applications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/ngo/applications',
+        [NgoApplicationController::class, 'index']
+    );
+
+    Route::post(
+        '/ngo/applications/{id}/accept',
+        [NgoApplicationController::class, 'accept']
+    );
+
+    Route::post(
+        '/ngo/applications/{id}/reject',
+        [NgoApplicationController::class, 'reject']
+    );
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Volunteer Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware([
+    'auth:sanctum',
+    'role:volunteer'
+])->group(function () {
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Task Discovery
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/tasks',
+        [VolunteerTaskController::class, 'index']
+    );
+
+    Route::get(
+        '/volunteer/tasks/{id}',
+        [VolunteerTaskController::class, 'show']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Applications
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/volunteer/tasks/{id}/apply',
+        [VolunteerApplicationController::class, 'store']
+    );
+
+    Route::get(
+        '/volunteer/applications',
+        [VolunteerApplicationController::class, 'index']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Profile
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/profile',
+        [VolunteerProfileController::class, 'show']
+    );
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| TF-IDF Public Debug Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/volunteers/{id}/tfidf',
+    [TfIdfController::class, 'showVolunteer']
+);
+
+Route::get(
+    '/tasks/{id}/tfidf',
+    [TfIdfController::class, 'showTask']
+);
+</file>
+
+<file path="routes/console.php">
+<?php
+
+use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Artisan;
+
+Artisan::command('inspire', function () {
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');
+</file>
+
+<file path="routes/web.php">
+<?php
+</file>
+
+<file path="storage/app/private/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="storage/app/public/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="storage/app/.gitignore">
+*
+!private/
+!public/
+!.gitignore
+</file>
+
+<file path="storage/framework/cache/data/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="storage/framework/cache/.gitignore">
+*
+!data/
+!.gitignore
+</file>
+
+<file path="storage/framework/sessions/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="storage/framework/testing/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="storage/framework/views/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="storage/framework/.gitignore">
+compiled.php
+config.php
+down
+events.scanned.php
+maintenance.php
+routes.php
+routes.scanned.php
+schedule-*
+services.json
+</file>
+
+<file path="storage/logs/.gitignore">
+*
+!.gitignore
+</file>
+
+<file path="tests/Feature/ExampleTest.php">
+<?php
+
+use Tests\TestCase;
+
+class ExampleTest extends TestCase
+{
+    public function test_the_application_returns_a_successful_response()
+    {
+        $response = $this->get('/');
+
+        $response->assertStatus(200);
+    }
+}
+</file>
+
+<file path="tests/Unit/ExampleTest.php">
+<?php
+
+test('that true is true', function () {
+    expect(true)->toBeTrue();
+});
+</file>
+
+<file path="tests/Pest.php">
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Test Case
+|--------------------------------------------------------------------------
+|
+| The closure you provide to your test functions is always bound to a specific PHPUnit test
+| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
+| need to change it using the "pest()" function to bind a different classes or traits.
+|
+*/
+
+pest()->extend(Tests\TestCase::class)
+ // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature');
+
+/*
+|--------------------------------------------------------------------------
+| Expectations
+|--------------------------------------------------------------------------
+|
+| When you're writing tests, you often need to check that values meet certain conditions. The
+| "expect()" function gives you access to a set of "expectations" methods that you can use
+| to assert different things. Of course, you may extend the Expectation API at any time.
+|
+*/
+
+expect()->extend('toBeOne', function () {
+    return $this->toBe(1);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Functions
+|--------------------------------------------------------------------------
+|
+| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
+| project that you don't want to repeat in every file. Here you can also expose helpers as
+| global functions to help you to reduce the number of lines of code in your test files.
+|
+*/
+
+function something()
+{
+    // ..
+}
+</file>
+
+<file path="tests/TestCase.php">
+<?php
+
+namespace Tests;
+
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+
+abstract class TestCase extends BaseTestCase
+{
+    //
+}
+</file>
+
+<file path=".editorconfig">
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[compose.yaml]
+indent_size = 4
+</file>
+
+<file path=".env.example">
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+APP_FAKER_LOCALE=en_US
+
+APP_MAINTENANCE_DRIVER=file
+# APP_MAINTENANCE_STORE=database
+
+# PHP_CLI_SERVER_WORKERS=4
+
+BCRYPT_ROUNDS=12
+
+LOG_CHANNEL=stack
+LOG_STACK=single
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=api_backend
+DB_USERNAME=root
+DB_PASSWORD=
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+SESSION_ENCRYPT=false
+SESSION_PATH=/
+SESSION_DOMAIN=null
+
+BROADCAST_CONNECTION=log
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=database
+
+CACHE_STORE=database
+# CACHE_PREFIX=
+
+MEMCACHED_HOST=127.0.0.1
+
+REDIS_CLIENT=phpredis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+MAIL_MAILER=log
+MAIL_SCHEME=null
+MAIL_HOST=127.0.0.1
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_FROM_ADDRESS="hello@example.com"
+MAIL_FROM_NAME="${APP_NAME}"
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_DEFAULT_REGION=us-east-1
+AWS_BUCKET=
+AWS_USE_PATH_STYLE_ENDPOINT=false
+
+VITE_APP_NAME="${APP_NAME}"
+</file>
+
+<file path=".gitattributes">
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+/.github export-ignore
+CHANGELOG.md export-ignore
+.styleci.yml export-ignore
+</file>
+
+<file path=".gitignore">
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+Thumbs.db
+</file>
+
+<file path="artisan">
+#!/usr/bin/env php
+<?php
+
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+define('LARAVEL_START', microtime(true));
+
+// Register the Composer autoloader...
+require __DIR__.'/vendor/autoload.php';
+
+// Bootstrap Laravel and handle the command...
+/** @var Application $app */
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$status = $app->handleCommand(new ArgvInput);
+
+exit($status);
+</file>
+
+<file path="composer.json">
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "laravel/laravel",
+    "type": "project",
+    "description": "The skeleton application for the Laravel framework.",
+    "keywords": [
+        "laravel",
+        "framework"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^12.0",
+        "laravel/sanctum": "^4.3",
+        "laravel/tinker": "^2.10.1"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pail": "^1.2.2",
+        "laravel/pint": "^1.24",
+        "laravel/sail": "^1.41",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.6",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate",
+            "@php artisan migrate --force",
+            "npm install",
+            "npm run build"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names='server,queue,vite'"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi",
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
+</file>
+
+<file path="package.json">
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "axios": "^1.11.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^2.0.0",
+        "tailwindcss": "^4.0.0",
+        "vite": "^7.0.7"
+    }
+}
+</file>
+
+<file path="phpunit.xml">
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="BROADCAST_CONNECTION" value="null"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
+    </php>
+</phpunit>
+</file>
+
+<file path="vite.config.js">
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import tailwindcss from '@tailwindcss/vite';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: ['resources/css/app.css', 'resources/js/app.js'],
+            refresh: true,
+        }),
+        tailwindcss(),
+    ],
+    server: {
+        watch: {
+            ignored: ['**/storage/framework/views/**'],
+        },
+    },
+});
+</file>
+
+</files>

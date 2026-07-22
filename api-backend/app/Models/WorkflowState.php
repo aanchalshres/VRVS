@@ -11,7 +11,7 @@ class WorkflowState extends Model
     'code',
     'name',
     'description',
-    'sequence_order',
+    'sequence',
     'is_final',
   ];
 

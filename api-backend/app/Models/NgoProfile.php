@@ -10,22 +10,30 @@ class NgoProfile extends Model
     use HasFactory;
 
     protected $fillable = [
-    'user_id',
-    'organization_name',
-    'registration_number',
-    'description',
-    'logo',
-    'website',
-    'office_location',
-    'city',
-    'country',
-    'latitude',
-    'longitude',
-    'pan_number',
-    'verification_status',
-    'verified_by',
-    'verified_at',
-    'rejection_reason',
+        'user_id',
+        'organization_name',
+        'registration_number',
+        'description',
+        'mission',
+        'vision',
+        'logo',
+        'website',
+        'social_links',
+        'office_location',
+        'city',
+        'country',
+        'org_category_id',
+        'latitude',
+        'longitude',
+        'pan_number',
+        'verification_status',
+        'verified_by',
+        'verified_at',
+        'rejection_reason',
+    ];
+
+    protected $casts = [
+        'social_links' => 'array',
     ];
 
 
@@ -41,5 +49,15 @@ class NgoProfile extends Model
     public function verifiedBy()
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function documents()
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
+
+    public function orgCategory()
+    {
+        return $this->belongsTo(Category::class, 'org_category_id');
     }
 }

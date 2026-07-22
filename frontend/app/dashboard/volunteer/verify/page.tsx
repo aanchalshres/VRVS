@@ -12,7 +12,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Phone, ShieldCheck, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Mail, Phone, ShieldCheck, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import { apiGet } from "@/app/lib/api";
 import {
   getVerification,
   sendEmailOtp,
@@ -27,6 +28,7 @@ export default function VerifyIdentityPage() {
   const next = searchParams.get("next") || "/dashboard/volunteer/tasks";
 
   const [volunteerProfileId, setVolunteerProfileId] = useState<number | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -39,25 +41,35 @@ export default function VerifyIdentityPage() {
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Demo-only: surfaces the generated OTP directly in the UI since there's
-  // no real email/SMS provider wired up yet. Remove devEmailOtp/devPhoneOtp
-  // once your Laravel backend sends real codes.
   const [devEmailOtp, setDevEmailOtp] = useState<string | null>(null);
   const [devPhoneOtp, setDevPhoneOtp] = useState<string | null>(null);
 
   useEffect(() => {
-    const idStr = localStorage.getItem("volunteer_profile_id");
-    const id = idStr ? Number(idStr) : null;
-    setVolunteerProfileId(id);
-
-    if (id !== null) {
-      const rec = getVerification(String(id));
-      if (rec) {
-        setEmail(rec.email || "");
-        setPhone(rec.phone || "");
-        setEmailVerified(!!rec.email_verified);
-        setPhoneVerified(!!rec.phone_verified);
+    async function loadProfile() {
+      try {
+        setProfileLoading(true);
+        const res = await apiGet<{ data: { id: number; city?: string; country?: string } }>('/volunteer/profile');
+        const profileId = res.data?.id;
+        if (profileId) {
+          setVolunteerProfileId(profileId);
+          const rec = getVerification(String(profileId));
+          if (rec) {
+            setEmail(rec.email || "");
+            setPhone(rec.phone || "");
+            setEmailVerified(!!rec.email_verified);
+            setPhoneVerified(!!rec.phone_verified);
+          }
+        } else {
+          setError('Volunteer profile not found. Please complete your profile first.');
+        }
+      } catch {
+        setError('Failed to load profile. Please try again.');
+      } finally {
+        setProfileLoading(false);
       }
+    }
+    loadProfile();
+  }, []);
     }
   }, []);
 

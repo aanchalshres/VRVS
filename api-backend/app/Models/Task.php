@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\TaskSkill;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,12 +9,12 @@ class Task extends Model
 {
     use HasFactory;
 
-   protected $fillable = [
+    protected $fillable = [
         'ngo_id',
-        'category_id',
         'title',
         'slug',
         'description',
+        'category_id',
         'task_type',
         'selection_logic',
         'location',
@@ -23,24 +22,28 @@ class Task extends Model
         'country',
         'latitude',
         'longitude',
+        'required_volunteers',
         'start_date',
         'end_date',
         'application_deadline',
-        'required_volunteers',
-        'status',
         'urgency_level',
+        'status',
         'cover_image',
         'created_by',
+        'updated_by',
+        'tfidf_vector',
     ];
+
 
     protected $casts = [
-        'skills' => 'array',
-        'is_emergency' => 'boolean',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'tfidf_vector' => 'array',
+        'latitude' => 'float',
+        'longitude' => 'float',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+        'application_deadline' => 'datetime',
     ];
 
-  // Task.php
 
     public function ngo()
     {
@@ -50,18 +53,12 @@ class Task extends Model
         );
     }
 
-    public function category()
+
+    public function applications()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(Application::class);
     }
 
-    public function creator()
-    {
-        return $this->belongsTo(
-            User::class,
-            'created_by'
-        );
-    }
 
     public function skills()
     {
@@ -71,9 +68,13 @@ class Task extends Model
         );
     }
 
-    public function applications()
+
+    public function category()
     {
-        return $this->hasMany(Application::class);
+        return $this->belongsTo(
+            Category::class,
+            'category_id'
+        );
     }
 
     public function serviceLogs()

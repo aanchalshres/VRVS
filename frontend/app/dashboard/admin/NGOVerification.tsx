@@ -8,8 +8,7 @@ import { DataTable } from '@/app/components/ui-custom/DataTable';
 import { StatusBadge } from '@/app/components/ui-custom/StatusBadge';
 import { EmptyState } from '@/app/components/ui-custom/EmptyState';
 import { TableSkeleton, StatsCardSkeleton } from '@/app/components/ui-custom/Skeleton';
-import { apiGet, apiPost } from '@/app/lib/api';
-import { mockNGOs } from '@/app/data/mockData';
+import { apiGet, apiPost, apiDelete } from '@/app/lib/api';
 import {
   Select,
   SelectContent,
@@ -32,6 +31,9 @@ import {
   RefreshCw,
   FileText,
   Download,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
 } from 'lucide-react';
 
 export function NGOVerification() {
@@ -61,7 +63,7 @@ export function NGOVerification() {
           organizationName: ngo.organization_name,
           registrationNumber: ngo.registration_number,
           officeLocation: ngo.office_location,
-          status: ngo.status || 'pending',
+          status: ngo.verification_status || ngo.status || 'pending',
           ownerName: ngo.user?.name || 'N/A',
           email: ngo.user?.email || '',
           phone: ngo.user?.phone || '',
@@ -79,8 +81,6 @@ export function NGOVerification() {
         }
       } catch (error) {
         console.error('Failed to fetch NGOs:', error);
-        // Fallback to mock data
-        setNgos(mockNGOs);
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -158,6 +158,8 @@ export function NGOVerification() {
     }
   };
 
+  const [rejectionReason, setRejectionReason] = useState('');
+
   const handleApproveNGO = async () => {
     if (!selectedNGO?.id) return;
 
@@ -169,27 +171,13 @@ export function NGOVerification() {
 
     try {
       setDetailLoading(true);
-      
-      // Add timeout to prevent hanging requests
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timeout')), 15000)
-      );
-      
-      await Promise.race([
-        apiPost<any>(`/api/ngo-profiles/${selectedNGO.id}/approve`, {}),
-        timeoutPromise,
-      ]);
-      
-      // Update the NGO in the list
+      await apiPost<any>(`/api/admin/ngo-verify/${selectedNGO.id}`, {});
       setNgos(ngos.map(ngo => 
         ngo.id === selectedNGO.id 
           ? { ...ngo, status: 'verified' } 
           : ngo
       ));
-
-      // Update selected NGO
       setSelectedNGO({ ...selectedNGO, status: 'verified' });
-      
       alert('NGO approved successfully!');
       setIsDetailModalOpen(false);
     } catch (error) {
@@ -203,40 +191,76 @@ export function NGOVerification() {
   const handleRejectNGO = async () => {
     if (!selectedNGO?.id) return;
 
-    const isConfirmed = window.confirm(
-      `Are you sure you want to reject "${selectedNGO.organization_name || selectedNGO.organizationName}"?`
-    );
-
-    if (!isConfirmed) return;
+    const reason = rejectionReason.trim() || prompt('Please enter a reason for rejection:') || 'No reason provided';
+    if (!reason) return;
 
     try {
       setDetailLoading(true);
-      
-      // Add timeout to prevent hanging requests
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Request timeout')), 15000)
-      );
-      
-      await Promise.race([
-        apiPost<any>(`/api/ngo-profiles/${selectedNGO.id}/reject`, {}),
-        timeoutPromise,
-      ]);
-      
-      // Update the NGO in the list
+      await apiPost<any>(`/api/admin/ngo-reject/${selectedNGO.id}`, { reason });
       setNgos(ngos.map(ngo => 
         ngo.id === selectedNGO.id 
           ? { ...ngo, status: 'rejected' } 
           : ngo
       ));
-
-      // Update selected NGO
       setSelectedNGO({ ...selectedNGO, status: 'rejected' });
-      
       alert('NGO rejected successfully!');
       setIsDetailModalOpen(false);
+      setRejectionReason('');
     } catch (error) {
       console.error('Failed to reject NGO:', error);
       alert('Failed to reject NGO. Please try again.');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleSuspendNGO = async () => {
+    const ngoUserId = selectedNGO?.user?.id || selectedNGO?.ngoOwnerId;
+    if (!ngoUserId) { alert('Could not determine NGO user account'); return; }
+    if (!window.confirm(`Suspend "${selectedNGO.organization_name || selectedNGO.organizationName}"?`)) return;
+    try {
+      setDetailLoading(true);
+      await apiPost<any>(`/api/admin/ngos/${ngoUserId}/suspend`, {});
+      alert('NGO suspended successfully!');
+      setIsDetailModalOpen(false);
+    } catch (error) {
+      console.error('Failed to suspend NGO:', error);
+      alert('Failed to suspend NGO.');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleActivateNGO = async () => {
+    const ngoUserId = selectedNGO?.user?.id || selectedNGO?.ngoOwnerId;
+    if (!ngoUserId) { alert('Could not determine NGO user account'); return; }
+    if (!window.confirm(`Activate "${selectedNGO.organization_name || selectedNGO.organizationName}"?`)) return;
+    try {
+      setDetailLoading(true);
+      await apiPost<any>(`/api/admin/ngos/${ngoUserId}/activate`, {});
+      alert('NGO activated successfully!');
+      setIsDetailModalOpen(false);
+    } catch (error) {
+      console.error('Failed to activate NGO:', error);
+      alert('Failed to activate NGO.');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleDeleteNGO = async () => {
+    const ngoUserId = selectedNGO?.user?.id || selectedNGO?.ngoOwnerId;
+    if (!ngoUserId) { alert('Could not determine NGO user account'); return; }
+    if (!window.confirm(`Permanently delete "${selectedNGO.organization_name || selectedNGO.organizationName}"? This cannot be undone.`)) return;
+    try {
+      setDetailLoading(true);
+      await apiDelete(`/api/admin/ngos/${ngoUserId}`);
+      setNgos(ngos.filter(ngo => ngo.id !== selectedNGO.id));
+      alert('NGO deleted successfully!');
+      setIsDetailModalOpen(false);
+    } catch (error) {
+      console.error('Failed to delete NGO:', error);
+      alert('Failed to delete NGO.');
     } finally {
       setDetailLoading(false);
     }
@@ -552,11 +576,29 @@ export function NGOVerification() {
                 </div>
               )}
 
+              {/* Rejection Reason Input */}
+              {selectedNGO.status === 'pending' && (
+                <div className="border-t border-[#CACDD3] pt-4">
+                  <label className="text-xs text-[#6B7280] mb-1 block">Rejection Reason (required for reject)</label>
+                  <textarea
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    rows={2}
+                    placeholder="Enter reason for rejection..."
+                    className="w-full p-3 rounded-md text-sm outline-none border border-[#CACDD3]"
+                    style={{ color: '#111827' }}
+                  />
+                </div>
+              )}
+
               {/* Action Buttons */}
-              <div className="border-t border-[#CACDD3] pt-4 flex gap-3 justify-end">
+              <div className="border-t border-[#CACDD3] pt-4 flex flex-wrap gap-2 justify-end">
                 <Button
                   variant="outline"
-                  onClick={() => setIsDetailModalOpen(false)}
+                  onClick={() => {
+                    setIsDetailModalOpen(false);
+                    setRejectionReason('');
+                  }}
                   className="text-sm"
                   disabled={detailLoading}
                 >
@@ -581,6 +623,34 @@ export function NGOVerification() {
                     </Button>
                   </>
                 )}
+                {selectedNGO.is_active !== false && selectedNGO.status === 'verified' && (
+                  <Button
+                    variant="outline"
+                    onClick={handleSuspendNGO}
+                    className="text-amber-600 border-amber-200 hover:bg-amber-50 text-sm"
+                    disabled={detailLoading}
+                  >
+                    <ToggleRight className="w-4 h-4 mr-1" />Suspend
+                  </Button>
+                )}
+                {selectedNGO.is_active === false && (
+                  <Button
+                    variant="outline"
+                    onClick={handleActivateNGO}
+                    className="text-emerald-600 border-emerald-200 hover:bg-emerald-50 text-sm"
+                    disabled={detailLoading}
+                  >
+                    <ToggleLeft className="w-4 h-4 mr-1" />Activate
+                  </Button>
+                )}
+                <Button
+                  variant="outline"
+                  onClick={handleDeleteNGO}
+                  className="text-red-600 border-red-200 hover:bg-red-50 text-sm"
+                  disabled={detailLoading}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />Delete
+                </Button>
               </div>
             </div>
           ) : null}

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('volunteer_profiles', function (Blueprint $table) {
             $table->id();
+            $table->json('tfidf_vector')->nullable();
             $table->foreignId('user_id')->unique()->constrained('users')->onDelete('cascade');
             $table->string('profile_photo')->nullable();
             $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
@@ -25,7 +26,9 @@ return new class extends Migration
             $table->decimal('longitude', 11, 8)->nullable();
             $table->string('emergency_contact_name')->nullable();
             $table->string('emergency_contact_phone')->nullable();
-            $table->enum('availability', ['Available', 'Unavailable', 'Busy'])->nullable(); // available, unavailable, busy
+            $table->enum('availability', ['Available', 'Unavailable', 'Busy'])->default('Available'); // available, unavailable, busy
+            $table->float('trust_score')->default(0.5);
+            $table->timestamp('trust_updated_at')->nullable();
             $table->decimal('reliability_score', 5, 2)->default(0.00);
             $table->decimal('total_service_hours', 10, 2)->default(0.00);
             $table->decimal('average_rating', 3, 2)->default(0.00);

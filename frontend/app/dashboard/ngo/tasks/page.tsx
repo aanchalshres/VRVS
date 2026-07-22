@@ -1,336 +1,229 @@
-"use client";
-
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+'use client'
+import { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/link'
+import Link from 'next/link'
+import { apiGet, apiDelete } from '@/app/lib/api'
 import {
-  Pencil,
-  Trash2,
-  Eye,
-  CheckCircle,
-  MapPin,
-  Users,
-  AlertTriangle,
-  Calendar,
-  Search,
-  Inbox,
-  Bell,
-  Plus,
-} from "lucide-react";
+  FileText, MapPin, Calendar, Users, Clock, PlusCircle,
+  Search, Filter, Trash2, Edit3, Eye, ChevronDown, AlertTriangle
+} from 'lucide-react'
 
 interface Task {
-  id: number;
-  title: string;
-  description: string;
-  location: string | null;
-  volunteers_needed: number;
-  start_date: string;
-  end_date: string | null;
-  urgency_level: "low" | "medium" | "high";
-  status: "draft" | "open" | "ongoing" | "completed";
+  id: number
+  title: string
+  description: string
+  category_id: number | null
+  task_type: string
+  location: string | null
+  city: string | null
+  latitude: number | null
+  longitude: number | null
+  required_volunteers: number
+  start_date: string
+  end_date: string | null
+  application_deadline: string | null
+  urgency_level: string
+  status: string
+  selection_logic: string | null
+  created_at: string
+  skills?: { id: number; name: string }[]
+  applications_count?: number
 }
-
-interface Application {
-  id: number;
-  task_id: number;
-  volunteer_name: string;
-  status: "pending" | "accepted" | "rejected";
-  applied_at: string;
-}
-
-type StatusFilter = "all" | Task["status"];
-
-const STATUS_TABS: { label: string; value: StatusFilter }[] = [
-  { label: "All", value: "all" },
-  { label: "Draft", value: "draft" },
-  { label: "Open", value: "open" },
-  { label: "Ongoing", value: "ongoing" },
-  { label: "Completed", value: "completed" },
-];
 
 export default function TasksPage() {
-  const router = useRouter();
+  const router = useRouter()
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
-  const [search, setSearch] = useState("");
-  const [loaded, setLoaded] = useState(false);
-
-  const loadTasks = useCallback(() => {
-    setTasks(JSON.parse(localStorage.getItem("ngo_tasks") || "[]"));
-  }, []);
-
-  const loadApplications = useCallback(() => {
-    setApplications(JSON.parse(localStorage.getItem("ngo_applications") || "[]"));
-  }, []);
-
-  useEffect(() => {
-    loadTasks();
-    loadApplications();
-    setLoaded(true);
-
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "ngo_tasks") loadTasks();
-      if (e.key === "ngo_applications") loadApplications();
-    };
-    // Dispatched from the volunteer Apply page and from this page's
-    // own close/delete flows so everything stays in sync live.
-    const onTasksUpdated = () => loadTasks();
-    const onAppsUpdated = () => loadApplications();
-    const onFocus = () => {
-      loadTasks();
-      loadApplications();
-    };
-
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("tasks:updated", onTasksUpdated);
-    window.addEventListener("applications:updated", onAppsUpdated);
-    window.addEventListener("focus", onFocus);
-
-    const interval = setInterval(() => {
-      loadTasks();
-      loadApplications();
-    }, 5000);
-
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener("tasks:updated", onTasksUpdated);
-      window.removeEventListener("applications:updated", onAppsUpdated);
-      window.removeEventListener("focus", onFocus);
-      clearInterval(interval);
-    };
-  }, [loadTasks, loadApplications]);
-
-  const applicationStats = useMemo(() => {
-    const map = new Map<number, { total: number; pending: number }>();
-    for (const app of applications) {
-      const entry = map.get(app.task_id) || { total: 0, pending: 0 };
-      entry.total += 1;
-      if (app.status === "pending") entry.pending += 1;
-      map.set(app.task_id, entry);
+  const loadTasks = useCallback(async () => {
+    try {
+      setLoading(true)
+      const res = await apiGet<{ data: Task[] }>('/api/ngo/tasks')
+      setTasks(res.data)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-    return map;
-  }, [applications]);
+  }, [])
 
-  const filteredTasks = useMemo(() => {
-    return tasks
-      .filter((t) => statusFilter === "all" || t.status === statusFilter)
-      .filter((t) => {
-        const q = search.trim().toLowerCase();
-        if (!q) return true;
-        return (
-          t.title.toLowerCase().includes(q) ||
-          (t.location || "").toLowerCase().includes(q)
-        );
-      })
-      .sort(
-        (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
-      );
-  }, [tasks, statusFilter, search]);
+  useEffect(() => { loadTasks() }, [loadTasks])
 
-  const badgeColor = (status: Task["status"]) => {
-    switch (status) {
-      case "open":
-        return "bg-green-100 text-green-700";
-      case "ongoing":
-        return "bg-blue-100 text-blue-700";
-      case "completed":
-        return "bg-gray-200 text-gray-700";
-      default:
-        return "bg-yellow-100 text-yellow-700";
+  const handleDelete = async (id: number) => {
+    try {
+      setDeleting(true)
+      await apiDelete(`/api/ngo/tasks/${id}`)
+      setShowDeleteConfirm(null)
+      loadTasks()
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete task')
+    } finally {
+      setDeleting(false)
     }
-  };
+  }
 
-  const urgencyColor = (level: Task["urgency_level"]) => {
-    switch (level) {
-      case "high":
-        return "text-red-600";
-      case "medium":
-        return "text-amber-600";
-      default:
-        return "text-[#6B7280]";
-    }
-  };
+  const filtered = tasks.filter((t) => {
+    const q = searchQuery.toLowerCase()
+    const matchesSearch = !q || t.title.toLowerCase().includes(q) || (t.location || '').toLowerCase().includes(q) || (t.city || '').toLowerCase().includes(q)
+    const matchesStatus = statusFilter === 'all' || t.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  const statusCounts = tasks.reduce((acc, t) => { acc[t.status] = (acc[t.status] || 0) + 1; return acc }, {} as Record<string, number>)
+
+  const statusColors: Record<string, string> = {
+    draft: 'bg-gray-100 text-gray-700',
+    open: 'bg-green-100 text-green-700',
+    ongoing: 'bg-blue-100 text-blue-700',
+    completed: 'bg-purple-100 text-purple-700',
+  }
+
+  const urgencyColors: Record<string, string> = {
+    low: 'bg-gray-50 text-gray-500 border border-gray-200',
+    medium: 'bg-amber-50 text-amber-600 border border-amber-200',
+    high: 'bg-red-50 text-red-600 border border-red-200',
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50/80 flex items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[#4F46C8]" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50/80 flex items-center justify-center p-8">
+        <div className="bg-white border border-red-200 rounded-xl p-6 text-center max-w-md">
+          <AlertTriangle size={36} className="mx-auto text-red-500 mb-3" />
+          <p className="text-red-600 font-medium mb-2">Failed to load tasks</p>
+          <p className="text-sm text-[#6B7280]">{error}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-[#F0F1F3] p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+    <div className="min-h-screen bg-gray-50/80 py-8 px-5 md:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#111827]">Volunteer Tasks</h1>
-            <p className="text-[#6B7280] mt-1">
-              {tasks.length} task{tasks.length !== 1 ? "s" : ""} total
-            </p>
+            <h1 className="text-xl font-bold text-gray-900">My Opportunities</h1>
+            <p className="text-sm text-gray-500">{tasks.length} total</p>
           </div>
-
-          <button
-            onClick={() => router.push("/dashboard/ngo/post-task")}
-            className="flex items-center gap-2 bg-[#4F46C8] hover:bg-[#3f39a8] transition-colors text-white px-5 py-2.5 rounded-lg font-medium shadow-sm"
-          >
-            <Plus size={18} />
-            Create Task
-          </button>
+          <Link href="/dashboard/ngo/post-task" className="flex items-center gap-2 bg-[#4F46C8] text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-[#4338CA] transition self-start">
+            <PlusCircle size={16} /> New Opportunity
+          </Link>
         </div>
 
-        {/* Filters */}
-        <div className="bg-white border border-[#CACDD3] rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            {STATUS_TABS.map((tab) => {
-              const count =
-                tab.value === "all" ? tasks.length : tasks.filter((t) => t.status === tab.value).length;
-              const active = statusFilter === tab.value;
-              return (
-                <button
-                  key={tab.value}
-                  onClick={() => setStatusFilter(tab.value)}
-                  className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    active
-                      ? "bg-[#4F46C8] text-white"
-                      : "bg-[#B9C0D4]/30 text-[#111827] hover:bg-[#B9C0D4]/50"
-                  }`}
-                >
-                  {tab.label} ({count})
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280]" />
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title or location..."
-              className="pl-9 pr-3 py-2 border border-[#CACDD3] rounded-lg text-sm text-[#111827] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#7683D6] w-64"
+              type="text"
+              placeholder="Search tasks by title, location..."
+              className="w-full pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:border-[#4F46C8] focus:ring-1 focus:ring-[#4F46C8]/30 transition"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          <div className="relative">
+            <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <select
+              className="pl-9 pr-8 py-2.5 bg-white border border-gray-200 rounded-lg text-sm outline-none focus:border-[#4F46C8] focus:ring-1 focus:ring-[#4F46C8]/30 transition appearance-none cursor-pointer"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">All Status ({tasks.length})</option>
+              {Object.entries(statusCounts).map(([s, c]) => (
+                <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)} ({c})</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
         </div>
 
-        {/* Empty states */}
-        {loaded && tasks.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-[#CACDD3] p-10 text-center">
-            <Inbox size={40} className="mx-auto text-[#6B7280] mb-3" />
-            <h2 className="text-xl font-semibold text-[#111827] mb-2">No Tasks Found</h2>
-            <p className="text-[#6B7280] mb-6">Create your first volunteer task to get started.</p>
-            <button
-              onClick={() => router.push("/dashboard/ngo/post-task")}
-              className="inline-flex items-center gap-2 bg-[#4F46C8] hover:bg-[#3f39a8] transition-colors text-white px-5 py-2.5 rounded-lg font-medium"
-            >
-              <Plus size={16} />
-              Create Task
-            </button>
-          </div>
-        )}
-
-        {loaded && tasks.length > 0 && filteredTasks.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-[#CACDD3] p-10 text-center">
-            <Search size={40} className="mx-auto text-[#6B7280] mb-3" />
-            <h2 className="text-xl font-semibold text-[#111827] mb-2">No matching tasks</h2>
-            <p className="text-[#6B7280]">Try a different search term or filter.</p>
-          </div>
-        )}
-
-        {/* Task list */}
-        <div className="space-y-5">
-          {filteredTasks.map((task) => {
-            const stats = applicationStats.get(task.id) || { total: 0, pending: 0 };
-
-            return (
-              <div key={task.id} className="bg-white rounded-2xl shadow-sm border border-[#CACDD3] p-6">
-                <div className="flex justify-between items-start gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <h2 className="text-xl font-bold text-[#111827]">{task.title}</h2>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeColor(task.status)}`}
-                      >
-                        {task.status.toUpperCase()}
-                      </span>
-                    </div>
-
-                    <p className="text-[#6B7280] mt-2">{task.description}</p>
-
-                    <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-[#111827]">
-                      <span className="flex items-center gap-1.5">
-                        <MapPin size={16} className="text-[#7683D6]" />
-                        {task.location || "Remote / Unspecified"}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Users size={16} className="text-[#7683D6]" />
-                        {task.volunteers_needed} volunteers needed
-                      </span>
-                      <span className={`flex items-center gap-1.5 font-medium ${urgencyColor(task.urgency_level)}`}>
-                        <AlertTriangle size={16} />
-                        {task.urgency_level} urgency
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Calendar size={16} className="text-[#7683D6]" />
-                        {new Date(task.start_date).toLocaleDateString()}
-                        {task.end_date && ` – ${new Date(task.end_date).toLocaleDateString()}`}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Applications indicator */}
-                  <button
-                    onClick={() => router.push(`/dashboard/ngo/applications?task_id=${task.id}`)}
-                    className="relative flex flex-col items-center justify-center bg-[#B9C0D4]/30 hover:bg-[#B9C0D4]/50 transition-colors rounded-xl px-4 py-3 min-w-[110px]"
-                  >
-                    {stats.pending > 0 && (
-                      <span className="absolute -top-2 -right-2 flex items-center justify-center h-5 w-5 rounded-full bg-[#4F46C8] text-white text-[11px] font-bold">
-                        {stats.pending}
+        <div className="space-y-3">
+          {filtered.length === 0 && (
+            <div className="bg-white border border-black/5 rounded-xl p-10 text-center">
+              <FileText size={40} className="mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-500 font-medium">No opportunities found</p>
+              <p className="text-sm text-gray-400 mt-1">{searchQuery ? 'Try a different search term.' : 'Create your first opportunity to get started.'}</p>
+            </div>
+          )}
+          {filtered.map((task) => (
+            <div key={task.id} className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${statusColors[task.status] || 'bg-gray-100 text-gray-600'}`}>
+                      {task.status?.charAt(0).toUpperCase() + task.status?.slice(1)}
+                    </span>
+                    <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${urgencyColors[task.urgency_level] || ''}`}>
+                      {task.urgency_level?.charAt(0).toUpperCase() + task.urgency_level?.slice(1)}
+                    </span>
+                    {task.applications_count !== undefined && (
+                      <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                        {task.applications_count} applicant{task.applications_count !== 1 ? 's' : ''}
                       </span>
                     )}
-                    <Bell size={18} className="text-[#4F46C8] mb-1" />
-                    <span className="text-lg font-bold text-[#111827] leading-none">{stats.total}</span>
-                    <span className="text-[11px] text-[#6B7280] mt-1">
-                      Application{stats.total !== 1 ? "s" : ""}
-                    </span>
-                  </button>
-                </div>
-
-                {/* Actions — each routes to its own dedicated page */}
-                <div className="mt-6 flex flex-wrap gap-3 pt-4 border-t border-[#CACDD3]">
-                  <button
-                    onClick={() => router.push(`/dashboard/ngo/tasks/edit/${task.id}`)}
-                    className="flex items-center gap-2 bg-[#7683D6] hover:bg-[#5f6cc4] transition-colors text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    <Pencil size={16} />
-                    Update
-                  </button>
-
-                  {task.status !== "completed" && (
-                    <button
-                      onClick={() => router.push(`/dashboard/ngo/tasks/close/${task.id}`)}
-                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700 transition-colors text-white px-4 py-2 rounded-lg text-sm font-medium"
-                    >
-                      <CheckCircle size={16} />
-                      Close
-                    </button>
+                  </div>
+                  <h3 className="text-base font-bold text-gray-800">{task.title}</h3>
+                  <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-gray-500">
+                    {(task.city || task.location) && <span className="flex items-center gap-1"><MapPin size={12} /> {[task.city, task.location].filter(Boolean).join(', ')}</span>}
+                    <span className="flex items-center gap-1"><Calendar size={12} /> {task.start_date ? new Date(task.start_date).toLocaleDateString() : 'TBD'}{task.end_date ? ` - ${new Date(task.end_date).toLocaleDateString()}` : ''}</span>
+                    <span className="flex items-center gap-1"><Users size={12} /> {task.required_volunteers} needed</span>
+                    <span className="flex items-center gap-1"><Clock size={12} /> {new Date(task.created_at).toLocaleDateString()}</span>
+                  </div>
+                  {task.skills && task.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {task.skills.map((s) => (
+                        <span key={s.id} className="text-[10px] bg-[#EEF0FF] text-[#4F46C8] px-2 py-0.5 rounded-full">{s.name}</span>
+                      ))}
+                    </div>
                   )}
-
-                  <button
-                    onClick={() => router.push(`/dashboard/ngo/applications?task_id=${task.id}`)}
-                    className="flex items-center gap-2 bg-[#4F46C8] hover:bg-[#3f39a8] transition-colors text-white px-4 py-2 rounded-lg text-sm font-medium"
-                  >
-                    <Eye size={16} />
-                    View Applications
-                  </button>
-
-                  <button
-                    onClick={() => router.push(`/dashboard/ngo/tasks/delete/${task.id}`)}
-                    className="flex items-center gap-2 bg-red-600 hover:bg-red-700 transition-colors text-white px-4 py-2 rounded-lg text-sm font-medium ml-auto"
-                  >
-                    <Trash2 size={16} />
-                    Delete
+                </div>
+                <div className="flex items-center gap-2 lg:flex-shrink-0">
+                  <Link href={`/dashboard/ngo/tasks/${task.id}`} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#4F46C8] bg-[#EEF0FF] rounded-lg hover:bg-[#DDE0FF] transition">
+                    <Eye size={14} /> View
+                  </Link>
+                  <Link href={`/dashboard/ngo/tasks/edit/${task.id}`} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition">
+                    <Edit3 size={14} /> Edit
+                  </Link>
+                  <Link href={`/dashboard/ngo/tasks/close/${task.id}`} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-green-700 bg-green-50 rounded-lg hover:bg-green-100 transition">
+                    <Clock size={14} /> Close
+                  </Link>
+                  <button onClick={() => setShowDeleteConfirm(task.id)} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">
+                    <Trash2 size={14} /> Delete
                   </button>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
+
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
+              <Trash2 size={28} className="text-red-500 mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-center text-gray-900 mb-1">Delete this task?</h3>
+              <p className="text-sm text-gray-500 text-center mb-6">This action cannot be undone.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowDeleteConfirm(null)} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition">Cancel</button>
+                <button onClick={() => handleDelete(showDeleteConfirm)} disabled={deleting} className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition disabled:opacity-60">
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
-  );
+  )
 }

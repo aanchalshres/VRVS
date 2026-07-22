@@ -13,6 +13,7 @@ class AuthController extends Controller
     // =========================
     // REGISTER (Volunteer + NGO)
     // =========================
+
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -21,11 +22,12 @@ class AuthController extends Controller
             'phone' => 'required|string|max:20|unique:users,phone',
             'password' => 'required|string|min:6',
             'role' => 'required|in:volunteer,ngo',
-            // NGO-specific fields (optional during registration, can be filled later)
-            'website'     => 'nullable|string|max:255',
+
+            // NGO fields
+            'website' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'city'         => 'nullable|string|max:255',
-            'country'      => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:255',
             'organizationName' => 'nullable|string|max:255',
             'registrationNumber' => 'nullable|string|max:255',
             'officeLocation' => 'nullable|string|max:255',
@@ -33,7 +35,8 @@ class AuthController extends Controller
             'registrationFile' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
             'panFile' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
             'letterhead' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png',
-            // Volunteer-specific fields
+
+            // Volunteer field
             'location' => 'nullable|string|max:255',
         ]);
 
@@ -47,48 +50,66 @@ class AuthController extends Controller
                 'role' => $validated['role'],
             ]);
 
-            // If Volunteer → create profile
+            // Volunteer profile
             if ($validated['role'] === 'volunteer') {
+
                 $user->volunteerProfile()->create([
                     'bio' => null,
-                    'skills' => [],
-                    'primary_location' => $request->input('location'),
+                    'primary_location' => $validated['location'] ?? null,
+                    'availability' => 'Available',
+                    'trust_score' => 0.5,
+                    'reliability_score' => 0,
+                    'total_service_hours' => 0,
+                    'average_rating' => 0,
                 ]);
             }
 
-            // If NGO → create profile
+            // NGO profile
             if ($validated['role'] === 'ngo') {
-                // Handle file uploads
-                $registrationFilePath = null;
-                $panFilePath = null;
-                $letterheadFilePath = null;
 
+                // Store uploaded files (optional)
                 if ($request->hasFile('registrationFile')) {
-                    $registrationFilePath = $request->file('registrationFile')->store('ngo-documents', 'public');
+                    $request->file('registrationFile')
+                            ->store('ngo-documents', 'public');
                 }
 
                 if ($request->hasFile('panFile')) {
-                    $panFilePath = $request->file('panFile')->store('ngo-documents', 'public');
+                    $request->file('panFile')
+                            ->store('ngo-documents', 'public');
                 }
 
                 if ($request->hasFile('letterhead')) {
-                    $letterheadFilePath = $request->file('letterhead')->store('ngo-documents', 'public');
+                    $request->file('letterhead')
+                            ->store('ngo-documents', 'public');
                 }
 
                 $user->ngoProfile()->create([
-                    'organization_name' => $validated['name'],
-                    'registration_number' => $request->input('registrationNumber'),
-                    'office_location' => $request->input('officeLocation'),
-                    'website'     => $request->input('website'),
-                    'description' => $request->input('description'),
-                    'city'         => $request->input('city'),
-                    'country'      => $request->input('country'),
-                    'pan_number' => $request->input('panNumber'),
-                    'registration_file_path' => $registrationFilePath,
-                    'pan_file_path' => $panFilePath,
-                    'letterhead_file_path' => $letterheadFilePath,
-                    'is_verified' => false,
-                    'status' => 'pending',
+                    'organization_name' =>
+                        $request->input('organizationName')
+                        ?? $validated['name'],
+
+                    'registration_number' =>
+                        $request->input('registrationNumber'),
+
+                    'office_location' =>
+                        $request->input('officeLocation'),
+
+                    'website' =>
+                        $request->input('website'),
+
+                    'description' =>
+                        $request->input('description'),
+
+                    'city' =>
+                        $request->input('city'),
+
+                    'country' =>
+                        $request->input('country'),
+
+                    'pan_number' =>
+                        $request->input('panNumber'),
+
+                    'verification_status' => 'pending',
                 ]);
             }
 
@@ -111,6 +132,7 @@ class AuthController extends Controller
             ],
         ], 201);
     }
+
 
     // =========================
     // LOGIN

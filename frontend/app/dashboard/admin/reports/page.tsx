@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { apiGet } from "@/app/lib/api";
 
 type Report = {
   id: number;
   reported_by: number;
   against_user_id: number | null;
-  opportunity_id: number | null;
+  task_id: number | null;
   reason: string;
-  status: "open" | "reviewing" | "resolved" | "rejected";
+  status: "open" | "reviewed" | "resolved" | "rejected";
   created_at: string;
 };
 
@@ -24,7 +25,7 @@ const COLORS = {
 
 const statusColors: Record<string, string> = {
   open: "#EF4444",
-  reviewing: COLORS.softSection,
+  reviewed: COLORS.softSection,
   resolved: "#22C55E",
   rejected: COLORS.textSecondary,
 };
@@ -33,15 +34,19 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/reports")
-      .then((res) => res.json())
-      .then((data) => {
-        setReports(data);
+    apiGet<{ data: Report[] }>('/api/admin/reports')
+      .then((res) => {
+        const data = res.data ?? res;
+        setReports(Array.isArray(data) ? data : []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setError(err.message || 'Failed to load reports');
+        setLoading(false);
+      });
   }, []);
 
   const filtered =
@@ -62,9 +67,15 @@ export default function ReportsPage() {
         Complaints and reports submitted by users
       </p>
 
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-5 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+
       {/* Filter tabs */}
       <div className="flex gap-2 mb-5">
-        {["all", "open", "reviewing", "resolved", "rejected"].map((s) => (
+        {["all", "open", "reviewed", "resolved", "rejected"].map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}

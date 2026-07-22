@@ -75,13 +75,6 @@ const Navbar = () => {
           </Link> */}
 
           <Link
-            href="/badges"
-            className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
-          >
-            Badges
-          </Link>
-
-          <Link
             href="/about"
             className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
           >
@@ -148,14 +141,6 @@ const Navbar = () => {
           <div className="flex flex-col gap-3">
 
             
-
-            <Link
-              href="/badges"
-              onClick={() => setMobileOpen(false)}
-              className="text-sm font-medium text-muted-foreground"
-            >
-              Badges
-            </Link>
 
             {mounted && isAuthenticated && user ? (
               <>

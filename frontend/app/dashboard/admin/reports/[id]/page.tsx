@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiGet, apiPut } from "@/app/lib/api";
 
 type ReportDetail = {
   id: number;
   reported_by: number;
   against_user_id: number | null;
-  opportunity_id: number | null;
+  task_id: number | null;
   reason: string;
-  status: "open" | "reviewing" | "resolved" | "rejected";
+  status: "open" | "reviewed" | "resolved" | "rejected";
   resolved_by: number | null;
   resolved_at: string | null;
   resolution_notes: string | null;
@@ -34,28 +35,38 @@ export default function ReportDetailPage({
   const [report, setReport] = useState<ReportDetail | null>(null);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/reports/${params.id}`)
-      .then((res) => res.json())
-      .then(setReport);
+    apiGet<{ data: ReportDetail }>(`/api/admin/reports/${params.id}`)
+      .then((res) => {
+        const data = res.data ?? res;
+        setReport(Array.isArray(data) ? data[0] : data);
+      })
+      .catch((err) => setError(err.message || 'Failed to load report'));
   }, [params.id]);
 
-  const updateStatus = async (status: "resolved" | "rejected" | "reviewing") => {
+  const updateStatus = async (status: "resolved" | "rejected" | "reviewed") => {
     setSubmitting(true);
-    await fetch(`/api/reports/${params.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, resolution_notes: notes }),
-    });
-    setSubmitting(false);
-    router.push("/dashboard/admin/reports");
+    setError(null);
+    try {
+      await apiPut(`/api/admin/reports/${params.id}`, {
+        status,
+        resolution_notes: notes,
+      });
+      router.push("/dashboard/admin/reports");
+    } catch (err: any) {
+      setError(err.message || 'Failed to update report');
+      setSubmitting(false);
+    }
   };
 
   if (!report) {
     return (
       <div style={{ background: COLORS.background, minHeight: "100vh" }} className="p-6">
-        <p style={{ color: COLORS.textSecondary }}>Loading report...</p>
+        <p style={{ color: COLORS.textSecondary }}>
+          {error || "Loading report..."}
+        </p>
       </div>
     );
   }
@@ -69,6 +80,12 @@ export default function ReportDetailPage({
       >
         ← Back to Reports
       </button>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
 
       <div
         className="rounded-lg p-6 max-w-2xl"
@@ -84,7 +101,7 @@ export default function ReportDetailPage({
               background:
                 report.status === "open"
                   ? "#EF4444"
-                  : report.status === "reviewing"
+                  : report.status === "reviewed"
                   ? COLORS.softSection
                   : report.status === "resolved"
                   ? "#22C55E"
@@ -111,9 +128,9 @@ export default function ReportDetailPage({
             </p>
           </div>
           <div>
-            <p style={{ color: COLORS.textSecondary }} className="text-xs mb-1">Opportunity</p>
+            <p style={{ color: COLORS.textSecondary }} className="text-xs mb-1">Task</p>
             <p style={{ color: COLORS.textPrimary }} className="text-sm">
-              {report.opportunity_id ? `#${report.opportunity_id}` : "—"}
+              {report.task_id ? `#${report.task_id}` : "—"}
             </p>
           </div>
           <div>
@@ -174,7 +191,7 @@ export default function ReportDetailPage({
             <div className="flex gap-3">
               <button
                 disabled={submitting}
-                onClick={() => updateStatus("reviewing")}
+                onClick={() => updateStatus("reviewed")}
                 className="px-4 py-2 rounded-md text-sm font-medium"
                 style={{
                   background: "#fff",
@@ -182,7 +199,7 @@ export default function ReportDetailPage({
                   border: `1px solid ${COLORS.border}`,
                 }}
               >
-                Mark as Reviewing
+                Mark as Reviewed
               </button>
               <button
                 disabled={submitting}

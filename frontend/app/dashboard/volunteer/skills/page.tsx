@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
+import { apiGet, apiPost, apiDelete, apiUpload, apiCall } from "@/app/lib/api";
 
 // ---------- Design tokens ----------
 const COLORS = {
@@ -29,6 +30,8 @@ interface Document {
   remarks: string | null;
   created_at: string;
   file_name?: string;
+  original_name?: string;
+  expires_at?: string | null;
 }
 
 // ---------- Small icon set (inline SVG, no external deps) ----------
@@ -113,6 +116,14 @@ function IconTrash({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
+function IconDownload({ className = "h-5 w-5" }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+}
+
 // Document-type-aware file icon (used in the table, replaces the emoji)
 function IconDocFile({ type, className = "h-5 w-5" }: { type: Document["document_type"]; className?: string }) {
   if (type === "certificate") {
@@ -173,25 +184,8 @@ export default function VolunteerSkillsPage() {
   // ---------- Data fetching (skills) ----------
   const fetchSkills = useCallback(async () => {
     try {
-      /*
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/skills`
-      );
-      const data = await response.json();
+      const data = await apiGet<any>("/skills");
       setSkills(data.data);
-      */
-      setSkills([
-        { id: 1, name: "First Aid" },
-        { id: 2, name: "Teaching" },
-        { id: 3, name: "Disaster Response" },
-        { id: 4, name: "Community Outreach" },
-        { id: 5, name: "Fundraising" },
-        { id: 6, name: "Counseling" },
-        { id: 7, name: "Event Management" },
-        { id: 8, name: "Leadership" },
-        { id: 9, name: "Project Management" },
-        { id: 10, name: "Public Speaking" },
-      ]);
     } catch (err) {
       setError("Failed to load available skills.");
       console.error(err);
@@ -200,15 +194,8 @@ export default function VolunteerSkillsPage() {
 
   const fetchVolunteerSkills = useCallback(async () => {
     try {
-      /*
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/volunteer/skills`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      const data = await response.json();
-      setSelectedSkills(data.data.map((item: any) => item.skill_id));
-      */
-      setSelectedSkills([1, 3, 4]);
+      const data = await apiGet<any>("/volunteer/skills");
+      setSelectedSkills(data.data.map((item: any) => item.id));
     } catch (err) {
       setError("Failed to load your saved skills.");
       console.error(err);
@@ -220,34 +207,8 @@ export default function VolunteerSkillsPage() {
   // ---------- Documents fetching ----------
   const fetchDocuments = useCallback(async () => {
     try {
-      /*
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/documents`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      const data = await response.json();
+      const data = await apiGet<any>("/volunteer/documents");
       setDocuments(data.data);
-      */
-      setDocuments([
-        {
-          id: 1,
-          document_type: "citizenship",
-          file_path: "/uploads/citizenship.jpg",
-          status: "approved",
-          remarks: "Verified",
-          created_at: "2025-01-15T10:00:00Z",
-          file_name: "citizenship_john_doe.jpg",
-        },
-        {
-          id: 2,
-          document_type: "certificate",
-          file_path: "/uploads/certificate.pdf",
-          status: "pending",
-          remarks: null,
-          created_at: "2025-02-20T14:30:00Z",
-          file_name: "first_aid_certificate.pdf",
-        },
-      ]);
     } catch (err) {
       setDocError("Failed to load your documents.");
       console.error(err);
@@ -281,17 +242,7 @@ export default function VolunteerSkillsPage() {
     setError(null);
     setSuccessMessage(null);
     try {
-      /*
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/volunteer/skills`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ skill_ids: selectedSkills }),
-      });
-      */
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await apiPost("/volunteer/skills", { skill_ids: selectedSkills });
       setSuccessMessage("Skills updated successfully!");
     } catch (err) {
       setError("Failed to save skills. Please try again.");
@@ -344,33 +295,12 @@ export default function VolunteerSkillsPage() {
     setDocError(null);
     setDocSuccess(null);
     try {
-      /*
       const formData = new FormData();
       formData.append("document", selectedFile);
       formData.append("document_type", documentType);
       formData.append("remarks", uploadRemarks);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/documents`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          body: formData,
-        }
-      );
-      const data = await response.json();
+      const data = await apiUpload<any>("/volunteer/documents", formData);
       setDocuments((prev) => [data.data, ...prev]);
-      */
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-      const newDoc: Document = {
-        id: Date.now(),
-        document_type: documentType,
-        file_path: `/uploads/${selectedFile.name}`,
-        status: "pending",
-        remarks: uploadRemarks || null,
-        created_at: new Date().toISOString(),
-        file_name: selectedFile.name,
-      };
-      setDocuments((prev) => [newDoc, ...prev]);
       setDocSuccess("Document uploaded successfully!");
       setSelectedFile(null);
       setDocumentType("other");
@@ -384,10 +314,47 @@ export default function VolunteerSkillsPage() {
     }
   }, [selectedFile, documentType, uploadRemarks]);
 
-  const removeDocument = useCallback((id: number) => {
-    // Optimistically remove from UI; you could also call DELETE API
-    setDocuments((prev) => prev.filter((doc) => doc.id !== id));
-    setDocSuccess("Document removed.");
+  const removeDocument = useCallback(async (id: number) => {
+    try {
+      await apiDelete(`/volunteer/documents/${id}`);
+      setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+      setDocSuccess("Document removed.");
+    } catch (err) {
+      setDocError("Failed to remove document.");
+      console.error(err);
+    }
+  }, []);
+
+  const downloadDocument = useCallback(async (doc: Document) => {
+    try {
+      const response = await apiCall(`/volunteer/documents/${doc.id}`);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = doc.original_name || doc.file_name || "document";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setDocError("Failed to download document.");
+      console.error(err);
+    }
+  }, []);
+
+  const isDocExpired = useCallback((doc: Document): boolean => {
+    if (!doc.expires_at) return false;
+    return new Date(doc.expires_at) < new Date();
+  }, []);
+
+  const handleReplaceDocument = useCallback((doc: Document) => {
+    setDocumentType(doc.document_type);
+    setUploadRemarks("Replacement for expired document");
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   // ---------- Loading skeletons ----------
@@ -767,7 +734,7 @@ export default function VolunteerSkillsPage() {
                 <table className="min-w-full divide-y" style={{ borderColor: COLORS.border }}>
                   <thead>
                     <tr>
-                      {["File", "Type", "Status", "Remarks", "Uploaded", ""].map((h, i) => (
+                      {["File", "Type", "Status", "Expiry", "Remarks", "Uploaded", ""].map((h, i) => (
                         <th
                           key={i}
                           className={`px-4 py-3 text-xs font-medium uppercase tracking-wider ${
@@ -781,19 +748,22 @@ export default function VolunteerSkillsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y" style={{ borderColor: COLORS.border }}>
-                    {documents.map((doc) => (
+                    {documents.map((doc) => {
+                      const expired = isDocExpired(doc);
+                      return (
                       <tr
                         key={doc.id}
                         className="transition-colors"
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${COLORS.soft}1A`)}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                        style={expired ? { backgroundColor: "#FEF2F2", opacity: 0.9 } : {}}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = expired ? "#FEE2E2" : `${COLORS.soft}1A`)}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = expired ? "#FEF2F2" : "transparent")}
                       >
                         <td className="px-4 py-3 text-sm" style={{ color: COLORS.textPrimary }}>
                           <span className="flex items-center gap-2 truncate max-w-[180px]">
                             <span style={{ color: COLORS.textSecondary }} className="flex-shrink-0">
                               <IconDocFile type={doc.document_type} className="h-4 w-4" />
                             </span>
-                            {doc.file_name || doc.file_path.split("/").pop()}
+                            {doc.original_name || doc.file_name || doc.file_path.split("/").pop()}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm capitalize" style={{ color: COLORS.textPrimary }}>
@@ -812,6 +782,14 @@ export default function VolunteerSkillsPage() {
                           >
                             {doc.status}
                           </span>
+                          {expired && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium" style={{ backgroundColor: "#FEE2E2", color: "#B91C1C" }}>
+                              Expired
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-sm" style={{ color: COLORS.textSecondary }}>
+                          {doc.expires_at ? new Date(doc.expires_at).toLocaleDateString() : "—"}
                         </td>
                         <td className="px-4 py-3 text-sm" style={{ color: COLORS.textSecondary }}>
                           {doc.remarks || "—"}
@@ -820,17 +798,42 @@ export default function VolunteerSkillsPage() {
                           {new Date(doc.created_at).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() => removeDocument(doc.id)}
-                            className="transition-colors hover:opacity-70"
-                            style={{ color: "#F87171" }}
-                            aria-label="Remove document"
-                          >
-                            <IconTrash className="h-5 w-5" />
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => downloadDocument(doc)}
+                              className="transition-colors hover:opacity-70"
+                              style={{ color: "#4F46C8" }}
+                              aria-label="Download document"
+                              title="Download"
+                            >
+                              <IconDownload className="h-4 w-4" />
+                            </button>
+                            {expired && (
+                              <button
+                                onClick={() => handleReplaceDocument(doc)}
+                                className="text-xs font-medium px-2 py-1 rounded transition-colors"
+                                style={{ backgroundColor: "#EEF0FF", color: "#4F46C8" }}
+                                title="Replace expired document"
+                              >
+                                Replace
+                              </button>
+                            )}
+                            {doc.status === "pending" && (
+                              <button
+                                onClick={() => removeDocument(doc.id)}
+                                className="transition-colors hover:opacity-70"
+                                style={{ color: "#F87171" }}
+                                aria-label="Remove document"
+                                title="Remove"
+                              >
+                                <IconTrash className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
