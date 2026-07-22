@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
   const role = request.cookies.get('role')?.value;
   const { pathname } = request.nextUrl;
 
-  const authPages = ['/login', '/login/volunteer', '/login/ngo', '/signup', '/signup/volunteer-register', '/signup/ngo-register'];
+  const isAuthPage = pathname === '/login' || pathname.startsWith('/login/') ||
+                     pathname === '/signup' || pathname.startsWith('/signup/');
 
   // Logged-in users shouldn't see login/signup pages
-  if (token && authPages.includes(pathname)) {
+  if (token && isAuthPage) {
     if (role === 'volunteer') {
       return NextResponse.redirect(new URL('/dashboard/volunteer', request.url));
     }
@@ -20,6 +21,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // Protect dashboard routes
   if (pathname.startsWith('/dashboard')) {
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
@@ -50,7 +52,6 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Configure which routes to run middleware on
 export const config = {
   matcher: ['/dashboard/:path*', '/login', '/login/:path*', '/signup', '/signup/:path*'],
 };

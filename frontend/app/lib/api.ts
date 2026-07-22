@@ -164,6 +164,40 @@ export async function apiDelete<T>(endpoint: string) {
 }
 
 /**
+ * Upload a file via multipart/form-data (POST)
+ * Does NOT set Content-Type so the browser adds the correct multipart boundary
+ */
+export async function apiUpload<T>(endpoint: string, formData: FormData) {
+  const token = localStorage.getItem("authToken");
+
+  const headers: Record<string, string> = {};
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const resolvedEndpoint = resolveApiEndpoint(endpoint);
+
+  const response = await fetch(`${API_URL}${resolvedEndpoint}`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
+
+  if (response.status === 403) {
+    window.location.href = "/unauthorized";
+  }
+
+  return parseResponse<T>(response);
+}
+
+/**
  * Health check - test if backend is running
  */
 export async function checkBackendHealth() {

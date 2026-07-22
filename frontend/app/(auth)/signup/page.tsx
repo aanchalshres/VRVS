@@ -97,8 +97,11 @@ const Signup = () => {
             // IMPORTANT: Also set in cookies so middleware can see it
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + 7); // 7 days
-            document.cookie = `authToken=${encodeURIComponent(token)}; path=/; expires=${expiryDate.toUTCString()}`;
-            document.cookie = `user=${encodeURIComponent(JSON.stringify(user))}; path=/; expires=${expiryDate.toUTCString()}`;
+            document.cookie = `token=${encodeURIComponent(token)}; path=/; expires=${expiryDate.toUTCString()}`;
+            document.cookie = `role=${encodeURIComponent(user.role)}; path=/; expires=${expiryDate.toUTCString()}`;
+            
+            // Notify AuthProvider of auth change immediately
+            window.dispatchEvent(new CustomEvent("auth-updated"));
             
             router.replace("/dashboard/volunteer");
           } else {
@@ -162,17 +165,16 @@ const Signup = () => {
             localStorage.setItem("user", JSON.stringify(user));
             
             // IMPORTANT: Set cookies for middleware
-            document.cookie = `token=${token}; path=/`;
-            document.cookie = `role=${user.role}; path=/`;
+            const expiry = new Date();
+            expiry.setDate(expiry.getDate() + 7);
+            document.cookie = `token=${token}; path=/; expires=${expiry.toUTCString()}`;
+            document.cookie = `role=${user.role}; path=/; expires=${expiry.toUTCString()}`;
             
             // Notify AuthProvider of auth change immediately
             window.dispatchEvent(new CustomEvent("auth-updated"));
             
             const redirectPath = role === "volunteer" ? "/dashboard/volunteer" : "/dashboard/ngo";
-            
-            setTimeout(() => {
-              router.replace(redirectPath);
-            }, 100);
+            router.replace(redirectPath);
           } else {
             setError(data.message || "Registration failed");
           }
