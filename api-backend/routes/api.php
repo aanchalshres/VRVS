@@ -51,6 +51,9 @@ use App\Http\Controllers\Volunteer\RatingController as VolunteerRatingController
 use App\Http\Controllers\Volunteer\CertificateController as VolunteerCertificateController;
 use App\Http\Controllers\Volunteer\WorkflowController as VolunteerWorkflowController;
 
+use App\Http\Controllers\IdentityVerification\VerificationController as IdentityVerificationController;
+use App\Http\Controllers\IdentityVerification\AdminVerificationController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -1296,6 +1299,36 @@ Route::middleware([
 
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Identity Verification Routes (Volunteer)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:sanctum', 'role:volunteer'])->prefix('volunteer/identity-verification')->group(function () {
+    Route::post('/start', [IdentityVerificationController::class, 'start']);
+    Route::post('/upload-document', [IdentityVerificationController::class, 'uploadDocument']);
+    Route::post('/upload-selfie', [IdentityVerificationController::class, 'uploadSelfie']);
+    Route::post('/submit', [IdentityVerificationController::class, 'submit']);
+    Route::get('/status/{id}', [IdentityVerificationController::class, 'status']);
+    Route::get('/history', [IdentityVerificationController::class, 'history']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Identity Verification Routes (Admin)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin/identity-verification')->group(function () {
+    Route::get('/', [AdminVerificationController::class, 'index']);
+    Route::get('/pending', [AdminVerificationController::class, 'pending']);
+    Route::get('/stats', [AdminVerificationController::class, 'stats']);
+    Route::get('/{id}', [AdminVerificationController::class, 'show']);
+    Route::post('/{id}/approve', [AdminVerificationController::class, 'approve']);
+    Route::post('/{id}/reject', [AdminVerificationController::class, 'reject']);
+});
 
 /*
 |--------------------------------------------------------------------------
