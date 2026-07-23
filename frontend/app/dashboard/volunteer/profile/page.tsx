@@ -192,6 +192,91 @@ function IconClock({ className = "h-5 w-5" }: { className?: string }) {
   );
 }
 
+function TrustScoreCard() {
+  const [trustData, setTrustData] = useState<{ trust_score: number; components: Record<string, number>; updated_at: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiGet<any>("/volunteer/trust/score");
+        setTrustData(res.data);
+      } catch {
+        setTrustData(null);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const getScoreColor = (score: number) => {
+    if (score >= 0.8) return "text-green-600";
+    if (score >= 0.6) return "text-yellow-600";
+    if (score >= 0.4) return "text-orange-600";
+    return "text-red-600";
+  };
+
+  const getScoreBg = (score: number) => {
+    if (score >= 0.8) return "bg-green-100";
+    if (score >= 0.6) return "bg-yellow-100";
+    if (score >= 0.4) return "bg-orange-100";
+    return "bg-red-100";
+  };
+
+  const componentLabels: Record<string, string> = {
+    attendance: "Attendance", completion: "Completion", ratings: "Ratings",
+    verification: "Verification", response_rate: "Response Rate", account_activity: "Activity",
+    penalties: "Penalties",
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-[#CACDD3] p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-base font-semibold text-[#111827]">Trust Score</h2>
+        <a href="/dashboard/volunteer/trust-history" className="text-xs text-[#4F46C8] hover:text-[#4338CA] font-medium">
+          View History &rarr;
+        </a>
+      </div>
+      {loading ? (
+        <div className="h-24 flex items-center justify-center">
+          <span className="w-5 h-5 border-2 border-[#4F46C8]/30 border-t-[#4F46C8] rounded-full animate-spin" />
+        </div>
+      ) : !trustData ? (
+        <p className="text-sm text-[#6B7280]">Trust score unavailable</p>
+      ) : (
+        <div className="space-y-4">
+          <div className={`flex items-center gap-3 ${getScoreBg(trustData.trust_score)} rounded-lg p-4`}>
+            <span className={`text-3xl font-bold ${getScoreColor(trustData.trust_score)}`}>
+              {Math.round(trustData.trust_score * 100)}
+            </span>
+            <div>
+              <p className={`text-sm font-semibold ${getScoreColor(trustData.trust_score)}`}>
+                {trustData.trust_score >= 0.8 ? "Excellent" : trustData.trust_score >= 0.6 ? "Good" : trustData.trust_score >= 0.4 ? "Fair" : "Low"}
+              </p>
+              <p className="text-xs text-[#6B7280]">out of 100</p>
+            </div>
+          </div>
+          {Object.entries(trustData.components).map(([key, value]) => (
+            <div key={key}>
+              <div className="flex justify-between text-xs mb-1">
+                <span className="text-[#6B7280] capitalize">{componentLabels[key] || key}</span>
+                <span className="font-medium text-[#111827]">{Math.round((value as number) * 100)}</span>
+              </div>
+              <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full rounded-full transition-all duration-300"
+                  style={{
+                    width: `${Math.min(100, Math.max(0, (value as number) * 100))}%`,
+                    backgroundColor: key === "penalties" ? "#EF4444" : "#4F46C8",
+                  }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function VolunteerProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<VolunteerProfile | null>(null);
@@ -641,6 +726,9 @@ export default function VolunteerProfilePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Trust Score */}
+              <TrustScoreCard />
 
               {/* Profile Actions */}
               <div className="bg-white rounded-xl border border-[#CACDD3] p-6">

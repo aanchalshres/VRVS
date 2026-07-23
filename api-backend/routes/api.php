@@ -51,6 +51,11 @@ use App\Http\Controllers\Volunteer\RatingController as VolunteerRatingController
 use App\Http\Controllers\Volunteer\CertificateController as VolunteerCertificateController;
 use App\Http\Controllers\Volunteer\WorkflowController as VolunteerWorkflowController;
 
+use App\Http\Controllers\Attendance\VolunteerAttendanceController as SecureAttendanceController;
+use App\Http\Controllers\Attendance\NgoAttendanceController as SecureNgoAttendanceController;
+
+use App\Http\Controllers\TrustScoreController;
+
 use App\Http\Controllers\IdentityVerification\VerificationController as IdentityVerificationController;
 use App\Http\Controllers\IdentityVerification\AdminVerificationController;
 
@@ -676,6 +681,32 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
+    | Trust Score Management
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/admin/trust/volunteer/{id}',
+        [TrustScoreController::class, 'show']
+    );
+
+    Route::post(
+        '/admin/trust/volunteer/{id}/recalculate',
+        [TrustScoreController::class, 'adminRecalculate']
+    );
+
+    Route::post(
+        '/admin/trust/recalculate-all',
+        [TrustScoreController::class, 'adminRecalculateAll']
+    );
+
+    Route::get(
+        '/admin/trust/volunteer/{profileId}/history',
+        [TrustScoreController::class, 'adminHistory']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
     | Activity Log
     |--------------------------------------------------------------------------
     */
@@ -906,6 +937,26 @@ Route::post(
 Route::get(
     '/ngo/attendance/summary',
     [NgoAttendanceController::class, 'summary']
+);
+
+Route::post(
+    '/ngo/attendance/generate-qr',
+    [SecureNgoAttendanceController::class, 'generateQr']
+);
+
+Route::get(
+    '/ngo/attendance/qr-codes',
+    [SecureNgoAttendanceController::class, 'listQrCodes']
+);
+
+Route::delete(
+    '/ngo/attendance/qr-codes/{id}',
+    [SecureNgoAttendanceController::class, 'revokeQr']
+);
+
+Route::get(
+    '/ngo/attendance/analytics',
+    [SecureNgoAttendanceController::class, 'analytics']
 );
 
 
@@ -1217,6 +1268,43 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
+    | Secure Attendance Verification (QR + GPS)
+    |--------------------------------------------------------------------------
+    */
+
+    Route::post(
+        '/volunteer/attendance/validate-qr',
+        [SecureAttendanceController::class, 'validateQr']
+    );
+
+    Route::post(
+        '/volunteer/attendance/secure-check-in',
+        [SecureAttendanceController::class, 'checkIn']
+    );
+
+    Route::post(
+        '/volunteer/attendance/secure-check-out',
+        [SecureAttendanceController::class, 'checkOut']
+    );
+
+    Route::get(
+        '/volunteer/attendance/status',
+        [SecureAttendanceController::class, 'status']
+    );
+
+    Route::get(
+        '/volunteer/attendance/secure-history',
+        [SecureAttendanceController::class, 'history']
+    );
+
+    Route::get(
+        '/volunteer/attendance/analytics',
+        [SecureAttendanceController::class, 'analytics']
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Ratings & Feedback
     |--------------------------------------------------------------------------
     */
@@ -1283,6 +1371,32 @@ Route::middleware([
 
     /*
     |--------------------------------------------------------------------------
+    | Trust Score
+    |--------------------------------------------------------------------------
+    */
+
+    Route::get(
+        '/volunteer/trust/score',
+        [TrustScoreController::class, 'myScore']
+    );
+
+    Route::get(
+        '/volunteer/trust/breakdown',
+        [TrustScoreController::class, 'breakdown']
+    );
+
+    Route::get(
+        '/volunteer/trust/history',
+        [TrustScoreController::class, 'myHistory']
+    );
+
+    Route::post(
+        '/volunteer/trust/recalculate',
+        [TrustScoreController::class, 'recalculate']
+    );
+
+    /*
+    |--------------------------------------------------------------------------
     | Workflow Automation
     |--------------------------------------------------------------------------
     */
@@ -1345,3 +1459,42 @@ Route::get(
     '/tasks/{id}/tfidf',
     [TfIdfController::class, 'showTask']
 );
+
+/*
+|--------------------------------------------------------------------------
+| Certificate Authentication Routes
+|--------------------------------------------------------------------------
+*/
+
+use App\Http\Controllers\CertificateAuthController;
+
+// Public verification (no auth required)
+Route::get('/verify-certificate', [CertificateAuthController::class, 'publicVerify']);
+
+// Volunteer certificate auth
+Route::middleware(['auth:sanctum', 'role:volunteer'])->prefix('volunteer')->group(function () {
+    Route::get('/certificates/{id}/verify', [CertificateAuthController::class, 'verifyById']);
+    Route::get('/certificates/{id}/status', [CertificateAuthController::class, 'status']);
+    Route::get('/certificates/{id}/qr', [CertificateAuthController::class, 'qrCode']);
+    Route::get('/certificates/{id}/auth-status', [CertificateAuthController::class, 'history']);
+});
+
+// NGO certificate auth
+Route::middleware(['auth:sanctum', 'role:ngo'])->prefix('ngo')->group(function () {
+    Route::post('/certificates/{id}/setup-auth', [CertificateAuthController::class, 'setupAuthentication']);
+    Route::get('/certificates/{id}/verify', [CertificateAuthController::class, 'verifyById']);
+    Route::get('/certificates/{id}/qr', [CertificateAuthController::class, 'qrCode']);
+    Route::get('/certificates/{id}/auth-status', [CertificateAuthController::class, 'history']);
+});
+
+// Admin certificate auth
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/certificates/{id}/verify', [CertificateAuthController::class, 'verifyById']);
+    Route::get('/certificates/{id}/status', [CertificateAuthController::class, 'status']);
+    Route::post('/certificates/{id}/revoke', [CertificateAuthController::class, 'revoke']);
+    Route::post('/certificates/{id}/restore', [CertificateAuthController::class, 'restore']);
+    Route::get('/certificates/{id}/verification-history', [CertificateAuthController::class, 'history']);
+    Route::get('/certificates/{id}/qr', [CertificateAuthController::class, 'qrCode']);
+    Route::post('/certificates/{id}/setup-auth', [CertificateAuthController::class, 'setupAuthentication']);
+    Route::get('/certificates/auth-analytics', [CertificateAuthController::class, 'analytics']);
+});

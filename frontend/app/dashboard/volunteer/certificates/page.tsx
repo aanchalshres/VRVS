@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { apiGet } from "@/app/lib/api"
 import {
-  Award, Download, Eye, X,
-  CheckCircle, AlertCircle,
+  Award, Download, Eye, X, ShieldCheck, Shield,
+  CheckCircle, AlertCircle, QrCode
 } from 'lucide-react'
+import Link from 'next/link'
 
 interface Certificate {
   id: number
@@ -29,12 +30,23 @@ export default function VolunteerCertificatesPage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [preview, setPreview] = useState<{ html: string; number: string } | null>(null)
   const [downloading, setDownloading] = useState<number | null>(null)
+  const [authStatuses, setAuthStatuses] = useState<Record<number, string>>({})
 
   const loadCerts = async () => {
     setLoading(true)
     try {
       const res = await apiGet<{ data: Certificate[] }>('/volunteer/certificates')
-      setCertificates(res.data ?? [])
+      const certs = res.data ?? []
+      setCertificates(certs)
+
+      const statuses: Record<number, string> = {}
+      await Promise.all(certs.slice(0, 20).map(async (c: Certificate) => {
+        try {
+          const authRes = await apiGet<any>(`/volunteer/certificates/${c.id}/auth-status`)
+          statuses[c.id] = authRes.data?.is_revoked ? 'revoked' : authRes.data?.status || 'unknown'
+        } catch { statuses[c.id] = 'unknown' }
+      }))
+      setAuthStatuses(statuses)
     } catch {
       setToast({ message: 'Failed to load certificates.', type: 'error' })
     } finally {
@@ -80,7 +92,6 @@ export default function VolunteerCertificatesPage() {
 
   return (
     <div className="min-h-screen bg-[#F0F1F3] p-6">
-
       {toast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
           <div className={`flex items-center gap-3 px-5 py-3 rounded-xl shadow-lg border text-sm font-medium ${
@@ -97,7 +108,7 @@ export default function VolunteerCertificatesPage() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-[#111827]">My Certificates</h1>
-          <p className="text-sm text-[#6B7280] mt-1">View and download your earned certificates.</p>
+          <p className="text-sm text-[#6B7280] mt-1">View, download, and verify your earned certificates.</p>
         </div>
 
         {loading ? (
@@ -108,33 +119,44 @@ export default function VolunteerCertificatesPage() {
           <div className="bg-white border border-dashed border-[#CACDD3] rounded-2xl p-12 text-center shadow-sm">
             <Award className="mx-auto h-12 w-12 text-[#6B7280]" />
             <p className="text-[#111827] font-semibold mt-3">No certificates yet</p>
-            <p className="text-[#6B7280] text-sm mt-1">
-              Complete tasks to earn certificates from NGOs.
-            </p>
+            <p className="text-[#6B7280] text-sm mt-1">Complete tasks to earn certificates from NGOs.</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {certificates.map((cert) => {
               const content = cert.content || {}
+              const authStatus = authStatuses[cert.id]
               return (
-                <div
-                  key={cert.id}
-                  className="bg-white rounded-2xl border border-[#CACDD3] p-5 shadow-sm hover:border-[#4F46C8]/40 transition"
+                <Link key={cert.id}
+                  href={`/dashboard/volunteer/certificates/${cert.id}`}
+                  className="bg-white rounded-2xl border border-[#CACDD3] p-5 shadow-sm hover:border-[#4F46C8]/40 transition block"
                 >
                   <div className="flex items-start gap-3">
                     <div className="h-10 w-10 rounded-full bg-[#4F46C8]/10 flex items-center justify-center shrink-0">
                       <Award className="h-5 w-5 text-[#4F46C8]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[#111827] truncate">
-                        {content.task_title || cert.task?.title || 'Certificate'}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-[#111827] truncate">
+                          {content.task_title || cert.task?.title || 'Certificate'}
+                        </p>
+                        {authStatus === 'active' && (
+                          <span className="shrink-0" title="SHA-256 Authenticated">
+                            <ShieldCheck className="w-4 h-4 text-green-600" />
+                          </span>
+                        )}
+                        {authStatus === 'revoked' && (
+                          <span className="shrink-0" title="Revoked">
+                            <Shield className="w-4 h-4 text-red-600" />
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-[#6B7280] mt-0.5">
                         {content.organization_name || cert.ngo?.organization_name || 'NGO'}
                       </p>
                       <p className="text-xs text-[#6B7280] mt-0.5">
                         {content.hours_contributed > 0 && `${content.hours_contributed} hrs contributed`}
-                        {content.hours_contributed > 0 && ' \u00b7 '}
+                        {content.hours_contributed > 0 && ' · '}
                         Issued: {new Date(cert.issued_at || cert.created_at).toLocaleDateString()}
                       </p>
                       <p className="text-xs text-[#4F46C8] mt-1 font-mono">
@@ -142,28 +164,21 @@ export default function VolunteerCertificatesPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="mt-4 flex gap-2">
-                    <button
-                      onClick={() => handlePreview(cert.id)}
-                      className="flex-1 flex items-center justify-center gap-2 border border-[#CACDD3] hover:bg-gray-50 text-[#111827] py-2 rounded-lg text-sm font-medium transition"
-                    >
-                      <Eye size={16} />
-                      Preview
+                  <div className="mt-4 flex gap-2" onClick={(e) => e.preventDefault()}>
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handlePreview(cert.id); }}
+                      className="flex-1 flex items-center justify-center gap-2 border border-[#CACDD3] hover:bg-gray-50 text-[#111827] py-2 rounded-lg text-sm font-medium transition">
+                      <Eye size={16} /> Preview
                     </button>
-                    <button
-                      onClick={() => handleDownload(cert.id)}
+                    <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownload(cert.id); }}
                       disabled={downloading === cert.id}
-                      className="flex-1 flex items-center justify-center gap-2 bg-[#4F46C8] hover:bg-[#4F46C8]/90 disabled:bg-[#4F46C8]/50 text-white py-2 rounded-lg text-sm font-medium transition"
-                    >
+                      className="flex-1 flex items-center justify-center gap-2 bg-[#4F46C8] hover:bg-[#4F46C8]/90 disabled:bg-[#4F46C8]/50 text-white py-2 rounded-lg text-sm font-medium transition">
                       {downloading === cert.id ? (
                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <Download size={16} />
-                      )}
+                      ) : <Download size={16} />}
                       {downloading === cert.id ? 'Downloading...' : 'Download'}
                     </button>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -175,17 +190,9 @@ export default function VolunteerCertificatesPage() {
           <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-auto shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-[#CACDD3]">
               <p className="font-semibold text-[#111827]">Certificate {preview.number}</p>
-              <button
-                onClick={() => setPreview(null)}
-                className="p-1.5 rounded-lg hover:bg-gray-100"
-              >
-                <X size={18} />
-              </button>
+              <button onClick={() => setPreview(null)} className="p-1.5 rounded-lg hover:bg-gray-100"><X size={18} /></button>
             </div>
-            <div
-              className="p-4"
-              dangerouslySetInnerHTML={{ __html: preview.html }}
-            />
+            <div className="p-4" dangerouslySetInnerHTML={{ __html: preview.html }} />
           </div>
         </div>
       )}

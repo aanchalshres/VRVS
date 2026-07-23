@@ -27,6 +27,7 @@ import {
   BarChart3,
   Tags,
   BookOpen,
+  Shield,
 } from 'lucide-react';
 
 const menuItems = [
@@ -45,6 +46,7 @@ const menuItems = [
   { id: 'categories', label: 'Categories', icon: Tags, href: '/dashboard/admin/categories' },
   { id: 'skills', label: 'Skills', icon: BookOpen, href: '/dashboard/admin/skills' },
   { id: 'activity-log', label: 'Activity Log', icon: Activity, href: '/dashboard/admin/activity-log' },
+  { id: 'trust-management', label: 'Trust Management', icon: Shield, href: '/dashboard/admin/trust-management' },
   { id: 'reports', label: 'Reports', icon: FileText, href: '/dashboard/admin/reports' },
   { id: 'settings', label: 'Settings', icon: Settings, href: '/dashboard/admin/settings' },
 ];

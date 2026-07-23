@@ -24,6 +24,7 @@ const pageConfig: Record<string, string> = {
   '/dashboard/admin/categories': 'Categories',
   '/dashboard/admin/skills': 'Skills',
   '/dashboard/admin/activity-log': 'Activity Log',
+  '/dashboard/admin/trust-management': 'Trust Management',
   '/dashboard/admin/reports': 'Reports',
   '/dashboard/admin/settings': 'Settings',
 };

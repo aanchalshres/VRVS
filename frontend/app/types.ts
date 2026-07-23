@@ -133,3 +133,24 @@ export interface IdentityVerificationStatusResponse {
 export interface IdentityVerificationHistoryResponse {
   data: IdentityVerification[];
 }
+
+// ─── Attendance Verification Types ───
+
+export type ConfidenceLevel = 'high' | 'medium' | 'low' | 'manual_review';
+
+export interface AttendanceLog {
+  id: number;
+  task_id: number;
+  task_title: string;
+  task_ngo: string;
+  status: string;
+  check_in_time: string | null;
+  check_out_time: string | null;
+  hours: number | null;
+  verification_method: string | null;
+  confidence_score: number | null;
+  confidence_level: ConfidenceLevel | null;
+  check_in_distance: number | null;
+  check_out_distance: number | null;
+  created_at: string;
+}
