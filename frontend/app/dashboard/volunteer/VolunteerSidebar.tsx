@@ -16,6 +16,7 @@ import {
   Award,
   Settings,
   Upload,
+  ShieldCheck,
 } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -26,6 +27,7 @@ const menuItems = [
   { name: "My Skills", href: "/dashboard/volunteer/skills", icon: CheckSquare },
   { name: "Profile", href: "/dashboard/volunteer/profile", icon: User },
   { name: "Documents", href: "/dashboard/volunteer/documents", icon: Upload },
+  { name: "Identity Verification", href: "/dashboard/volunteer/verify", icon: ShieldCheck },
   { name: "Participations", href: "/dashboard/volunteer/participations", icon: Users },
   { name: "Ratings", href: "/dashboard/volunteer/ratings", icon: Star },
   { name: "Certificates", href: "/dashboard/volunteer/certificates", icon: Award },
