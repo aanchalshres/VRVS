@@ -13,7 +13,9 @@ class TaskObserver
 
     public function saved(Task $task): void
     {
-        $task->loadMissing(['skills', 'category']);
-        $this->tfidf->generateForTask($task);
+        if ($task->wasChanged(['title', 'description', 'category_id', 'location', 'city', 'country'])) {
+            $task->loadMissing(['skills', 'category']);
+            $this->tfidf->generateForTask($task);
+        }
     }
 }

@@ -42,6 +42,11 @@ class WorkflowController extends Controller
                     ]),
                     'shortlist_rank' => $v->shortlist_rank,
                     'recommendation_score' => $v->recommendation_score,
+                    'semantic_match_score' => $v->semantic_match_score ?? 0,
+                    'skill_overlap_score' => $v->skill_overlap_score ?? 0,
+                    'distance_score' => $v->distance_score ?? 0,
+                    'availability_score' => $v->availability_score ?? 0,
+                    'trust_score' => $v->trust_score ?? 0,
                     'strategy_used' => $v->strategy_used ?? 'recommendation',
                 ];
             }),
@@ -85,6 +90,11 @@ class WorkflowController extends Controller
                     ]),
                     'shortlist_rank' => $v->shortlist_rank,
                     'recommendation_score' => $v->recommendation_score,
+                    'semantic_match_score' => $v->semantic_match_score ?? 0,
+                    'skill_overlap_score' => $v->skill_overlap_score ?? 0,
+                    'distance_score' => $v->distance_score ?? 0,
+                    'availability_score' => $v->availability_score ?? 0,
+                    'trust_score' => $v->trust_score ?? 0,
                     'strategy_score' => $v->strategy_score,
                     'strategy_used' => $v->strategy_used,
                 ];

@@ -8,10 +8,7 @@ class TrustFirstStrategy implements RankingStrategyInterface
 {
     public function getWeights(): array
     {
-        return config('workflow.strategies.trust_first.weights', [
-            'semantic' => 0.15, 'distance' => 0.10, 'skill' => 0.15,
-            'availability' => 0.10, 'trust' => 0.50,
-        ]);
+        return config('workflow.strategies.trust_first.weights');
     }
 
     public function calculateScore(array $scores): float

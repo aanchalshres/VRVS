@@ -13,7 +13,9 @@ class VolunteerProfileObserver
 
     public function saved(VolunteerProfile $profile): void
     {
-        $profile->loadMissing('skills');
-        $this->tfidf->generateForVolunteer($profile);
+        if ($profile->wasChanged(['bio', 'primary_location', 'city', 'country'])) {
+            $profile->loadMissing('skills');
+            $this->tfidf->generateForVolunteer($profile);
+        }
     }
 }

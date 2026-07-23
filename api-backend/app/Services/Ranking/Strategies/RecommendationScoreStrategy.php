@@ -8,10 +8,7 @@ class RecommendationScoreStrategy implements RankingStrategyInterface
 {
     public function getWeights(): array
     {
-        return config('workflow.strategies.recommendation.weights', [
-            'semantic' => 0.30, 'distance' => 0.20, 'skill' => 0.20,
-            'availability' => 0.10, 'trust' => 0.20,
-        ]);
+        return config('workflow.strategies.recommendation.weights');
     }
 
     public function calculateScore(array $scores): float

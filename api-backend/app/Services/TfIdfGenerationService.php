@@ -8,25 +8,49 @@ use App\Models\VolunteerProfile;
 
 class TfIdfGenerationService
 {
+    private array $generationCache = [];
+
     public function __construct(
         private TfIdfVectorizer $vectorizer,
     ) {}
 
     public function generateForVolunteer(VolunteerProfile $profile): void
     {
+        $cacheKey = 'volunteer:' . $profile->id;
+
+        if (isset($this->generationCache[$cacheKey])) {
+            $profile->updateQuietly(['tfidf_vector' => $this->generationCache[$cacheKey]]);
+            return;
+        }
+
         $text = $this->extractVolunteerText($profile);
 
+        $vector = $this->computeVector($profile->id, $text);
+
+        $this->generationCache[$cacheKey] = $vector;
+
         $profile->updateQuietly([
-            'tfidf_vector' => $this->computeVector($profile->id, $text),
+            'tfidf_vector' => $vector,
         ]);
     }
 
     public function generateForTask(Task $task): void
     {
+        $cacheKey = 'task:' . $task->id;
+
+        if (isset($this->generationCache[$cacheKey])) {
+            $task->updateQuietly(['tfidf_vector' => $this->generationCache[$cacheKey]]);
+            return;
+        }
+
         $text = $this->extractTaskText($task);
 
+        $vector = $this->computeVector($task->id, $text);
+
+        $this->generationCache[$cacheKey] = $vector;
+
         $task->updateQuietly([
-            'tfidf_vector' => $this->computeVector($task->id, $text),
+            'tfidf_vector' => $vector,
         ]);
     }
 

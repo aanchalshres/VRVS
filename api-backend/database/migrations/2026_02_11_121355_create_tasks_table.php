@@ -20,7 +20,7 @@ return new class extends Migration
     $table->string('slug')->unique();
     $table->text('description')->nullable();
     $table->enum('task_type', ['Event', 'Emergency', 'Campaign', 'Task']); // event, emergency, campaign, task
-    $table->enum('selection_logic', ['FCFS', 'Weighted']);
+    $table->enum('selection_logic', ['FCFS', 'Weighted', 'recommendation']);
     $table->text('location')->nullable();
     $table->string('city')->nullable();
     $table->string('country')->nullable();

@@ -15,33 +15,15 @@ class RecalculateTrustScores extends Command
     {
         if ($volunteerId = $this->option('volunteer')) {
             $profile = VolunteerProfile::findOrFail($volunteerId);
-            $result = $trustService->calculateForVolunteer($profile);
+            $fresh = $trustService->recalculate($profile);
 
-            $profile->updateQuietly([
-                'trust_score' => $result['final_score'],
-                'trust_score_components' => $result['components'],
-                'trust_updated_at' => now(),
-            ]);
-
-            $this->info("Trust score recalculated for volunteer #{$volunteerId}: {$result['final_score']}");
-            $this->line(json_encode($result['components'], JSON_PRETTY_PRINT));
+            $this->info("Trust score recalculated for volunteer #{$volunteerId}: {$fresh->trust_score}");
+            $this->line(json_encode($fresh->trust_score_components, JSON_PRETTY_PRINT));
 
             return Command::SUCCESS;
         }
 
-        $count = 0;
-        VolunteerProfile::chunk(100, function ($profiles) use ($trustService, &$count) {
-            foreach ($profiles as $profile) {
-                $result = $trustService->calculateForVolunteer($profile);
-
-                $profile->updateQuietly([
-                    'trust_score' => $result['final_score'],
-                    'trust_score_components' => $result['components'],
-                    'trust_updated_at' => now(),
-                ]);
-                $count++;
-            }
-        });
+        $count = $trustService->recalculateAll();
 
         $this->info("Recalculated trust scores for {$count} volunteers.");
 

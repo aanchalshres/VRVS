@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Services;
+declare(strict_types=1);
 
-class HungarianMatcher
+namespace App\Algorithms\Assignment;
+
+use App\Algorithms\Contracts\AssignmentSolverInterface;
+
+class HungarianMatcher implements AssignmentSolverInterface
 {
-   
     public function solve(array $costMatrix): array
     {
         $n    = count($costMatrix);
@@ -66,25 +69,5 @@ class HungarianMatcher
         }
 
         return $result;
-    }
-
-    /**
-     * Build cost matrix from scores.
-     * cost = 1 - finalScore (Hungarian minimizes, we want to maximize score)
-     */
-    public function buildCostMatrix(array $volunteers, array $tasks, callable $scoreFn): array
-    {
-        $matrix = [];
-
-        foreach ($volunteers as $i => $volunteer) {
-            $row = [];
-            foreach ($tasks as $j => $task) {
-                $score   = $scoreFn($volunteer, $task); // 0–1
-                $row[$j] = round(1 - $score, 6);        // invert: low cost = high score
-            }
-            $matrix[$i] = $row;
-        }
-
-        return $matrix;
     }
 }

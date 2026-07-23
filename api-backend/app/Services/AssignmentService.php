@@ -1,20 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\Algorithms\Contracts\AssignmentSolverInterface;
 use App\Models\Application;
 use App\Models\Task;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AssignmentService
 {
     public function __construct(
         private MatchingService $matchingService,
         private AssignmentSolverInterface $solver,
-        private ApplicationService $applicationService,
     ) {}
 
+    /**
+     * @param int[] $applicationIds
+     * @param int[] $taskIds
+     * @return array<int, array{application_id: int, volunteer_id: int, volunteer_name: ?string, task_id: int, task_title: string, match_score: float, status: string, assigned_at: string}>
+     */
     public function batchAssign(array $applicationIds, array $taskIds): array
     {
         $applications = Application::whereIn('id', $applicationIds)
@@ -26,7 +33,7 @@ class AssignmentService
             ->get();
 
         $volunteers = $applications
-            ->map(fn ($application) => $application->volunteer)
+            ->map(fn (Application $application) => $application->volunteer)
             ->filter()
             ->values();
 
@@ -34,7 +41,6 @@ class AssignmentService
             return [];
         }
 
-        // Build the cost matrix using MatchingService
         $costMatrix = [];
 
         foreach ($volunteers as $i => $volunteer) {
@@ -42,12 +48,10 @@ class AssignmentService
                 $score = $this->matchingService
                     ->calculateVolunteerTaskScore($volunteer, $task);
 
-                // Hungarian minimizes cost
                 $costMatrix[$i][$j] = 1 - $score;
             }
         }
 
-        // Hungarian requires square matrix
         $size = max(count($volunteers), count($tasks));
 
         for ($i = 0; $i < $size; $i++) {
@@ -58,32 +62,62 @@ class AssignmentService
 
         $assignments = $this->solver->solve($costMatrix);
 
-        $result = [];
+        try {
+            DB::beginTransaction();
 
-        foreach ($assignments as $volunteerIndex => $taskIndex) {
+            $result = [];
 
-            $volunteer = $volunteers[$volunteerIndex] ?? null;
-            $task = $tasks[$taskIndex] ?? null;
+            foreach ($assignments as $volunteerIndex => $taskIndex) {
+                $volunteer = $volunteers[$volunteerIndex] ?? null;
+                $task = $tasks[$taskIndex] ?? null;
 
-            if (!$volunteer || !$task) {
-                continue;
+                if (!$volunteer || !$task) {
+                    continue;
+                }
+
+                $matchingApplication = $applications->first(
+                    fn (Application $app) => $app->volunteer_profile_id === $volunteer->id
+                        && $app->task_id === $task->id
+                );
+
+                if (!$matchingApplication) {
+                    continue;
+                }
+
+                $matchingApplication->updateOrFail([
+                    'status' => 'Accepted',
+                    'reviewed_at' => now(),
+                ]);
+
+                $matchScore = round(1 - $costMatrix[$volunteerIndex][$taskIndex], 3);
+
+                $result[] = [
+                    'application_id'   => $matchingApplication->id,
+                    'volunteer_id'     => $volunteer->id,
+                    'volunteer_name'   => $volunteer->user->name ?? null,
+                    'task_id'          => $task->id,
+                    'task_title'       => $task->title,
+                    'match_score'      => $matchScore,
+                    'status'           => 'Accepted',
+                    'assigned_at'      => now()->toIso8601String(),
+                ];
             }
 
-            // Leave commented until ApplicationService::accept() exists
-            // $this->applicationService->accept($volunteer, $task);
+            DB::commit();
 
-            $result[] = [
-                'volunteer_id'   => $volunteer->id,
-                'volunteer_name' => $volunteer->user->name ?? null,
-                'task_id'        => $task->id,
-                'task_title'     => $task->title,
-                'score'          => round(
-                    1 - $costMatrix[$volunteerIndex][$taskIndex],
-                    3
-                ),
-            ];
+            return $result;
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            Log::error('Batch assignment failed', [
+                'application_ids' => $applicationIds,
+                'task_ids'        => $taskIds,
+                'error'           => $e->getMessage(),
+                'trace'           => $e->getTraceAsString(),
+            ]);
+
+            throw $e;
         }
-
-        return $result;
     }
 }

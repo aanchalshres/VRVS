@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Collection;
 
 class RecommendationService
 {
+    private array $trustScoreCache = [];
+    private array $scoreCache = [];
+
     public function __construct(
         private SimilarityCalculatorInterface $similarity,
         private HaversineDistance $distance,
@@ -20,6 +23,12 @@ class RecommendationService
         VolunteerProfile $volunteer,
         Task $task
     ): array {
+        $cacheKey = $volunteer->id . ':' . $task->id;
+
+        if (isset($this->scoreCache[$cacheKey])) {
+            return $this->scoreCache[$cacheKey];
+        }
+
         $volunteer->loadMissing('skills');
         $task->loadMissing('skills');
 
@@ -37,7 +46,7 @@ class RecommendationService
             $trustScore
         );
 
-        return [
+        return $this->scoreCache[$cacheKey] = [
             'recommendation_score' => round($finalScore * 100, 1),
             'semantic_match_score' => round($semanticScore, 4),
             'distance_score' => round($distanceScore, 4),
@@ -64,14 +73,20 @@ class RecommendationService
 
     public function getTrustScore(VolunteerProfile $volunteer): float
     {
+        $id = $volunteer->id;
+
+        if (isset($this->trustScoreCache[$id])) {
+            return $this->trustScoreCache[$id];
+        }
+
         if (
             !$volunteer->trust_updated_at ||
             $volunteer->trust_updated_at->diffInHours(now()) > 1
         ) {
-            $this->trustService->recalculate($volunteer);
+            $volunteer = $this->trustService->recalculate($volunteer);
         }
 
-        return $volunteer->fresh()->trust_score ?? 0.5;
+        return $this->trustScoreCache[$id] = $volunteer->trust_score ?? 0.5;
     }
 
     public function rankVolunteersForTask(Task $task): Collection
@@ -278,10 +293,7 @@ class RecommendationService
         float $availability,
         float $trust
     ): float {
-        $w = config('workflow.strategies.recommendation.weights', [
-            'semantic' => 0.30, 'distance' => 0.20, 'skill' => 0.20,
-            'availability' => 0.10, 'trust' => 0.20,
-        ]);
+        $w = config('workflow.strategies.recommendation.weights');
 
         return min(1.0, max(0.01,
             ($w['semantic'] * $semantic) +

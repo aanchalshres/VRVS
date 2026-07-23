@@ -25,10 +25,16 @@ class WorkflowService
 
         $shortlisted = $volunteers->take($limit);
 
+        $upsertData = [];
+        $shortlistRanks = [];
+        $strategyScores = [];
         $shortlistData = [];
         $rank = 1;
+        $now = now();
 
         foreach ($shortlisted as $volunteer) {
+            $currentRank = $rank++;
+
             $scores = [
                 'semantic_match_score' => $volunteer->semantic_match_score ?? 0,
                 'distance_score' => $volunteer->distance_score ?? 0,
@@ -39,44 +45,37 @@ class WorkflowService
 
             $strategyScore = $this->ranker->score($scores, $strategy);
 
-            Shortlist::updateOrCreate(
-                [
-                    'task_id' => $task->id,
-                    'volunteer_profile_id' => $volunteer->id,
-                ],
-                [
-                    'recommendation_score' => $volunteer->recommendation_score,
-                    'semantic_match_score' => $volunteer->semantic_match_score ?? 0,
-                    'distance_score' => $volunteer->distance_score ?? 0,
-                    'skill_overlap_score' => $volunteer->skill_overlap_score ?? 0,
-                    'availability_score' => $volunteer->availability_score ?? 0,
-                    'trust_score' => $volunteer->trust_score ?? 0.5,
-                    'strategy_used' => $strategy,
-                    'rank' => $rank++,
-                ]
-            );
+            $upsertData[] = [
+                'task_id' => $task->id,
+                'volunteer_profile_id' => $volunteer->id,
+                'recommendation_score' => $volunteer->recommendation_score,
+                'semantic_match_score' => $volunteer->semantic_match_score ?? 0,
+                'distance_score' => $volunteer->distance_score ?? 0,
+                'skill_overlap_score' => $volunteer->skill_overlap_score ?? 0,
+                'availability_score' => $volunteer->availability_score ?? 0,
+                'trust_score' => $volunteer->trust_score ?? 0.5,
+                'strategy_used' => $strategy,
+                'rank' => $currentRank,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
 
+            $shortlistRanks[$volunteer->id] = $currentRank;
+            $strategyScores[$volunteer->id] = $strategyScore;
             $shortlistData[] = $volunteer;
         }
+
+        Shortlist::upsert($upsertData, ['task_id', 'volunteer_profile_id']);
 
         Shortlist::where('task_id', $task->id)
             ->whereNotIn('volunteer_profile_id', $shortlisted->pluck('id'))
             ->delete();
 
         $result = new Collection($shortlistData);
-        $result->each(function ($v) use ($strategy) {
-            $scores = [
-                'semantic_match_score' => $v->semantic_match_score ?? 0,
-                'distance_score' => $v->distance_score ?? 0,
-                'skill_overlap_score' => $v->skill_overlap_score ?? 0,
-                'availability_score' => $v->availability_score ?? 0,
-                'trust_score' => $v->trust_score ?? 0.5,
-            ];
-            $v->strategy_score = round($this->ranker->score($scores, $strategy) * 100, 1);
+        $result->each(function ($v) use ($strategy, $shortlistRanks, $strategyScores) {
+            $v->strategy_score = round(($strategyScores[$v->id] ?? 0) * 100, 1);
             $v->strategy_used = $strategy;
-            $v->shortlist_rank = Shortlist::where('task_id', $task->id)
-                ->where('volunteer_profile_id', $v->id)
-                ->value('rank');
+            $v->shortlist_rank = $shortlistRanks[$v->id] ?? null;
         });
 
         return $result->sortBy('shortlist_rank')->values();

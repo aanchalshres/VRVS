@@ -6,6 +6,7 @@ use App\Models\Application;
 use App\Models\Document;
 use App\Models\ServiceLog;
 use App\Models\VolunteerProfile;
+use Illuminate\Support\Facades\DB;
 
 class TrustScoreService implements \App\Algorithms\Contracts\TrustCalculatorInterface
 {
@@ -57,10 +58,13 @@ class TrustScoreService implements \App\Algorithms\Contracts\TrustCalculatorInte
     {
         $result = $this->calculateForVolunteer($profile);
 
-        $profile->updateQuietly([
-            'trust_score' => $result['final_score'],
-            'trust_updated_at' => now(),
-        ]);
+        DB::transaction(function () use ($profile, $result) {
+            $profile->updateQuietly([
+                'trust_score' => $result['final_score'],
+                'trust_score_components' => $result['components'],
+                'trust_updated_at' => now(),
+            ]);
+        });
 
         return $profile->fresh();
     }

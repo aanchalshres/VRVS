@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { apiGet, apiPost } from "@/app/lib/api";
 import { useRouter } from 'next/navigation'
+import { RecommendationScores, getOverallScore, generateExplanation, getMatchColor, formatScore } from '@/app/lib/scoring'
 import {
   MapPin, Users, Layers, Inbox, Send,
   CheckCircle, AlertCircle, Eye, Search, X,
@@ -278,6 +279,38 @@ export default function VolunteerTasksPage() {
                           {skill.name || skill}
                         </span>
                       ))}
+                    </div>
+                  )}
+
+                  {(task.recommendation_score || task.match_score) && (
+                    <div className="mt-3 pt-3 border-t border-[#E5E7EB]">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-medium text-[#6B7280]">Match Score</span>
+                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${getMatchColor(getOverallScore(task as RecommendationScores))}`}>
+                          {getOverallScore(task as RecommendationScores)}%
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-5 gap-1 text-center">
+                        {[
+                          { label: 'Semantic', value: task.semantic_match_score },
+                          { label: 'Skills', value: task.skill_overlap_score },
+                          { label: 'Distance', value: task.distance_score },
+                          { label: 'Avail.', value: task.availability_score },
+                          { label: 'Trust', value: task.trust_score },
+                        ].map((s) => (
+                          <div key={s.label} className="text-[10px] text-[#6B7280]">
+                            <div className="font-semibold text-[#111827]">{formatScore(s.value)}%</div>
+                            <div>{s.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {generateExplanation(task as RecommendationScores).map((reason, i) => (
+                          <span key={i} className="text-[10px] bg-[#4F46C8]/10 text-[#4F46C8] px-1.5 py-0.5 rounded-full">
+                            {reason}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
 
