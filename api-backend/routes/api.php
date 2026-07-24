@@ -1498,3 +1498,36 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     Route::post('/certificates/{id}/setup-auth', [CertificateAuthController::class, 'setupAuthentication']);
     Route::get('/certificates/auth-analytics', [CertificateAuthController::class, 'analytics']);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Schedule Conflict Detection Routes
+|--------------------------------------------------------------------------
+*/
+
+use App\Http\Controllers\ScheduleConflictController;
+
+// Volunteer schedule and conflict check
+Route::middleware(['auth:sanctum', 'role:volunteer'])->prefix('volunteer')->group(function () {
+    Route::get('/schedule', [ScheduleConflictController::class, 'mySchedule']);
+    Route::get('/schedule/commitments', [ScheduleConflictController::class, 'myCommitments']);
+    Route::post('/schedule/check-before-apply', [ScheduleConflictController::class, 'checkBeforeApply']);
+    Route::get('/schedule/conflicts', [ScheduleConflictController::class, 'mySchedule']);
+});
+
+// NGO schedule and conflict check
+Route::middleware(['auth:sanctum', 'role:ngo'])->prefix('ngo')->group(function () {
+    Route::post('/schedule/check-conflict', [ScheduleConflictController::class, 'ngoCheckConflict']);
+    Route::get('/schedule/volunteer/{profileId}', [ScheduleConflictController::class, 'ngoVolunteerSchedule']);
+});
+
+// Admin schedule conflict management
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/schedule/conflicts', [ScheduleConflictController::class, 'adminAllConflicts']);
+    Route::post('/schedule/conflicts/{id}/resolve', [ScheduleConflictController::class, 'adminResolveConflict']);
+    Route::get('/schedule/analytics', [ScheduleConflictController::class, 'adminAnalytics']);
+    Route::post('/schedule/validate-assignment', [ScheduleConflictController::class, 'adminValidateAssignment']);
+});
+
+// Public Schedule Check (minimal info, no auth needed for basic task check)
+Route::get('/schedule/check/{volunteerProfileId}/task/{taskId}', [ScheduleConflictController::class, 'checkTaskConflict']);

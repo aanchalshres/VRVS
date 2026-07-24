@@ -18,6 +18,7 @@ import {
   BarChart3,
   Star,
   Award,
+  Calendar,
 } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -32,6 +33,7 @@ const menuItems = [
   { name: "Reports", href: "/dashboard/ngo/reports", icon: BarChart3 },
   { name: "Ratings", href: "/dashboard/ngo/ratings", icon: Star },
   { name: "Certificates", href: "/dashboard/ngo/certificates", icon: Award },
+  { name: "Schedule", href: "/dashboard/ngo/schedule", icon: Calendar },
   { name: "Notifications", href: "/dashboard/ngo/notifications", icon: Bell },
   { name: "Profile", href: "/dashboard/ngo/profile", icon: User },
 ];

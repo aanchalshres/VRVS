@@ -20,6 +20,7 @@ const pageConfig: Record<string, string> = {
   '/dashboard/admin/reviews': 'Ratings & Reviews',
   '/dashboard/admin/notifications': 'Notifications',
   '/dashboard/admin/admin-users': 'Admin Users',
+  '/dashboard/admin/schedule-conflicts': 'Schedule Conflicts',
   '/dashboard/admin/analytics': 'Analytics',
   '/dashboard/admin/categories': 'Categories',
   '/dashboard/admin/skills': 'Skills',
